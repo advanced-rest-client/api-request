@@ -1,0 +1,25 @@
+#%RAML 1.0 DataType
+displayName: "CheckAPIStatusResponse"
+description: "A dataType used to form a response to the resuable check API status endpoint."
+type: object
+properties: 
+  status:
+    description: "The current status of the API."
+    displayName: "Status"
+    type: string
+  apiName:
+    description: "The current name of the API."
+    displayName: "API-Name"
+    type: string    
+  apiVersion:
+    description: "The fully qualified version number of the API."
+    displayName: "API-Version"
+    type: string
+  serverHost: 
+    description: "The host of the server where the application is currently deployed."
+    displayName: "Server Host"
+    type: string
+  currentTime:
+    description: "The current system time of the API."
+    displayName: "Current Time"
+    type: datetime

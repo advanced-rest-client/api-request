@@ -1,0 +1,3830 @@
+{
+  "@id": "./",
+  "@type": [
+    "doc:Fragment",
+    "doc:Module",
+    "doc:Document",
+    "doc:Unit"
+  ],
+  "doc:declares": [
+    {
+      "@id": "#51"
+    },
+    {
+      "@id": "#25"
+    },
+    {
+      "@id": "#5"
+    },
+    {
+      "@id": "#114"
+    },
+    {
+      "@id": "#33"
+    },
+    {
+      "@id": "#23"
+    },
+    {
+      "@id": "#46"
+    },
+    {
+      "@id": "#55"
+    },
+    {
+      "@id": "#72"
+    },
+    {
+      "@id": "#143"
+    },
+    {
+      "@id": "#91"
+    },
+    {
+      "@id": "#3"
+    },
+    {
+      "@id": "#27"
+    },
+    {
+      "@id": "#49"
+    },
+    {
+      "@id": "#1"
+    },
+    {
+      "@id": "#147"
+    },
+    {
+      "@id": "#135"
+    }
+  ],
+  "doc:encodes": {
+    "@id": "#150",
+    "@type": [
+      "schema-org:WebAPI",
+      "doc:RootDomainElement"
+    ],
+    "amf://id#27": {
+      "@id": "#472",
+      "@type": "http://a.ml/vocabularies/data#Object",
+      "http://a.ml/vocabularies/data#description": {
+        "@id": "#473",
+        "@type": "http://a.ml/vocabularies/data#Scalar",
+        "http://a.ml/vocabularies/data#value": "Find out more about Swagger"
+      },
+      "http://a.ml/vocabularies/data#url": {
+        "@id": "#474",
+        "@type": "http://a.ml/vocabularies/data#Scalar",
+        "http://a.ml/vocabularies/data#value": "http://swagger.io"
+      }
+    },
+    "amf://id#33": {
+      "@id": "#455",
+      "@type": [
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+        "http://a.ml/vocabularies/data#Array"
+      ],
+      "http://a.ml/vocabularies/data#pos0": {
+        "@id": "#456"
+      },
+      "http://a.ml/vocabularies/data#pos1": {
+        "@id": "#462"
+      },
+      "http://a.ml/vocabularies/data#pos2": {
+        "@id": "#465"
+      },
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": [
+        {
+          "@id": "#465",
+          "@type": "http://a.ml/vocabularies/data#Object",
+          "http://a.ml/vocabularies/data#description": {
+            "@id": "#466",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Operations about user"
+          },
+          "http://a.ml/vocabularies/data#externalDocs": {
+            "@id": "#467",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#468",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Find out more about our store"
+            },
+            "http://a.ml/vocabularies/data#url": {
+              "@id": "#469",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "http://swagger.io"
+            }
+          },
+          "http://a.ml/vocabularies/data#name": {
+            "@id": "#470",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "user"
+          }
+        },
+        {
+          "@id": "#462",
+          "@type": "http://a.ml/vocabularies/data#Object",
+          "http://a.ml/vocabularies/data#description": {
+            "@id": "#463",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Access to Petstore orders"
+          },
+          "http://a.ml/vocabularies/data#name": {
+            "@id": "#464",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "store"
+          }
+        },
+        {
+          "@id": "#456",
+          "@type": "http://a.ml/vocabularies/data#Object",
+          "http://a.ml/vocabularies/data#description": {
+            "@id": "#457",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Everything about your Pets"
+          },
+          "http://a.ml/vocabularies/data#externalDocs": {
+            "@id": "#458",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#459",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Find out more"
+            },
+            "http://a.ml/vocabularies/data#url": {
+              "@id": "#460",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "http://swagger.io"
+            }
+          },
+          "http://a.ml/vocabularies/data#name": {
+            "@id": "#461",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "pet"
+          }
+        }
+      ]
+    },
+    "amf://id#5": {
+      "@id": "#476",
+      "@type": "http://a.ml/vocabularies/data#Object",
+      "http://a.ml/vocabularies/data#contact": {
+        "@id": "#477",
+        "@type": "http://a.ml/vocabularies/data#Object",
+        "http://a.ml/vocabularies/data#email": {
+          "@id": "#478",
+          "@type": "http://a.ml/vocabularies/data#Scalar",
+          "http://a.ml/vocabularies/data#value": "apiteam@swagger.io"
+        }
+      },
+      "http://a.ml/vocabularies/data#license": {
+        "@id": "#479",
+        "@type": "http://a.ml/vocabularies/data#Object",
+        "http://a.ml/vocabularies/data#name": {
+          "@id": "#480",
+          "@type": "http://a.ml/vocabularies/data#Scalar",
+          "http://a.ml/vocabularies/data#value": "Apache 2.0"
+        },
+        "http://a.ml/vocabularies/data#url": {
+          "@id": "#481",
+          "@type": "http://a.ml/vocabularies/data#Scalar",
+          "http://a.ml/vocabularies/data#value": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+      },
+      "http://a.ml/vocabularies/data#termsOfService": {
+        "@id": "#482",
+        "@type": "http://a.ml/vocabularies/data#Scalar",
+        "http://a.ml/vocabularies/data#value": "http://swagger.io/terms/"
+      }
+    },
+    "doc:customDomainProperties": [
+      {
+        "@id": "#27",
+        "@type": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+          "doc:DomainProperty"
+        ],
+        "doc:name": "oas-externalDocs",
+        "raml-shapes:schema": {
+          "@id": "#28",
+          "@type": [
+            "doc:DomainElement",
+            "raml-shapes:Shape",
+            "shacl:Shape",
+            "shacl:NodeShape"
+          ],
+          "shacl:closed": false,
+          "shacl:name": "schema",
+          "shacl:property": [
+            {
+              "@id": "#31",
+              "@type": "shacl:PropertyShape",
+              "raml-shapes:range": {
+                "@id": "#32",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ScalarShape"
+                ],
+                "shacl:datatype": {
+                  "@id": "http://www.w3.org/2001/XMLSchema#string"
+                },
+                "shacl:name": "url"
+              },
+              "shacl:minCount": 1,
+              "shacl:name": "url",
+              "shacl:path": {
+                "@id": "http://a.ml/vocabularies/data#url"
+              }
+            },
+            {
+              "@id": "#29",
+              "@type": "shacl:PropertyShape",
+              "raml-shapes:range": {
+                "@id": "#30",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ScalarShape"
+                ],
+                "shacl:datatype": {
+                  "@id": "http://www.w3.org/2001/XMLSchema#string"
+                },
+                "shacl:name": "description?"
+              },
+              "shacl:minCount": 0,
+              "shacl:name": "description",
+              "shacl:path": {
+                "@id": "http://a.ml/vocabularies/data#description"
+              }
+            }
+          ]
+        },
+        "http://www.w3.org/2000/01/rdf-schema#domain": [
+          {
+            "@id": "shacl:Shape"
+          },
+          {
+            "@id": "hydra:Operation"
+          },
+          {
+            "@id": "http:WebAPI"
+          }
+        ]
+      },
+      {
+        "@id": "#33",
+        "@type": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+          "doc:DomainProperty"
+        ],
+        "doc:name": "oas-tags-definition",
+        "raml-shapes:schema": {
+          "@id": "#34",
+          "@type": [
+            "doc:DomainElement",
+            "raml-shapes:Shape",
+            "shacl:Shape",
+            "raml-shapes:ArrayShape"
+          ],
+          "raml-shapes:items": {
+            "@id": "#35",
+            "@type": [
+              "doc:DomainElement",
+              "raml-shapes:Shape",
+              "shacl:Shape",
+              "shacl:NodeShape"
+            ],
+            "shacl:closed": false,
+            "shacl:name": "items",
+            "shacl:property": [
+              {
+                "@id": "#40",
+                "@type": "shacl:PropertyShape",
+                "raml-shapes:range": {
+                  "@id": "#41",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "shacl:NodeShape"
+                  ],
+                  "shacl:closed": false,
+                  "shacl:name": "externalDocs?",
+                  "shacl:property": [
+                    {
+                      "@id": "#44",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#45",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "description?"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "description",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#description"
+                      }
+                    },
+                    {
+                      "@id": "#42",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#43",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "url"
+                      },
+                      "shacl:minCount": 1,
+                      "shacl:name": "url",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#url"
+                      }
+                    }
+                  ]
+                },
+                "shacl:minCount": 0,
+                "shacl:name": "externalDocs",
+                "shacl:path": {
+                  "@id": "http://a.ml/vocabularies/data#externalDocs"
+                }
+              },
+              {
+                "@id": "#38",
+                "@type": "shacl:PropertyShape",
+                "raml-shapes:range": {
+                  "@id": "#39",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "description?"
+                },
+                "shacl:minCount": 0,
+                "shacl:name": "description",
+                "shacl:path": {
+                  "@id": "http://a.ml/vocabularies/data#description"
+                }
+              },
+              {
+                "@id": "#36",
+                "@type": "shacl:PropertyShape",
+                "raml-shapes:range": {
+                  "@id": "#37",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "name"
+                },
+                "shacl:minCount": 1,
+                "shacl:name": "name",
+                "shacl:path": {
+                  "@id": "http://a.ml/vocabularies/data#name"
+                }
+              }
+            ]
+          },
+          "shacl:name": "schema"
+        },
+        "http://www.w3.org/2000/01/rdf-schema#domain": {
+          "@id": "http:WebAPI"
+        }
+      },
+      {
+        "@id": "#5",
+        "@type": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+          "doc:DomainProperty"
+        ],
+        "doc:name": "oas-info",
+        "raml-shapes:schema": {
+          "@id": "#6",
+          "@type": [
+            "doc:DomainElement",
+            "raml-shapes:Shape",
+            "shacl:Shape",
+            "shacl:NodeShape"
+          ],
+          "shacl:closed": false,
+          "shacl:name": "schema",
+          "shacl:property": [
+            {
+              "@id": "#17",
+              "@type": "shacl:PropertyShape",
+              "raml-shapes:range": {
+                "@id": "#18",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "shacl:NodeShape"
+                ],
+                "shacl:closed": false,
+                "shacl:name": "license?",
+                "shacl:property": [
+                  {
+                    "@id": "#21",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#22",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "url?"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "url",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#url"
+                    }
+                  },
+                  {
+                    "@id": "#19",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#20",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "name?"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "name",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#name"
+                    }
+                  }
+                ]
+              },
+              "shacl:minCount": 0,
+              "shacl:name": "license",
+              "shacl:path": {
+                "@id": "http://a.ml/vocabularies/data#license"
+              }
+            },
+            {
+              "@id": "#9",
+              "@type": "shacl:PropertyShape",
+              "raml-shapes:range": {
+                "@id": "#10",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "shacl:NodeShape"
+                ],
+                "shacl:closed": false,
+                "shacl:name": "contact?",
+                "shacl:property": [
+                  {
+                    "@id": "#15",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#16",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "email?"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "email",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#email"
+                    }
+                  },
+                  {
+                    "@id": "#13",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#14",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "url?"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "url",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#url"
+                    }
+                  },
+                  {
+                    "@id": "#11",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#12",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "name?"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "name",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#name"
+                    }
+                  }
+                ]
+              },
+              "shacl:minCount": 0,
+              "shacl:name": "contact",
+              "shacl:path": {
+                "@id": "http://a.ml/vocabularies/data#contact"
+              }
+            },
+            {
+              "@id": "#7",
+              "@type": "shacl:PropertyShape",
+              "raml-shapes:range": {
+                "@id": "#8",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ScalarShape"
+                ],
+                "shacl:datatype": {
+                  "@id": "http://www.w3.org/2001/XMLSchema#string"
+                },
+                "shacl:name": "termsOfService?"
+              },
+              "shacl:minCount": 0,
+              "shacl:name": "termsOfService",
+              "shacl:path": {
+                "@id": "http://a.ml/vocabularies/data#termsOfService"
+              }
+            }
+          ]
+        },
+        "http://www.w3.org/2000/01/rdf-schema#domain": {
+          "@id": "http:WebAPI"
+        }
+      }
+    ],
+    "http:endpoint": [
+      {
+        "@id": "#200",
+        "@type": "http:EndPoint",
+        "http:path": "/user",
+        "hydra:supportedOperation": {
+          "@id": "#201",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#207",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Create user"
+          },
+          "amf://id#46": {
+            "@id": "#212",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#213"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#213",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "user"
+            }
+          },
+          "amf://id#49": {
+            "@id": "#209",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#210",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "successful operation"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#46"
+            },
+            {
+              "@id": "#49"
+            },
+            {
+              "@id": "#3"
+            }
+          ],
+          "schema-org:description": "This can only be done by the logged in user.",
+          "schema-org:name": "createUser",
+          "hydra:expects": {
+            "@id": "#202",
+            "@type": "http:Request",
+            "http:payload": {
+              "@id": "#203",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#204",
+                "@type": [
+                  "raml-shapes:Shape",
+                  "shacl:NodeShape",
+                  "shacl:Shape",
+                  "doc:DomainElement"
+                ],
+                "amf://id#1": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fuser/post/request/application%2Fjson/schema/oas-body-name/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "body"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#1"
+                },
+                "raml-shapes:xmlSerialization": {
+                  "@id": "#108"
+                },
+                "schema-org:description": "Created user object",
+                "shacl:closed": false,
+                "shacl:name": "User",
+                "shacl:property": [
+                  {
+                    "@id": "#98"
+                  },
+                  {
+                    "@id": "#100"
+                  },
+                  {
+                    "@id": "#92"
+                  },
+                  {
+                    "@id": "#102"
+                  },
+                  {
+                    "@id": "#94"
+                  },
+                  {
+                    "@id": "#104"
+                  },
+                  {
+                    "@id": "#96"
+                  },
+                  {
+                    "@id": "#106"
+                  }
+                ]
+              }
+            }
+          },
+          "hydra:method": "post"
+        }
+      },
+      {
+        "@id": "#361",
+        "@type": "http:EndPoint",
+        "http:parameter": {
+          "@id": "#406",
+          "@type": "http:Parameter",
+          "http:binding": "path",
+          "http:paramName": "petId",
+          "http:schema": {
+            "@id": "#407",
+            "@type": [
+              "doc:DomainElement",
+              "raml-shapes:Shape",
+              "shacl:Shape",
+              "raml-shapes:ScalarShape"
+            ],
+            "raml-shapes:format": "int64",
+            "schema-org:description": "ID of pet that needs to be updated",
+            "shacl:datatype": {
+              "@id": "http://www.w3.org/2001/XMLSchema#long"
+            },
+            "shacl:name": "schema"
+          },
+          "schema-org:description": "ID of pet that needs to be updated",
+          "schema-org:name": "petId",
+          "hydra:required": true
+        },
+        "http:path": "/pet/{petId}",
+        "hydra:supportedOperation": [
+          {
+            "@id": "#388",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#398",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Updates a pet in the store with form data"
+            },
+            "amf://id#46": {
+              "@id": "#400",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#401"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#401",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "pet"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#3"
+              },
+              {
+                "@id": "#46"
+              }
+            ],
+            "http://a.ml/vocabularies/security#security": {
+              "@id": "#402",
+              "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+              "http://a.ml/vocabularies/security#name": "petstore_auth",
+              "http://a.ml/vocabularies/security#scheme": {
+                "@id": "#143"
+              },
+              "http://a.ml/vocabularies/security#settings": {
+                "@id": "#403",
+                "@type": [
+                  "http://a.ml/vocabularies/security#Settings",
+                  "http://a.ml/vocabularies/security#OAuth2Settings"
+                ],
+                "http://a.ml/vocabularies/security#scope": [
+                  {
+                    "@id": "#405",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "read:pets"
+                  },
+                  {
+                    "@id": "#404",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "write:pets"
+                  }
+                ]
+              }
+            },
+            "schema-org:name": "updatePetWithForm",
+            "hydra:expects": {
+              "@id": "#389",
+              "@type": "http:Request",
+              "http:payload": {
+                "@id": "#390",
+                "@type": "http:Payload",
+                "http:mediaType": "multipart/form-data",
+                "http:schema": {
+                  "@id": "#391",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "shacl:NodeShape"
+                  ],
+                  "shacl:closed": false,
+                  "shacl:name": "schema",
+                  "shacl:property": [
+                    {
+                      "@id": "#394",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#395",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "schema-org:description": "Updated status of the pet",
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "status"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "status",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#status"
+                      }
+                    },
+                    {
+                      "@id": "#392",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#393",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "schema-org:description": "Updated name of the pet",
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "name"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "name",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#name"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "hydra:method": "post",
+            "hydra:returns": {
+              "@id": "#396",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid input",
+              "schema-org:name": "405",
+              "hydra:statusCode": "405"
+            }
+          },
+          {
+            "@id": "#373",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#380",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Deletes a pet"
+            },
+            "amf://id#46": {
+              "@id": "#382",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#383"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#383",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "pet"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#3"
+              },
+              {
+                "@id": "#46"
+              }
+            ],
+            "http://a.ml/vocabularies/security#security": {
+              "@id": "#384",
+              "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+              "http://a.ml/vocabularies/security#name": "petstore_auth",
+              "http://a.ml/vocabularies/security#scheme": {
+                "@id": "#143"
+              },
+              "http://a.ml/vocabularies/security#settings": {
+                "@id": "#385",
+                "@type": [
+                  "http://a.ml/vocabularies/security#Settings",
+                  "http://a.ml/vocabularies/security#OAuth2Settings"
+                ],
+                "http://a.ml/vocabularies/security#scope": [
+                  {
+                    "@id": "#387",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "read:pets"
+                  },
+                  {
+                    "@id": "#386",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "write:pets"
+                  }
+                ]
+              }
+            },
+            "schema-org:name": "deletePet",
+            "hydra:expects": {
+              "@id": "#374",
+              "@type": "http:Request",
+              "http:header": {
+                "@id": "#375",
+                "@type": "http:Parameter",
+                "http:binding": "header",
+                "http:paramName": "api_key",
+                "http:schema": {
+                  "@id": "#376",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                },
+                "schema-org:name": "api_key",
+                "hydra:required": false
+              }
+            },
+            "hydra:method": "delete",
+            "hydra:returns": [
+              {
+                "@id": "#377",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid ID supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              },
+              {
+                "@id": "#378",
+                "@type": "http:Response",
+                "schema-org:description": "Pet not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              }
+            ]
+          },
+          {
+            "@id": "#362",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#368",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Find pet by ID"
+            },
+            "amf://id#46": {
+              "@id": "#370",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#371"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#371",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "pet"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#46"
+              },
+              {
+                "@id": "#3"
+              }
+            ],
+            "http://a.ml/vocabularies/security#security": {
+              "@id": "#372",
+              "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+              "http://a.ml/vocabularies/security#name": "api_key",
+              "http://a.ml/vocabularies/security#scheme": {
+                "@id": "#147"
+              }
+            },
+            "schema-org:description": "Returns a single pet",
+            "schema-org:name": "getPetById",
+            "hydra:method": "get",
+            "hydra:returns": [
+              {
+                "@id": "#365",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid ID supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              },
+              {
+                "@id": "#363",
+                "@type": "http:Response",
+                "http:payload": {
+                  "@id": "#364",
+                  "@type": "http:Payload",
+                  "http:mediaType": "application/xml",
+                  "http:schema": {
+                    "@id": "#51"
+                  }
+                },
+                "schema-org:description": "successful operation",
+                "schema-org:name": "200",
+                "hydra:statusCode": "200"
+              },
+              {
+                "@id": "#366",
+                "@type": "http:Response",
+                "schema-org:description": "Pet not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@id": "#336",
+        "@type": "http:EndPoint",
+        "http:path": "/pet/findByStatus",
+        "hydra:supportedOperation": {
+          "@id": "#337",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#353",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Finds Pets by status"
+          },
+          "amf://id#46": {
+            "@id": "#355",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#356"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#356",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "pet"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            }
+          ],
+          "http://a.ml/vocabularies/security#security": {
+            "@id": "#357",
+            "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+            "http://a.ml/vocabularies/security#name": "petstore_auth",
+            "http://a.ml/vocabularies/security#scheme": {
+              "@id": "#143"
+            },
+            "http://a.ml/vocabularies/security#settings": {
+              "@id": "#358",
+              "@type": [
+                "http://a.ml/vocabularies/security#Settings",
+                "http://a.ml/vocabularies/security#OAuth2Settings"
+              ],
+              "http://a.ml/vocabularies/security#scope": [
+                {
+                  "@id": "#360",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "read:pets"
+                },
+                {
+                  "@id": "#359",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "write:pets"
+                }
+              ]
+            }
+          },
+          "schema-org:description": "Multiple status values can be provided with comma separated strings",
+          "schema-org:name": "findPetsByStatus",
+          "hydra:expects": {
+            "@id": "#338",
+            "@type": "http:Request",
+            "http:parameter": {
+              "@id": "#339",
+              "@type": "http:Parameter",
+              "amf://id#23": {
+                "@id": "#347",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "multi"
+              },
+              "doc:customDomainProperties": {
+                "@id": "#23"
+              },
+              "http:binding": "query",
+              "http:paramName": "status",
+              "http:schema": {
+                "@id": "#340",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ArrayShape"
+                ],
+                "amf://id#23": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fpet%2FfindByStatus/get/request/parameter/status/array/schema/oas-collectionFormat/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "multi"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#23"
+                },
+                "raml-shapes:items": {
+                  "@id": "#341",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:defaultValue": {
+                    "@id": "#342",
+                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                    "http://a.ml/vocabularies/data#value": "available"
+                  },
+                  "shacl:defaultValueStr": "available",
+                  "shacl:in": {
+                    "@id": "#341/list",
+                    "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                    "http://www.w3.org/2000/01/rdf-schema#_1": {
+                      "@id": "#343",
+                      "@type": "http://a.ml/vocabularies/data#Scalar",
+                      "http://a.ml/vocabularies/data#value": "available"
+                    },
+                    "http://www.w3.org/2000/01/rdf-schema#_2": {
+                      "@id": "#344",
+                      "@type": "http://a.ml/vocabularies/data#Scalar",
+                      "http://a.ml/vocabularies/data#value": "pending"
+                    },
+                    "http://www.w3.org/2000/01/rdf-schema#_3": {
+                      "@id": "#345",
+                      "@type": "http://a.ml/vocabularies/data#Scalar",
+                      "http://a.ml/vocabularies/data#value": "sold"
+                    }
+                  },
+                  "shacl:name": "items"
+                },
+                "schema-org:description": "Status values that need to be considered for filter",
+                "shacl:name": "schema"
+              },
+              "schema-org:description": "Status values that need to be considered for filter",
+              "schema-org:name": "status",
+              "hydra:required": true
+            }
+          },
+          "hydra:method": "get",
+          "hydra:returns": [
+            {
+              "@id": "#351",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid status value",
+              "schema-org:name": "400",
+              "hydra:statusCode": "400"
+            },
+            {
+              "@id": "#348",
+              "@type": "http:Response",
+              "http:payload": {
+                "@id": "#349",
+                "@type": "http:Payload",
+                "http:mediaType": "application/xml",
+                "http:schema": {
+                  "@id": "#350",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ArrayShape"
+                  ],
+                  "raml-shapes:items": {
+                    "@id": "#51"
+                  },
+                  "shacl:name": "schema"
+                }
+              },
+              "schema-org:description": "successful operation",
+              "schema-org:name": "200",
+              "hydra:statusCode": "200"
+            }
+          ]
+        }
+      },
+      {
+        "@id": "#303",
+        "@type": "http:EndPoint",
+        "http:path": "/pet",
+        "hydra:supportedOperation": [
+          {
+            "@id": "#319",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#328",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Update an existing pet"
+            },
+            "amf://id#46": {
+              "@id": "#330",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#331"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#331",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "pet"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#46"
+              },
+              {
+                "@id": "#3"
+              }
+            ],
+            "http://a.ml/vocabularies/security#security": {
+              "@id": "#332",
+              "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+              "http://a.ml/vocabularies/security#name": "petstore_auth",
+              "http://a.ml/vocabularies/security#scheme": {
+                "@id": "#143"
+              },
+              "http://a.ml/vocabularies/security#settings": {
+                "@id": "#333",
+                "@type": [
+                  "http://a.ml/vocabularies/security#Settings",
+                  "http://a.ml/vocabularies/security#OAuth2Settings"
+                ],
+                "http://a.ml/vocabularies/security#scope": [
+                  {
+                    "@id": "#335",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "read:pets"
+                  },
+                  {
+                    "@id": "#334",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "write:pets"
+                  }
+                ]
+              }
+            },
+            "schema-org:name": "updatePet",
+            "hydra:expects": {
+              "@id": "#320",
+              "@type": "http:Request",
+              "http:payload": {
+                "@id": "#321",
+                "@type": "http:Payload",
+                "http:mediaType": "application/json",
+                "http:schema": {
+                  "@id": "#322",
+                  "@type": [
+                    "raml-shapes:Shape",
+                    "shacl:NodeShape",
+                    "shacl:Shape",
+                    "doc:DomainElement"
+                  ],
+                  "amf://id#1": {
+                    "@id": "file://swagger.raml#/web-api/end-points/%2Fpet/put/request/application%2Fjson/schema/oas-body-name/scalar_1",
+                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                    "http://a.ml/vocabularies/data#value": "body"
+                  },
+                  "doc:customDomainProperties": {
+                    "@id": "#1"
+                  },
+                  "raml-shapes:xmlSerialization": {
+                    "@id": "#85"
+                  },
+                  "schema-org:description": "Pet object that needs to be added to the store",
+                  "shacl:closed": false,
+                  "shacl:name": "Pet",
+                  "shacl:property": [
+                    {
+                      "@id": "#66"
+                    },
+                    {
+                      "@id": "#80"
+                    },
+                    {
+                      "@id": "#70"
+                    },
+                    {
+                      "@id": "#52"
+                    },
+                    {
+                      "@id": "#54"
+                    },
+                    {
+                      "@id": "#62"
+                    }
+                  ]
+                }
+              }
+            },
+            "hydra:method": "put",
+            "hydra:returns": [
+              {
+                "@id": "#326",
+                "@type": "http:Response",
+                "schema-org:description": "Validation exception",
+                "schema-org:name": "405",
+                "hydra:statusCode": "405"
+              },
+              {
+                "@id": "#324",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid ID supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              },
+              {
+                "@id": "#325",
+                "@type": "http:Response",
+                "schema-org:description": "Pet not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              }
+            ]
+          },
+          {
+            "@id": "#304",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#311",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Add a new pet to the store"
+            },
+            "amf://id#46": {
+              "@id": "#313",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#314"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#314",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "pet"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#46"
+              },
+              {
+                "@id": "#3"
+              }
+            ],
+            "http://a.ml/vocabularies/security#security": {
+              "@id": "#315",
+              "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+              "http://a.ml/vocabularies/security#name": "petstore_auth",
+              "http://a.ml/vocabularies/security#scheme": {
+                "@id": "#143"
+              },
+              "http://a.ml/vocabularies/security#settings": {
+                "@id": "#316",
+                "@type": [
+                  "http://a.ml/vocabularies/security#Settings",
+                  "http://a.ml/vocabularies/security#OAuth2Settings"
+                ],
+                "http://a.ml/vocabularies/security#scope": [
+                  {
+                    "@id": "#318",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "read:pets"
+                  },
+                  {
+                    "@id": "#317",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "write:pets"
+                  }
+                ]
+              }
+            },
+            "schema-org:name": "addPet",
+            "hydra:expects": {
+              "@id": "#305",
+              "@type": "http:Request",
+              "http:payload": {
+                "@id": "#306",
+                "@type": "http:Payload",
+                "http:mediaType": "application/json",
+                "http:schema": {
+                  "@id": "#307",
+                  "@type": [
+                    "raml-shapes:Shape",
+                    "shacl:NodeShape",
+                    "shacl:Shape",
+                    "doc:DomainElement"
+                  ],
+                  "amf://id#1": {
+                    "@id": "file://swagger.raml#/web-api/end-points/%2Fpet/post/request/application%2Fjson/schema/oas-body-name/scalar_1",
+                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                    "http://a.ml/vocabularies/data#value": "body"
+                  },
+                  "doc:customDomainProperties": {
+                    "@id": "#1"
+                  },
+                  "raml-shapes:xmlSerialization": {
+                    "@id": "#85"
+                  },
+                  "schema-org:description": "Pet object that needs to be added to the store",
+                  "shacl:closed": false,
+                  "shacl:name": "Pet",
+                  "shacl:property": [
+                    {
+                      "@id": "#52"
+                    },
+                    {
+                      "@id": "#66"
+                    },
+                    {
+                      "@id": "#70"
+                    },
+                    {
+                      "@id": "#80"
+                    },
+                    {
+                      "@id": "#62"
+                    },
+                    {
+                      "@id": "#54"
+                    }
+                  ]
+                }
+              }
+            },
+            "hydra:method": "post",
+            "hydra:returns": {
+              "@id": "#309",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid input",
+              "schema-org:name": "405",
+              "hydra:statusCode": "405"
+            }
+          }
+        ]
+      },
+      {
+        "@id": "#430",
+        "@type": "http:EndPoint",
+        "http:path": "/pet/findByTags",
+        "hydra:supportedOperation": {
+          "@id": "#431",
+          "@type": "hydra:Operation",
+          "amf://id#25": {
+            "@id": "#448",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": true
+          },
+          "amf://id#3": {
+            "@id": "#443",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Finds Pets by tags"
+          },
+          "amf://id#46": {
+            "@id": "#445",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#446"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#446",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "pet"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#25",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                "doc:DomainProperty"
+              ],
+              "doc:name": "oas-deprecated",
+              "raml-shapes:schema": {
+                "@id": "#26",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ScalarShape"
+                ],
+                "shacl:datatype": {
+                  "@id": "http://www.w3.org/2001/XMLSchema#boolean"
+                },
+                "shacl:name": "schema"
+              },
+              "http://www.w3.org/2000/01/rdf-schema#domain": {
+                "@id": "hydra:Operation"
+              }
+            },
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            }
+          ],
+          "http://a.ml/vocabularies/security#security": {
+            "@id": "#449",
+            "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+            "http://a.ml/vocabularies/security#name": "petstore_auth",
+            "http://a.ml/vocabularies/security#scheme": {
+              "@id": "#143"
+            },
+            "http://a.ml/vocabularies/security#settings": {
+              "@id": "#450",
+              "@type": [
+                "http://a.ml/vocabularies/security#Settings",
+                "http://a.ml/vocabularies/security#OAuth2Settings"
+              ],
+              "http://a.ml/vocabularies/security#scope": [
+                {
+                  "@id": "#452",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "read:pets"
+                },
+                {
+                  "@id": "#451",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "write:pets"
+                }
+              ]
+            }
+          },
+          "schema-org:description": "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+          "schema-org:name": "findPetsByTags",
+          "hydra:expects": {
+            "@id": "#432",
+            "@type": "http:Request",
+            "http:parameter": {
+              "@id": "#433",
+              "@type": "http:Parameter",
+              "amf://id#23": {
+                "@id": "#437",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "multi"
+              },
+              "doc:customDomainProperties": {
+                "@id": "#23"
+              },
+              "http:binding": "query",
+              "http:paramName": "tags",
+              "http:schema": {
+                "@id": "#434",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ArrayShape"
+                ],
+                "amf://id#23": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fpet%2FfindByTags/get/request/parameter/tags/array/schema/oas-collectionFormat/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "multi"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#23",
+                  "@type": [
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                    "doc:DomainProperty"
+                  ],
+                  "doc:name": "oas-collectionFormat",
+                  "raml-shapes:schema": {
+                    "@id": "#24",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#string"
+                    },
+                    "shacl:name": "schema"
+                  }
+                },
+                "raml-shapes:items": {
+                  "@id": "#435",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "items"
+                },
+                "schema-org:description": "Tags to filter by",
+                "shacl:name": "schema"
+              },
+              "schema-org:description": "Tags to filter by",
+              "schema-org:name": "tags",
+              "hydra:required": true
+            }
+          },
+          "hydra:method": "get",
+          "hydra:returns": [
+            {
+              "@id": "#438",
+              "@type": "http:Response",
+              "http:payload": {
+                "@id": "#439",
+                "@type": "http:Payload",
+                "http:mediaType": "application/xml",
+                "http:schema": {
+                  "@id": "#440",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ArrayShape"
+                  ],
+                  "raml-shapes:items": {
+                    "@id": "#51",
+                    "@type": [
+                      "shacl:NodeShape",
+                      "shacl:Shape",
+                      "raml-shapes:Shape",
+                      "doc:DomainElement"
+                    ],
+                    "raml-shapes:xmlSerialization": {
+                      "@id": "#85",
+                      "@type": "raml-shapes:XMLSerializer",
+                      "raml-shapes:xmlAttribute": false,
+                      "raml-shapes:xmlName": "Pet",
+                      "raml-shapes:xmlWrapped": false
+                    },
+                    "shacl:closed": false,
+                    "shacl:name": "Pet",
+                    "shacl:property": [
+                      {
+                        "@id": "#70",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#71",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ArrayShape"
+                          ],
+                          "raml-shapes:items": {
+                            "@id": "#72",
+                            "@type": [
+                              "doc:DomainElement",
+                              "raml-shapes:Shape",
+                              "shacl:Shape",
+                              "shacl:NodeShape"
+                            ],
+                            "raml-shapes:xmlSerialization": {
+                              "@id": "#77",
+                              "@type": "raml-shapes:XMLSerializer",
+                              "raml-shapes:xmlAttribute": false,
+                              "raml-shapes:xmlName": "Tag",
+                              "raml-shapes:xmlWrapped": false
+                            },
+                            "shacl:closed": false,
+                            "shacl:name": "Tag",
+                            "shacl:property": [
+                              {
+                                "@id": "#75",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                  "@id": "#76",
+                                  "@type": [
+                                    "doc:DomainElement",
+                                    "raml-shapes:Shape",
+                                    "shacl:Shape",
+                                    "raml-shapes:ScalarShape"
+                                  ],
+                                  "shacl:datatype": {
+                                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                  },
+                                  "shacl:name": "name"
+                                },
+                                "shacl:minCount": 0,
+                                "shacl:name": "name",
+                                "shacl:path": {
+                                  "@id": "http://a.ml/vocabularies/data#name"
+                                }
+                              },
+                              {
+                                "@id": "#73",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                  "@id": "#74",
+                                  "@type": [
+                                    "doc:DomainElement",
+                                    "raml-shapes:Shape",
+                                    "shacl:Shape",
+                                    "raml-shapes:ScalarShape"
+                                  ],
+                                  "raml-shapes:format": "int64",
+                                  "shacl:datatype": {
+                                    "@id": "http://www.w3.org/2001/XMLSchema#long"
+                                  },
+                                  "shacl:name": "id"
+                                },
+                                "shacl:minCount": 0,
+                                "shacl:name": "id",
+                                "shacl:path": {
+                                  "@id": "http://a.ml/vocabularies/data#id"
+                                }
+                              }
+                            ]
+                          },
+                          "raml-shapes:xmlSerialization": {
+                            "@id": "#79",
+                            "@type": "raml-shapes:XMLSerializer",
+                            "raml-shapes:xmlAttribute": false,
+                            "raml-shapes:xmlName": "tag",
+                            "raml-shapes:xmlWrapped": true
+                          },
+                          "shacl:name": "tags"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "tags",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#tags"
+                        }
+                      },
+                      {
+                        "@id": "#62",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#63",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "doc:examples": {
+                            "@id": "#64",
+                            "@type": [
+                              "doc:DomainElement",
+                              "doc:Example"
+                            ],
+                            "doc:strict": true,
+                            "doc:structuredValue": {
+                              "@id": "#65",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "doggie"
+                            },
+                            "shacl:raw": "doggie"
+                          },
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                          },
+                          "shacl:name": "name"
+                        },
+                        "shacl:minCount": 1,
+                        "shacl:name": "name",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#name"
+                        }
+                      },
+                      {
+                        "@id": "#52",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#53",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "raml-shapes:format": "int64",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#long"
+                          },
+                          "shacl:name": "id"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "id",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#id"
+                        }
+                      },
+                      {
+                        "@id": "#80",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#81",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "schema-org:description": "pet status in the store",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                          },
+                          "shacl:in": {
+                            "@id": "#81/list",
+                            "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                            "http://www.w3.org/2000/01/rdf-schema#_1": {
+                              "@id": "#82",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "available"
+                            },
+                            "http://www.w3.org/2000/01/rdf-schema#_2": {
+                              "@id": "#83",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "pending"
+                            },
+                            "http://www.w3.org/2000/01/rdf-schema#_3": {
+                              "@id": "#84",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "sold"
+                            }
+                          },
+                          "shacl:name": "status"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "status",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#status"
+                        }
+                      },
+                      {
+                        "@id": "#54",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#55",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "shacl:NodeShape"
+                          ],
+                          "raml-shapes:xmlSerialization": {
+                            "@id": "#60",
+                            "@type": "raml-shapes:XMLSerializer",
+                            "raml-shapes:xmlAttribute": false,
+                            "raml-shapes:xmlName": "Category",
+                            "raml-shapes:xmlWrapped": false
+                          },
+                          "shacl:closed": false,
+                          "shacl:name": "Category",
+                          "shacl:property": [
+                            {
+                              "@id": "#58",
+                              "@type": "shacl:PropertyShape",
+                              "raml-shapes:range": {
+                                "@id": "#59",
+                                "@type": [
+                                  "doc:DomainElement",
+                                  "raml-shapes:Shape",
+                                  "shacl:Shape",
+                                  "raml-shapes:ScalarShape"
+                                ],
+                                "shacl:datatype": {
+                                  "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                },
+                                "shacl:name": "name"
+                              },
+                              "shacl:minCount": 0,
+                              "shacl:name": "name",
+                              "shacl:path": {
+                                "@id": "http://a.ml/vocabularies/data#name"
+                              }
+                            },
+                            {
+                              "@id": "#56",
+                              "@type": "shacl:PropertyShape",
+                              "raml-shapes:range": {
+                                "@id": "#57",
+                                "@type": [
+                                  "doc:DomainElement",
+                                  "raml-shapes:Shape",
+                                  "shacl:Shape",
+                                  "raml-shapes:ScalarShape"
+                                ],
+                                "raml-shapes:format": "int64",
+                                "shacl:datatype": {
+                                  "@id": "http://www.w3.org/2001/XMLSchema#long"
+                                },
+                                "shacl:name": "id"
+                              },
+                              "shacl:minCount": 0,
+                              "shacl:name": "id",
+                              "shacl:path": {
+                                "@id": "http://a.ml/vocabularies/data#id"
+                              }
+                            }
+                          ]
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "category",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#category"
+                        }
+                      },
+                      {
+                        "@id": "#66",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#67",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ArrayShape"
+                          ],
+                          "raml-shapes:items": {
+                            "@id": "#68",
+                            "@type": [
+                              "doc:DomainElement",
+                              "raml-shapes:Shape",
+                              "shacl:Shape",
+                              "raml-shapes:ScalarShape"
+                            ],
+                            "shacl:datatype": {
+                              "@id": "http://www.w3.org/2001/XMLSchema#string"
+                            },
+                            "shacl:name": "items"
+                          },
+                          "raml-shapes:xmlSerialization": {
+                            "@id": "#69",
+                            "@type": "raml-shapes:XMLSerializer",
+                            "raml-shapes:xmlAttribute": false,
+                            "raml-shapes:xmlName": "photoUrl",
+                            "raml-shapes:xmlWrapped": true
+                          },
+                          "shacl:name": "photoUrls"
+                        },
+                        "shacl:minCount": 1,
+                        "shacl:name": "photoUrls",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#photoUrls"
+                        }
+                      }
+                    ]
+                  },
+                  "shacl:name": "schema"
+                }
+              },
+              "schema-org:description": "successful operation",
+              "schema-org:name": "200",
+              "hydra:statusCode": "200"
+            },
+            {
+              "@id": "#441",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid tag value",
+              "schema-org:name": "400",
+              "hydra:statusCode": "400"
+            }
+          ]
+        }
+      },
+      {
+        "@id": "#283",
+        "@type": "http:EndPoint",
+        "http:path": "/user/login",
+        "hydra:supportedOperation": {
+          "@id": "#284",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#299",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Logs user into the system"
+          },
+          "amf://id#46": {
+            "@id": "#301",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#302"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#302",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "user"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            }
+          ],
+          "schema-org:name": "loginUser",
+          "hydra:expects": {
+            "@id": "#285",
+            "@type": "http:Request",
+            "http:parameter": [
+              {
+                "@id": "#288",
+                "@type": "http:Parameter",
+                "http:binding": "query",
+                "http:paramName": "password",
+                "http:schema": {
+                  "@id": "#289",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "schema-org:description": "The password for login in clear text",
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                },
+                "schema-org:description": "The password for login in clear text",
+                "schema-org:name": "password",
+                "hydra:required": true
+              },
+              {
+                "@id": "#286",
+                "@type": "http:Parameter",
+                "http:binding": "query",
+                "http:paramName": "username",
+                "http:schema": {
+                  "@id": "#287",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "schema-org:description": "The user name for login",
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                },
+                "schema-org:description": "The user name for login",
+                "schema-org:name": "username",
+                "hydra:required": true
+              }
+            ]
+          },
+          "hydra:method": "get",
+          "hydra:returns": [
+            {
+              "@id": "#290",
+              "@type": "http:Response",
+              "http:header": [
+                {
+                  "@id": "#293",
+                  "@type": "http:Parameter",
+                  "http:binding": "header",
+                  "http:paramName": "X-Expires-After",
+                  "http:schema": {
+                    "@id": "#294",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "raml-shapes:format": "rfc3339",
+                    "schema-org:description": "date in UTC when token expires",
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#dateTime"
+                    },
+                    "shacl:name": "schema"
+                  },
+                  "schema-org:description": "date in UTC when token expires",
+                  "schema-org:name": "X-Expires-After",
+                  "hydra:required": true
+                },
+                {
+                  "@id": "#291",
+                  "@type": "http:Parameter",
+                  "http:binding": "header",
+                  "http:paramName": "X-Rate-Limit",
+                  "http:schema": {
+                    "@id": "#292",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "raml-shapes:format": "int32",
+                    "schema-org:description": "calls per hour allowed by the user",
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#integer"
+                    },
+                    "shacl:name": "schema"
+                  },
+                  "schema-org:description": "calls per hour allowed by the user",
+                  "schema-org:name": "X-Rate-Limit",
+                  "hydra:required": true
+                }
+              ],
+              "http:payload": {
+                "@id": "#295",
+                "@type": "http:Payload",
+                "http:mediaType": "application/xml",
+                "http:schema": {
+                  "@id": "#296",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                }
+              },
+              "schema-org:description": "successful operation",
+              "schema-org:name": "200",
+              "hydra:statusCode": "200"
+            },
+            {
+              "@id": "#297",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid username/password supplied",
+              "schema-org:name": "400",
+              "hydra:statusCode": "400"
+            }
+          ]
+        }
+      },
+      {
+        "@id": "#408",
+        "@type": "http:EndPoint",
+        "http:parameter": {
+          "@id": "#428",
+          "@type": "http:Parameter",
+          "http:binding": "path",
+          "http:paramName": "petId",
+          "http:schema": {
+            "@id": "#429",
+            "@type": [
+              "doc:DomainElement",
+              "raml-shapes:Shape",
+              "shacl:Shape",
+              "raml-shapes:ScalarShape"
+            ],
+            "raml-shapes:format": "int64",
+            "schema-org:description": "ID of pet that needs to be updated",
+            "shacl:datatype": {
+              "@id": "http://www.w3.org/2001/XMLSchema#long"
+            },
+            "shacl:name": "schema"
+          },
+          "schema-org:description": "ID of pet that needs to be updated",
+          "schema-org:name": "petId",
+          "hydra:required": true
+        },
+        "http:path": "/pet/{petId}/uploadImage",
+        "hydra:supportedOperation": {
+          "@id": "#409",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#420",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "uploads an image"
+          },
+          "amf://id#46": {
+            "@id": "#422",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#423"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#423",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "pet"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#46"
+            },
+            {
+              "@id": "#3"
+            }
+          ],
+          "http://a.ml/vocabularies/security#security": {
+            "@id": "#424",
+            "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+            "http://a.ml/vocabularies/security#name": "petstore_auth",
+            "http://a.ml/vocabularies/security#scheme": {
+              "@id": "#143",
+              "@type": "http://a.ml/vocabularies/security#SecurityScheme",
+              "http://a.ml/vocabularies/security#name": "petstore_auth",
+              "http://a.ml/vocabularies/security#settings": {
+                "@id": "#144",
+                "@type": [
+                  "http://a.ml/vocabularies/security#Settings",
+                  "http://a.ml/vocabularies/security#OAuth2Settings"
+                ],
+                "http://a.ml/vocabularies/security#accessTokenUri": "",
+                "http://a.ml/vocabularies/security#authorizationGrant": "implicit",
+                "http://a.ml/vocabularies/security#authorizationUri": "http://petstore.swagger.io/oauth/dialog",
+                "http://a.ml/vocabularies/security#scope": [
+                  {
+                    "@id": "#146",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "read:pets"
+                  },
+                  {
+                    "@id": "#145",
+                    "@type": "http://a.ml/vocabularies/security#Scope",
+                    "http://a.ml/vocabularies/security#name": "write:pets"
+                  }
+                ]
+              },
+              "http://a.ml/vocabularies/security#type": "OAuth 2.0"
+            },
+            "http://a.ml/vocabularies/security#settings": {
+              "@id": "#425",
+              "@type": [
+                "http://a.ml/vocabularies/security#Settings",
+                "http://a.ml/vocabularies/security#OAuth2Settings"
+              ],
+              "http://a.ml/vocabularies/security#scope": [
+                {
+                  "@id": "#427",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "read:pets"
+                },
+                {
+                  "@id": "#426",
+                  "@type": "http://a.ml/vocabularies/security#Scope",
+                  "http://a.ml/vocabularies/security#name": "write:pets"
+                }
+              ]
+            }
+          },
+          "schema-org:name": "uploadFile",
+          "hydra:expects": {
+            "@id": "#410",
+            "@type": "http:Request",
+            "http:payload": {
+              "@id": "#411",
+              "@type": "http:Payload",
+              "http:mediaType": "multipart/form-data",
+              "http:schema": {
+                "@id": "#412",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "shacl:NodeShape"
+                ],
+                "shacl:closed": false,
+                "shacl:name": "schema",
+                "shacl:property": [
+                  {
+                    "@id": "#415",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#416",
+                      "@type": [
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:FileShape"
+                      ],
+                      "schema-org:description": "file to upload"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "file",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#file"
+                    }
+                  },
+                  {
+                    "@id": "#413",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#414",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "schema-org:description": "Additional data to pass to server",
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "additionalMetadata"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "additionalMetadata",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#additionalMetadata"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "hydra:method": "post",
+          "hydra:returns": {
+            "@id": "#417",
+            "@type": "http:Response",
+            "http:payload": {
+              "@id": "#418",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#135",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "shacl:NodeShape"
+                ],
+                "shacl:closed": false,
+                "shacl:name": "ApiResponse",
+                "shacl:property": [
+                  {
+                    "@id": "#140",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#141",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "message"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "message",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#message"
+                    }
+                  },
+                  {
+                    "@id": "#138",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#139",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                      },
+                      "shacl:name": "type"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "type",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#type"
+                    }
+                  },
+                  {
+                    "@id": "#136",
+                    "@type": "shacl:PropertyShape",
+                    "raml-shapes:range": {
+                      "@id": "#137",
+                      "@type": [
+                        "doc:DomainElement",
+                        "raml-shapes:Shape",
+                        "shacl:Shape",
+                        "raml-shapes:ScalarShape"
+                      ],
+                      "raml-shapes:format": "int32",
+                      "shacl:datatype": {
+                        "@id": "http://www.w3.org/2001/XMLSchema#integer"
+                      },
+                      "shacl:name": "code"
+                    },
+                    "shacl:minCount": 0,
+                    "shacl:name": "code",
+                    "shacl:path": {
+                      "@id": "http://a.ml/vocabularies/data#code"
+                    }
+                  }
+                ]
+              }
+            },
+            "schema-org:description": "successful operation",
+            "schema-org:name": "200",
+            "hydra:statusCode": "200"
+          }
+        }
+      },
+      {
+        "@id": "#152",
+        "@type": "http:EndPoint",
+        "http:path": "/store/order",
+        "hydra:supportedOperation": {
+          "@id": "#153",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#162",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Place an order for a pet"
+          },
+          "amf://id#46": {
+            "@id": "#164",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#165"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#165",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "store"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            }
+          ],
+          "schema-org:name": "placeOrder",
+          "hydra:expects": {
+            "@id": "#154",
+            "@type": "http:Request",
+            "http:payload": {
+              "@id": "#155",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#156",
+                "@type": [
+                  "shacl:NodeShape",
+                  "shacl:Shape",
+                  "raml-shapes:Shape",
+                  "doc:DomainElement"
+                ],
+                "amf://id#1": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fstore%2Forder/post/request/application%2Fjson/schema/oas-body-name/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "body"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#1"
+                },
+                "raml-shapes:xmlSerialization": {
+                  "@id": "#131"
+                },
+                "schema-org:description": "order placed for purchasing the pet",
+                "shacl:closed": false,
+                "shacl:name": "Order",
+                "shacl:property": [
+                  {
+                    "@id": "#119"
+                  },
+                  {
+                    "@id": "#117"
+                  },
+                  {
+                    "@id": "#128"
+                  },
+                  {
+                    "@id": "#123"
+                  },
+                  {
+                    "@id": "#115"
+                  },
+                  {
+                    "@id": "#121"
+                  }
+                ]
+              }
+            }
+          },
+          "hydra:method": "post",
+          "hydra:returns": [
+            {
+              "@id": "#158",
+              "@type": "http:Response",
+              "http:payload": {
+                "@id": "#159",
+                "@type": "http:Payload",
+                "http:mediaType": "application/xml",
+                "http:schema": {
+                  "@id": "#114"
+                }
+              },
+              "schema-org:description": "successful operation",
+              "schema-org:name": "200",
+              "hydra:statusCode": "200"
+            },
+            {
+              "@id": "#160",
+              "@type": "http:Response",
+              "schema-org:description": "Invalid Order",
+              "schema-org:name": "400",
+              "hydra:statusCode": "400"
+            }
+          ]
+        }
+      },
+      {
+        "@id": "#273",
+        "@type": "http:EndPoint",
+        "http:path": "/user/logout",
+        "hydra:supportedOperation": {
+          "@id": "#274",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#276",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Logs out current logged in user session"
+          },
+          "amf://id#46": {
+            "@id": "#281",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#282"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#282",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "user"
+            }
+          },
+          "amf://id#49": {
+            "@id": "#278",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#279",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "successful operation"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#46"
+            },
+            {
+              "@id": "#49"
+            },
+            {
+              "@id": "#3"
+            }
+          ],
+          "schema-org:name": "logoutUser",
+          "hydra:method": "get"
+        }
+      },
+      {
+        "@id": "#151",
+        "@type": "http:EndPoint",
+        "http:path": "/store"
+      },
+      {
+        "@id": "#260",
+        "@type": "http:EndPoint",
+        "http:path": "/user/createWithList",
+        "hydra:supportedOperation": {
+          "@id": "#261",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#266",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Creates list of users with given input array"
+          },
+          "amf://id#46": {
+            "@id": "#271",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#272"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#272",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "user"
+            }
+          },
+          "amf://id#49": {
+            "@id": "#268",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#269",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "successful operation"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#49"
+            },
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            }
+          ],
+          "schema-org:name": "createUsersWithListInput",
+          "hydra:expects": {
+            "@id": "#262",
+            "@type": "http:Request",
+            "http:payload": {
+              "@id": "#263",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#264",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ArrayShape"
+                ],
+                "amf://id#1": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fuser%2FcreateWithList/post/request/application%2Fjson/array/schema/oas-body-name/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "body"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#1"
+                },
+                "raml-shapes:items": {
+                  "@id": "#91"
+                },
+                "schema-org:description": "List of user object",
+                "shacl:name": "schema"
+              }
+            }
+          },
+          "hydra:method": "post"
+        }
+      },
+      {
+        "@id": "#214",
+        "@type": "http:EndPoint",
+        "http:parameter": {
+          "@id": "#245",
+          "@type": "http:Parameter",
+          "http:binding": "path",
+          "http:paramName": "username",
+          "http:schema": {
+            "@id": "#246",
+            "@type": [
+              "doc:DomainElement",
+              "raml-shapes:Shape",
+              "shacl:Shape",
+              "raml-shapes:ScalarShape"
+            ],
+            "schema-org:description": "The name that needs to be fetched. Use user1 for testing. ",
+            "shacl:datatype": {
+              "@id": "http://www.w3.org/2001/XMLSchema#string"
+            },
+            "shacl:name": "schema"
+          },
+          "schema-org:description": "The name that needs to be fetched. Use user1 for testing. ",
+          "schema-org:name": "username",
+          "hydra:required": true
+        },
+        "http:path": "/user/{username}",
+        "hydra:supportedOperation": [
+          {
+            "@id": "#235",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#241",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Get user by user name"
+            },
+            "amf://id#46": {
+              "@id": "#243",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#244"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#244",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "user"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#3"
+              },
+              {
+                "@id": "#46"
+              }
+            ],
+            "schema-org:name": "getUserByName",
+            "hydra:method": "get",
+            "hydra:returns": [
+              {
+                "@id": "#236",
+                "@type": "http:Response",
+                "http:payload": {
+                  "@id": "#237",
+                  "@type": "http:Payload",
+                  "http:mediaType": "application/xml",
+                  "http:schema": {
+                    "@id": "#91"
+                  }
+                },
+                "schema-org:description": "successful operation",
+                "schema-org:name": "200",
+                "hydra:statusCode": "200"
+              },
+              {
+                "@id": "#239",
+                "@type": "http:Response",
+                "schema-org:description": "User not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              },
+              {
+                "@id": "#238",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid username supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              }
+            ]
+          },
+          {
+            "@id": "#223",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#231",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Updated user"
+            },
+            "amf://id#46": {
+              "@id": "#233",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#234"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#234",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "user"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#3"
+              },
+              {
+                "@id": "#46"
+              }
+            ],
+            "schema-org:description": "This can only be done by the logged in user.",
+            "schema-org:name": "updateUser",
+            "hydra:expects": {
+              "@id": "#224",
+              "@type": "http:Request",
+              "http:payload": {
+                "@id": "#225",
+                "@type": "http:Payload",
+                "http:mediaType": "application/json",
+                "http:schema": {
+                  "@id": "#226",
+                  "@type": [
+                    "shacl:Shape",
+                    "raml-shapes:Shape",
+                    "doc:DomainElement",
+                    "shacl:NodeShape"
+                  ],
+                  "amf://id#1": {
+                    "@id": "file://swagger.raml#/web-api/end-points/%2Fuser%2F%7Busername%7D/put/request/application%2Fjson/schema/oas-body-name/scalar_1",
+                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                    "http://a.ml/vocabularies/data#value": "body"
+                  },
+                  "doc:customDomainProperties": {
+                    "@id": "#1"
+                  },
+                  "raml-shapes:xmlSerialization": {
+                    "@id": "#108"
+                  },
+                  "schema-org:description": "Updated user object",
+                  "shacl:closed": false,
+                  "shacl:name": "User",
+                  "shacl:property": [
+                    {
+                      "@id": "#96"
+                    },
+                    {
+                      "@id": "#98"
+                    },
+                    {
+                      "@id": "#100"
+                    },
+                    {
+                      "@id": "#102"
+                    },
+                    {
+                      "@id": "#104"
+                    },
+                    {
+                      "@id": "#92"
+                    },
+                    {
+                      "@id": "#106"
+                    },
+                    {
+                      "@id": "#94"
+                    }
+                  ]
+                }
+              }
+            },
+            "hydra:method": "put",
+            "hydra:returns": [
+              {
+                "@id": "#229",
+                "@type": "http:Response",
+                "schema-org:description": "User not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              },
+              {
+                "@id": "#228",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid user supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              }
+            ]
+          },
+          {
+            "@id": "#215",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#219",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Delete user"
+            },
+            "amf://id#46": {
+              "@id": "#221",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#222"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#222",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "user"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#46"
+              },
+              {
+                "@id": "#3"
+              }
+            ],
+            "schema-org:description": "This can only be done by the logged in user.",
+            "schema-org:name": "deleteUser",
+            "hydra:method": "delete",
+            "hydra:returns": [
+              {
+                "@id": "#216",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid username supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              },
+              {
+                "@id": "#217",
+                "@type": "http:Response",
+                "schema-org:description": "User not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@id": "#247",
+        "@type": "http:EndPoint",
+        "http:path": "/user/createWithArray",
+        "hydra:supportedOperation": {
+          "@id": "#248",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#253",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Creates list of users with given input array"
+          },
+          "amf://id#46": {
+            "@id": "#258",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#259"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#259",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "user"
+            }
+          },
+          "amf://id#49": {
+            "@id": "#255",
+            "@type": "http://a.ml/vocabularies/data#Object",
+            "http://a.ml/vocabularies/data#description": {
+              "@id": "#256",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "successful operation"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#3"
+            },
+            {
+              "@id": "#46"
+            },
+            {
+              "@id": "#49",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                "doc:DomainProperty"
+              ],
+              "doc:name": "oas-responses-default",
+              "raml-shapes:schema": {
+                "@id": "#50",
+                "@type": [
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:AnyShape"
+                ],
+                "shacl:name": "schema"
+              },
+              "http://www.w3.org/2000/01/rdf-schema#domain": {
+                "@id": "hydra:Operation"
+              }
+            }
+          ],
+          "schema-org:name": "createUsersWithArrayInput",
+          "hydra:expects": {
+            "@id": "#249",
+            "@type": "http:Request",
+            "http:payload": {
+              "@id": "#250",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#251",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "raml-shapes:ArrayShape"
+                ],
+                "amf://id#1": {
+                  "@id": "file://swagger.raml#/web-api/end-points/%2Fuser%2FcreateWithArray/post/request/application%2Fjson/array/schema/oas-body-name/scalar_1",
+                  "@type": "http://a.ml/vocabularies/data#Scalar",
+                  "http://a.ml/vocabularies/data#value": "body"
+                },
+                "doc:customDomainProperties": {
+                  "@id": "#1",
+                  "@type": [
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                    "doc:DomainProperty"
+                  ],
+                  "doc:name": "oas-body-name",
+                  "raml-shapes:schema": {
+                    "@id": "#2",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#string"
+                    },
+                    "shacl:name": "schema"
+                  },
+                  "http://www.w3.org/2000/01/rdf-schema#domain": {
+                    "@id": "shacl:Shape"
+                  }
+                },
+                "raml-shapes:items": {
+                  "@id": "#91",
+                  "@type": [
+                    "shacl:NodeShape",
+                    "raml-shapes:Shape",
+                    "doc:DomainElement",
+                    "shacl:Shape"
+                  ],
+                  "raml-shapes:xmlSerialization": {
+                    "@id": "#108",
+                    "@type": "raml-shapes:XMLSerializer",
+                    "raml-shapes:xmlAttribute": false,
+                    "raml-shapes:xmlName": "User",
+                    "raml-shapes:xmlWrapped": false
+                  },
+                  "shacl:closed": false,
+                  "shacl:name": "User",
+                  "shacl:property": [
+                    {
+                      "@id": "#100",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#101",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "email"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "email",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#email"
+                      }
+                    },
+                    {
+                      "@id": "#92",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#93",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "raml-shapes:format": "int64",
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#long"
+                        },
+                        "shacl:name": "id"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "id",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#id"
+                      }
+                    },
+                    {
+                      "@id": "#98",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#99",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "lastName"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "lastName",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#lastName"
+                      }
+                    },
+                    {
+                      "@id": "#106",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#107",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "raml-shapes:format": "int32",
+                        "schema-org:description": "User Status",
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#integer"
+                        },
+                        "shacl:name": "userStatus"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "userStatus",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#userStatus"
+                      }
+                    },
+                    {
+                      "@id": "#96",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#97",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "firstName"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "firstName",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#firstName"
+                      }
+                    },
+                    {
+                      "@id": "#94",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#95",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "username"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "username",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#username"
+                      }
+                    },
+                    {
+                      "@id": "#104",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#105",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "phone"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "phone",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#phone"
+                      }
+                    },
+                    {
+                      "@id": "#102",
+                      "@type": "shacl:PropertyShape",
+                      "raml-shapes:range": {
+                        "@id": "#103",
+                        "@type": [
+                          "doc:DomainElement",
+                          "raml-shapes:Shape",
+                          "shacl:Shape",
+                          "raml-shapes:ScalarShape"
+                        ],
+                        "shacl:datatype": {
+                          "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:name": "password"
+                      },
+                      "shacl:minCount": 0,
+                      "shacl:name": "password",
+                      "shacl:path": {
+                        "@id": "http://a.ml/vocabularies/data#password"
+                      }
+                    }
+                  ]
+                },
+                "schema-org:description": "List of user object",
+                "shacl:name": "schema"
+              }
+            }
+          },
+          "hydra:method": "post"
+        }
+      },
+      {
+        "@id": "#187",
+        "@type": "http:EndPoint",
+        "http:path": "/store/inventory",
+        "hydra:supportedOperation": {
+          "@id": "#188",
+          "@type": "hydra:Operation",
+          "amf://id#3": {
+            "@id": "#195",
+            "@type": "http://a.ml/vocabularies/data#Scalar",
+            "http://a.ml/vocabularies/data#value": "Returns pet inventories by status"
+          },
+          "amf://id#46": {
+            "@id": "#197",
+            "@type": [
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+              "http://a.ml/vocabularies/data#Array"
+            ],
+            "http://a.ml/vocabularies/data#pos0": {
+              "@id": "#198"
+            },
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+              "@id": "#198",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "store"
+            }
+          },
+          "doc:customDomainProperties": [
+            {
+              "@id": "#46"
+            },
+            {
+              "@id": "#3"
+            }
+          ],
+          "http://a.ml/vocabularies/security#security": {
+            "@id": "#199",
+            "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+            "http://a.ml/vocabularies/security#name": "api_key",
+            "http://a.ml/vocabularies/security#scheme": {
+              "@id": "#147",
+              "@type": "http://a.ml/vocabularies/security#SecurityScheme",
+              "http:header": {
+                "@id": "#148",
+                "@type": "http:Parameter",
+                "http:binding": "header",
+                "http:paramName": "api_key",
+                "http:schema": {
+                  "@id": "#149",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                },
+                "schema-org:name": "api_key",
+                "hydra:required": true
+              },
+              "http://a.ml/vocabularies/security#name": "api_key",
+              "http://a.ml/vocabularies/security#type": "Pass Through"
+            }
+          },
+          "schema-org:description": "Returns a map of status codes to quantities",
+          "schema-org:name": "getInventory",
+          "hydra:method": "get",
+          "hydra:returns": {
+            "@id": "#189",
+            "@type": "http:Response",
+            "http:payload": {
+              "@id": "#190",
+              "@type": "http:Payload",
+              "http:mediaType": "application/json",
+              "http:schema": {
+                "@id": "#191",
+                "@type": [
+                  "doc:DomainElement",
+                  "raml-shapes:Shape",
+                  "shacl:Shape",
+                  "shacl:NodeShape"
+                ],
+                "shacl:closed": true,
+                "shacl:name": "schema",
+                "shacl:property": {
+                  "@id": "#192",
+                  "@type": "shacl:PropertyShape",
+                  "raml-shapes:patternName": "^.*$",
+                  "raml-shapes:range": {
+                    "@id": "#193",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "raml-shapes:format": "int32",
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#integer"
+                    },
+                    "shacl:name": "//"
+                  },
+                  "shacl:minCount": 0,
+                  "shacl:name": "//",
+                  "shacl:path": {
+                    "@id": "http://a.ml/vocabularies/data#%2F%2F"
+                  }
+                }
+              }
+            },
+            "schema-org:description": "successful operation",
+            "schema-org:name": "200",
+            "hydra:statusCode": "200"
+          }
+        }
+      },
+      {
+        "@id": "#166",
+        "@type": "http:EndPoint",
+        "http:parameter": {
+          "@id": "#185",
+          "@type": "http:Parameter",
+          "http:binding": "path",
+          "http:paramName": "orderId",
+          "http:schema": {
+            "@id": "#186",
+            "@type": [
+              "doc:DomainElement",
+              "raml-shapes:Shape",
+              "shacl:Shape",
+              "raml-shapes:ScalarShape"
+            ],
+            "raml-shapes:format": "int64",
+            "schema-org:description": "ID of the order that needs to be deleted",
+            "shacl:datatype": {
+              "@id": "http://www.w3.org/2001/XMLSchema#long"
+            },
+            "shacl:minInclusive": 1.0,
+            "shacl:name": "schema"
+          },
+          "schema-org:description": "ID of the order that needs to be deleted",
+          "schema-org:name": "orderId",
+          "hydra:required": true
+        },
+        "http:path": "/store/order/{orderId}",
+        "hydra:supportedOperation": [
+          {
+            "@id": "#177",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#181",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Delete purchase order by ID"
+            },
+            "amf://id#46": {
+              "@id": "#183",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#184"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#184",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "store"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#3"
+              },
+              {
+                "@id": "#46"
+              }
+            ],
+            "schema-org:description": "For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors",
+            "schema-org:name": "deleteOrder",
+            "hydra:method": "delete",
+            "hydra:returns": [
+              {
+                "@id": "#179",
+                "@type": "http:Response",
+                "schema-org:description": "Order not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              },
+              {
+                "@id": "#178",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid ID supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              }
+            ]
+          },
+          {
+            "@id": "#167",
+            "@type": "hydra:Operation",
+            "amf://id#3": {
+              "@id": "#173",
+              "@type": "http://a.ml/vocabularies/data#Scalar",
+              "http://a.ml/vocabularies/data#value": "Find purchase order by ID"
+            },
+            "amf://id#46": {
+              "@id": "#175",
+              "@type": [
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                "http://a.ml/vocabularies/data#Array"
+              ],
+              "http://a.ml/vocabularies/data#pos0": {
+                "@id": "#176"
+              },
+              "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                "@id": "#176",
+                "@type": "http://a.ml/vocabularies/data#Scalar",
+                "http://a.ml/vocabularies/data#value": "store"
+              }
+            },
+            "doc:customDomainProperties": [
+              {
+                "@id": "#46",
+                "@type": [
+                  "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                  "doc:DomainProperty"
+                ],
+                "doc:name": "oas-tags",
+                "raml-shapes:schema": {
+                  "@id": "#47",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ArrayShape"
+                  ],
+                  "raml-shapes:items": {
+                    "@id": "#48",
+                    "@type": [
+                      "doc:DomainElement",
+                      "raml-shapes:Shape",
+                      "shacl:Shape",
+                      "raml-shapes:ScalarShape"
+                    ],
+                    "shacl:datatype": {
+                      "@id": "http://www.w3.org/2001/XMLSchema#string"
+                    }
+                  }
+                },
+                "http://www.w3.org/2000/01/rdf-schema#domain": {
+                  "@id": "hydra:Operation"
+                }
+              },
+              {
+                "@id": "#3",
+                "@type": [
+                  "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+                  "doc:DomainProperty"
+                ],
+                "doc:name": "oas-summary",
+                "raml-shapes:schema": {
+                  "@id": "#4",
+                  "@type": [
+                    "doc:DomainElement",
+                    "raml-shapes:Shape",
+                    "shacl:Shape",
+                    "raml-shapes:ScalarShape"
+                  ],
+                  "shacl:datatype": {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                  },
+                  "shacl:name": "schema"
+                },
+                "http://www.w3.org/2000/01/rdf-schema#domain": {
+                  "@id": "hydra:Operation"
+                }
+              }
+            ],
+            "schema-org:description": "For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions",
+            "schema-org:name": "getOrderById",
+            "hydra:method": "get",
+            "hydra:returns": [
+              {
+                "@id": "#171",
+                "@type": "http:Response",
+                "schema-org:description": "Order not found",
+                "schema-org:name": "404",
+                "hydra:statusCode": "404"
+              },
+              {
+                "@id": "#170",
+                "@type": "http:Response",
+                "schema-org:description": "Invalid ID supplied",
+                "schema-org:name": "400",
+                "hydra:statusCode": "400"
+              },
+              {
+                "@id": "#168",
+                "@type": "http:Response",
+                "http:payload": {
+                  "@id": "#169",
+                  "@type": "http:Payload",
+                  "http:mediaType": "application/xml",
+                  "http:schema": {
+                    "@id": "#114",
+                    "@type": [
+                      "raml-shapes:Shape",
+                      "shacl:NodeShape",
+                      "shacl:Shape",
+                      "doc:DomainElement"
+                    ],
+                    "raml-shapes:xmlSerialization": {
+                      "@id": "#131",
+                      "@type": "raml-shapes:XMLSerializer",
+                      "raml-shapes:xmlAttribute": false,
+                      "raml-shapes:xmlName": "Order",
+                      "raml-shapes:xmlWrapped": false
+                    },
+                    "shacl:closed": false,
+                    "shacl:name": "Order",
+                    "shacl:property": [
+                      {
+                        "@id": "#119",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#120",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "raml-shapes:format": "int32",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#integer"
+                          },
+                          "shacl:name": "quantity"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "quantity",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#quantity"
+                        }
+                      },
+                      {
+                        "@id": "#121",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#122",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "raml-shapes:format": "rfc3339",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#dateTime"
+                          },
+                          "shacl:name": "shipDate"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "shipDate",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#shipDate"
+                        }
+                      },
+                      {
+                        "@id": "#128",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#129",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#boolean"
+                          },
+                          "shacl:defaultValue": {
+                            "@id": "#130",
+                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                            "http://a.ml/vocabularies/data#value": false
+                          },
+                          "shacl:defaultValueStr": "false",
+                          "shacl:name": "complete"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "complete",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#complete"
+                        }
+                      },
+                      {
+                        "@id": "#123",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#124",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "schema-org:description": "Order Status",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                          },
+                          "shacl:in": {
+                            "@id": "#124/list",
+                            "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                            "http://www.w3.org/2000/01/rdf-schema#_1": {
+                              "@id": "#125",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "placed"
+                            },
+                            "http://www.w3.org/2000/01/rdf-schema#_2": {
+                              "@id": "#126",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "approved"
+                            },
+                            "http://www.w3.org/2000/01/rdf-schema#_3": {
+                              "@id": "#127",
+                              "@type": "http://a.ml/vocabularies/data#Scalar",
+                              "http://a.ml/vocabularies/data#value": "delivered"
+                            }
+                          },
+                          "shacl:name": "status"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "status",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#status"
+                        }
+                      },
+                      {
+                        "@id": "#115",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#116",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "raml-shapes:format": "int64",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#long"
+                          },
+                          "shacl:name": "id"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "id",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#id"
+                        }
+                      },
+                      {
+                        "@id": "#117",
+                        "@type": "shacl:PropertyShape",
+                        "raml-shapes:range": {
+                          "@id": "#118",
+                          "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                          ],
+                          "raml-shapes:format": "int64",
+                          "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#long"
+                          },
+                          "shacl:name": "petId"
+                        },
+                        "shacl:minCount": 0,
+                        "shacl:name": "petId",
+                        "shacl:path": {
+                          "@id": "http://a.ml/vocabularies/data#petId"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "schema-org:description": "successful operation",
+                "schema-org:name": "200",
+                "hydra:statusCode": "200"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "http:scheme": "HTTP",
+    "http:server": {
+      "@id": "#453",
+      "@type": "http:Server",
+      "http:url": "http://petstore.swagger.io/v2"
+    },
+    "schema-org:description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+    "schema-org:name": "Swagger Petstore",
+    "schema-org:version": "V1"
+  },
+  "@context": {
+    "@base": "amf://id",
+    "hydra": "http://www.w3.org/ns/hydra/core#",
+    "shacl": "http://www.w3.org/ns/shacl#",
+    "doc": "http://a.ml/vocabularies/document#",
+    "schema-org": "http://schema.org/",
+    "http": "http://a.ml/vocabularies/http#",
+    "raml-shapes": "http://a.ml/vocabularies/shapes#",
+    "smap": "http://a.ml/vocabularies/document-source-maps"
+  }
+}

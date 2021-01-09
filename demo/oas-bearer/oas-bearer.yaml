@@ -1,0 +1,45 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: OAS Bearer auth API
+
+servers:
+  - url: https://{customerId}.saas-app.com:{port}/v2
+    variables:
+      customerId:
+        default: demo
+        description: Customer ID assigned by the service provider
+      port:
+        enum:
+          - '443'
+          - '8443'
+        default: '443'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
+
+paths:
+  /bearer:
+    get:
+      summary: Requires bearer token
+      security:
+        - bearerAuth: []
+      responses:
+        default:
+          description: Unexpected error
+  /basic:
+    get:
+      summary: Requires basic auth
+      security:
+        - basicAuth: []
+      responses:
+        default:
+          description: Unexpected error

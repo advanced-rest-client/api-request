@@ -1,0 +1,16 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  Tests for queryString RAML's property
+type: x-custom
+describedBy:
+  queryString:
+    type: object
+    properties:
+      queryStringProperty1:
+        type: number
+        required: true
+      queryStringProperty2:
+        description: Random string
+        type: string
+        required: false

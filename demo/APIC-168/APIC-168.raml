@@ -1,0 +1,38 @@
+#%RAML 1.0
+---
+title: SecuritySchemes
+version: v1
+
+types:
+  paging:
+    properties:
+      start?: number
+      page-size?: number
+
+securitySchemes:
+  queryString:
+    type: x-Custom
+    describedBy:
+      queryString:
+        type: integer
+        required: true
+  queryString2:
+    type: x-paging
+    describedBy:
+      queryString:
+        type: paging
+        examples:
+          first:
+            value:
+              start: 2
+              page-size: 10
+          second:
+            value:
+              start: 2
+              page-size: 20
+/querystring:
+  securedBy: [ queryString ]
+  get:
+/querystring2:
+  securedBy: [ queryString2 ]
+  get:

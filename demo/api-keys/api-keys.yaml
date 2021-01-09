@@ -1,0 +1,85 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: OAS API key API
+
+servers:
+  - url: https://{customerId}.saas-app.com:{port}/v2
+    variables:
+      customerId:
+        default: demo
+        description: Customer ID assigned by the service provider
+      port:
+        enum:
+          - '443'
+          - '8443'
+        default: '443'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        name:
+          type: string
+          example: ServerException
+        message:
+          type: string
+          example: Some server error occurred
+  securitySchemes:
+    clientQuery:
+      type: apiKey
+      name: client_id
+      in: query
+    clientSecret:
+      type: apiKey
+      name: client_secret
+      in: header
+    clientCookie:
+      type: apiKey
+      name: client_secret
+      in: cookie
+    clientMulti:
+      type: apiKey
+      name: client_multi
+      in: header
+
+paths:
+  /query:
+    get:
+      security:
+        - clientQuery: []
+      responses:
+        default:
+          description: Unexpected error
+  /header:
+    get:
+      security:
+        - clientSecret: []
+      responses:
+        default:
+          description: Unexpected error
+  /cookie:
+    get:
+      security:
+        - clientCookie: []
+      responses:
+        default:
+          description: Unexpected error
+  /junction:
+    get:
+      security:
+        - clientQuery: []
+          clientMulti: []
+      responses:
+        default:
+          description: Unexpected error
+  /split:
+    get:
+      security:
+        - clientQuery: []
+        - clientMulti: []
+      responses:
+        default:
+          description: Unexpected error

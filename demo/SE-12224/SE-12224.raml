@@ -1,0 +1,89 @@
+#%RAML 1.0
+version: v1
+title: Training System API Gabe
+description: Best API ever
+baseUri: https://devapigw.ashleyfurniture.com/trn-sys-api-gabe
+securitySchemes:
+  secured-by-aad-oauth2: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/secured-by-aad-oauth2.raml
+securedBy: secured-by-aad-oauth2
+types:
+  innerError: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/innerError.raml
+  error: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/error.raml
+  product: !include dataTypes/product.raml
+  products: !include dataTypes/products.raml
+traits:
+  pageable: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/pageable.raml
+  orderable: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/orderable.raml
+  searchable: !include exchange_modules/ae8da8e3-99e3-4a45-acfa-86136e9d991f/ashley-base/1.0.2/searchable.raml
+resourceTypes:
+  products:
+    description: Get Products
+    is: [pageable, orderable, searchable]
+    get:
+      description: Get a list of <<resourcePathName>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<resourcePathName>>
+        500:
+          body:
+            application/json:
+              type: error
+    post:
+      description: Create <<resourcePathName>>
+      body:
+        application/json:
+          type: <<resourcePathName>>
+      responses:
+        201:
+          body:
+            application/json:
+              type: <<resourcePathName>>
+        500:
+          body:
+            application/json:
+              type: error
+  product:
+    get:
+      description: Get <<resourcePathName|!singularize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: product
+        500:
+          body:
+            application/json:
+              type: error
+    put:
+      description: Update <<resourcePathName|!singularize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: product
+        500:
+          body:
+            application/json:
+              type: error
+    delete:
+      description: Delete <<resourcePathName|!singularize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: product
+        500:
+          body:
+            application/json:
+              type: error
+/products:
+  type: products
+  get:
+  post:
+  /{sku}:
+    type: product
+    get:
+    put:
+    delete:

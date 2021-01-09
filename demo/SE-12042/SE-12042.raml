@@ -1,0 +1,52 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/217a24f8-9a87-4663-b3e8-4f807e661d80/ #
+title: Security Scheme Mocking Service Test
+version: v1.0.0
+protocols:
+  - HTTPS
+mediaType: application/json
+securedBy: x-clientIdSecret
+description: |
+  In the Design Centre, when you use custom authentication and the mocking service, you will see:
+
+  1   Authorization method
+  <Method Name> 
+   
+  2   Set authorization data"
+   
+  The authorization data may be already filled out, however the error:
+  "Fill in required parameters"
+   
+  remains. If you fill in at least one field, the error disappears, however the request still cannot be sent. All Authorization fields must be re-typed before you can submit the request
+
+  Steps to reproduce
+
+  Create a new API Specification
+  Import the attached File
+  Run the Mocking Service for api.xml
+  Click "Authorize and Send"
+  – This fails
+
+  Re-type the Client ID and Client Secret
+
+  Click "Authorize and Send"
+  – This works
+
+  Workaround
+  Re-type in the values and everything works!
+
+
+securitySchemes:
+  x-clientIdSecret: !include securitySchemes/x-clientIdSecret.raml
+
+/check/api-status:
+  get:
+    responses:
+      200:
+        description: "A successful API status check."
+        body:
+          application/json:
+            type: !include dataTypes/CheckAPIStatus.raml
+            examples:
+              success: !include examples/CheckAPIStatusExample1.raml
+              fail: !include examples/CheckAPIStatusExample2.raml

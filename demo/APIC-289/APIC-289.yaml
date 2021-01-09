@@ -1,0 +1,21 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: ParamRefExample
+
+paths:
+  /organization:
+    get:
+      parameters:
+      - $ref: "#/parameters/foo_bar"
+      responses:
+        200:
+          description: OK
+
+parameters:
+  foo_bar:
+    name: foo
+    in: query
+    required: true
+    type: string

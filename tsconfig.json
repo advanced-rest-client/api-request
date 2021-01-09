@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["es2017", "dom"],
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true
+  },
+  "include": [ "**/*.js", "node_modules/@open-wc/**/*.js",  "src/ApiUrlDataModel.d.ts", "src/ApiUrlParamsEditorElement.d.ts", "src/XhrSimpleRequestTransportElement.d.ts", "src/XhrSimpleRequestElement.d.ts", "api-response-view.d.ts", "src/ApiRequestEditorElement.d.ts", "src/ApiResponseViewElement.d.ts", "src/ApiRequestPanelElement.d.ts"],
+  "exclude": [
+    "node_modules/!(@open-wc)"
+  ]
+}

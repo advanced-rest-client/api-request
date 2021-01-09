@@ -1,0 +1,15 @@
+#%RAML 1.0 SecurityScheme
+description: Secures API with Mulesoft OUath2
+type: OAuth 2.0
+settings:
+  authorizationGrants:
+    [ client_credentials ]
+  accessTokenUri: security/token
+  authorizationUri: security/authorize
+describedBy:
+  headers:
+    Authorization:
+      description: Bearer {access_token}
+  responses:
+    401:
+      description: Unauthorized.

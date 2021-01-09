@@ -1,0 +1,906 @@
+{
+    "@id": "#68",
+    "@type": "http:EndPoint",
+    "http:path": "/api/user",
+    "hydra:supportedOperation": [
+        {
+            "@id": "#138",
+            "@type": "hydra:Operation",
+            "schema-org:description": "Update a user in db",
+            "schema-org:name": "Update a user",
+            "hydra:method": "put",
+            "hydra:returns": {
+                "@id": "#139",
+                "@type": "http:Response",
+                "http:payload": {
+                    "@id": "#140",
+                    "@type": "http:Payload",
+                    "http:mediaType": "application/json",
+                    "http:schema": {
+                        "@id": "#37"
+                    }
+                },
+                "schema-org:name": "201",
+                "hydra:statusCode": "201"
+            }
+        },
+        {
+            "@id": "#115",
+            "@type": "hydra:Operation",
+            "http://a.ml/vocabularies/security#security": {
+                "@id": "#137",
+                "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+                "http://a.ml/vocabularies/security#name": "myOtherAuth",
+                "http://a.ml/vocabularies/security#scheme": {
+                    "@id": "#63",
+                    "@type": "http://a.ml/vocabularies/security#SecurityScheme",
+                    "http://a.ml/vocabularies/security#name": "myOtherAuth",
+                    "http://a.ml/vocabularies/security#settings": {
+                        "@id": "#64",
+                        "@type": [
+                            "http://a.ml/vocabularies/security#Settings",
+                            "http://a.ml/vocabularies/security#OAuth2Settings"
+                        ],
+                        "http://a.ml/vocabularies/security#accessTokenUri": "https://authserver.example/token",
+                        "http://a.ml/vocabularies/security#authorizationGrant": "client_credentials",
+                        "http://a.ml/vocabularies/security#authorizationUri": "",
+                        "http://a.ml/vocabularies/security#scope": {
+                            "@id": "#65",
+                            "@type": "http://a.ml/vocabularies/security#Scope",
+                            "http://a.ml/vocabularies/security#name": "accounts"
+                        }
+                    },
+                    "http://a.ml/vocabularies/security#type": "OAuth 2.0"
+                }
+            },
+            "schema-org:description": "Create a user in db",
+            "schema-org:name": "Create a user",
+            "hydra:expects": {
+                "@id": "#116",
+                "@type": "http:Request",
+                "http:header": {
+                    "@id": "#117",
+                    "@type": "http:Parameter",
+                    "http:binding": "header",
+                    "http:paramName": "Content-Type",
+                    "http:schema": {
+                        "@id": "#118",
+                        "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "raml-shapes:ScalarShape"
+                        ],
+                        "doc:examples": {
+                            "@id": "#120",
+                            "@type": [
+                                "doc:DomainElement",
+                                "doc:Example"
+                            ],
+                            "doc:strict": true,
+                            "doc:structuredValue": {
+                                "@id": "#121",
+                                "@type": "http://a.ml/vocabularies/data#Scalar",
+                                "http://a.ml/vocabularies/data#value": "application/json"
+                            },
+                            "shacl:raw": "application/json"
+                        },
+                        "shacl:datatype": {
+                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                        },
+                        "shacl:defaultValue": {
+                            "@id": "#119",
+                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                            "http://a.ml/vocabularies/data#value": "application/json"
+                        },
+                        "shacl:defaultValueStr": "application/json",
+                        "shacl:name": "schema"
+                    },
+                    "schema-org:name": "Content-Type",
+                    "hydra:required": true
+                },
+                "http:payload": {
+                    "@id": "#122",
+                    "@type": "http:Payload",
+                    "http:mediaType": "application/json",
+                    "http:schema": {
+                        "@id": "#123",
+                        "@type": [
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "shacl:NodeShape",
+                            "doc:DomainElement"
+                        ],
+                        "shacl:closed": false,
+                        "shacl:name": "schema",
+                        "shacl:property": [
+                            {
+                                "@id": "#124",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#125",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "doc:examples": {
+                                        "@id": "#126",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "doc:Example"
+                                        ],
+                                        "doc:strict": true,
+                                        "doc:structuredValue": {
+                                            "@id": "#127",
+                                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                                            "http://a.ml/vocabularies/data#value": "Pepe"
+                                        },
+                                        "shacl:raw": "Pepe"
+                                    },
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:name": "name"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "name",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#name"
+                                }
+                            },
+                            {
+                                "@id": "#133",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#134",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:name": "birthday"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "birthday",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#birthday"
+                                }
+                            },
+                            {
+                                "@id": "#128",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#129",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "doc:examples": {
+                                        "@id": "#130",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "doc:Example"
+                                        ],
+                                        "doc:strict": true,
+                                        "doc:structuredValue": {
+                                            "@id": "#131",
+                                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                                            "http://a.ml/vocabularies/data#value": "Perez"
+                                        },
+                                        "shacl:raw": "Perez"
+                                    },
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:name": "lastname"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "lastname",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#lastname"
+                                }
+                            },
+                            {
+                                "@id": "#132",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#12"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "address",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#address"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "hydra:method": "post",
+            "hydra:returns": {
+                "@id": "#135",
+                "@type": "http:Response",
+                "http:payload": {
+                    "@id": "#136",
+                    "@type": "http:Payload",
+                    "http:mediaType": "application/json",
+                    "http:schema": {
+                        "@id": "#37"
+                    }
+                },
+                "schema-org:name": "201",
+                "hydra:statusCode": "201"
+            }
+        },
+        {
+            "@id": "#69",
+            "@type": "hydra:Operation",
+            "http://a.ml/vocabularies/security#security": {
+                "@id": "#114",
+                "@type": "http://a.ml/vocabularies/security#ParametrizedSecurityScheme",
+                "http://a.ml/vocabularies/security#name": "auth",
+                "http://a.ml/vocabularies/security#scheme": {
+                    "@id": "#55",
+                    "@type": "http://a.ml/vocabularies/security#SecurityScheme",
+                    "http://a.ml/vocabularies/security#name": "auth",
+                    "http://a.ml/vocabularies/security#settings": {
+                        "@id": "#56",
+                        "@type": [
+                            "http://a.ml/vocabularies/security#Settings",
+                            "http://a.ml/vocabularies/security#OAuth1Settings"
+                        ],
+                        "http://a.ml/vocabularies/security#additionalProperties": {
+                            "@id": "#57",
+                            "@type": "http://a.ml/vocabularies/data#Object",
+                            "http://a.ml/vocabularies/data#accessTokenUri": {
+                                "@id": "#58",
+                                "@type": "http://a.ml/vocabularies/data#Scalar",
+                                "http://a.ml/vocabularies/data#value": "https://authserver.example/token"
+                            },
+                            "http://a.ml/vocabularies/data#authorizationGrants": {
+                                "@id": "#59",
+                                "@type": [
+                                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                                    "http://a.ml/vocabularies/data#Array"
+                                ],
+                                "http://a.ml/vocabularies/data#pos0": {
+                                    "@id": "#60"
+                                },
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                                    "@id": "#60",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "client_credentials"
+                                }
+                            },
+                            "http://a.ml/vocabularies/data#scopes": {
+                                "@id": "#61",
+                                "@type": [
+                                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq",
+                                    "http://a.ml/vocabularies/data#Array"
+                                ],
+                                "http://a.ml/vocabularies/data#pos0": {
+                                    "@id": "#62"
+                                },
+                                "http://www.w3.org/1999/02/22-rdf-syntax-ns#member": {
+                                    "@id": "#62",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "accounts"
+                                }
+                            }
+                        },
+                        "http://a.ml/vocabularies/security#authorizationUri": "",
+                        "http://a.ml/vocabularies/security#requestTokenUri": "requestTokenUriValue",
+                        "http://a.ml/vocabularies/security#signature": [
+                            "signature2",
+                            "signature1"
+                        ],
+                        "http://a.ml/vocabularies/security#tokenCredentialsUri": "tokenCredentialsUriValue"
+                    },
+                    "http://a.ml/vocabularies/security#type": "OAuth 1.0"
+                }
+            },
+            "schema-org:description": "Get all users from db",
+            "schema-org:name": "Get all users",
+            "hydra:expects": {
+                "@id": "#70",
+                "@type": "http:Request",
+                "http:header": [
+                    {
+                        "@id": "#108",
+                        "@type": "http:Parameter",
+                        "http:binding": "header",
+                        "http:paramName": "Authorization",
+                        "http:schema": {
+                            "@id": "#109",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "doc:examples": {
+                                "@id": "#110",
+                                "@type": [
+                                    "doc:DomainElement",
+                                    "doc:Example"
+                                ],
+                                "doc:strict": true,
+                                "doc:structuredValue": {
+                                    "@id": "#111",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "Bearer 1d230676-a812-4438-bfeb-e46bad62bdf1"
+                                },
+                                "shacl:raw": "Bearer 1d230676-a812-4438-bfeb-e46bad62bdf1"
+                            },
+                            "shacl:datatype": {
+                                "@id": "http://www.w3.org/2001/XMLSchema#string"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "Authorization",
+                        "hydra:required": true
+                    },
+                    {
+                        "@id": "#104",
+                        "@type": "http:Parameter",
+                        "http:binding": "header",
+                        "http:paramName": "Content-Type",
+                        "http:schema": {
+                            "@id": "#105",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "doc:examples": {
+                                "@id": "#106",
+                                "@type": [
+                                    "doc:DomainElement",
+                                    "doc:Example"
+                                ],
+                                "doc:strict": true,
+                                "doc:structuredValue": {
+                                    "@id": "#107",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "application/json"
+                                },
+                                "shacl:raw": "application/json"
+                            },
+                            "shacl:datatype": {
+                                "@id": "http://www.w3.org/2001/XMLSchema#string"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "Content-Type",
+                        "hydra:required": true
+                    }
+                ],
+                "http:parameter": [
+                    {
+                        "@id": "#71",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "booleanParameter",
+                        "http:schema": {
+                            "@id": "#72",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "shacl:datatype": {
+                                "@id": "http://www.w3.org/2001/XMLSchema#boolean"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "booleanParameter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#82",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "numberParameter",
+                        "http:schema": {
+                            "@id": "#83",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "shacl:datatype": {
+                                "@id": "raml-shapes:number"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "numberParameter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#76",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "nestedArrayParameter",
+                        "http:schema": {
+                            "@id": "#77",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ArrayShape",
+                                "raml-shapes:MatrixShape"
+                            ],
+                            "raml-shapes:items": {
+                                "@id": "#78",
+                                "@type": [
+                                    "doc:DomainElement",
+                                    "raml-shapes:Shape",
+                                    "shacl:Shape",
+                                    "raml-shapes:ArrayShape"
+                                ],
+                                "raml-shapes:items": {
+                                    "@id": "#79",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:name": "items"
+                                },
+                                "shacl:name": "items"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "nestedArrayParameter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#84",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "enumParemeter",
+                        "http:schema": {
+                            "@id": "#85",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "shacl:datatype": {
+                                "@id": "http://www.w3.org/2001/XMLSchema#string"
+                            },
+                            "shacl:in": {
+                                "@id": "#85/list",
+                                "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                                "http://www.w3.org/2000/01/rdf-schema#_1": {
+                                    "@id": "#87",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "EnumValue1"
+                                },
+                                "http://www.w3.org/2000/01/rdf-schema#_2": {
+                                    "@id": "#88",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "EnumValue2"
+                                },
+                                "http://www.w3.org/2000/01/rdf-schema#_3": {
+                                    "@id": "#89",
+                                    "@type": "http://a.ml/vocabularies/data#Scalar",
+                                    "http://a.ml/vocabularies/data#value": "EnumValue3"
+                                }
+                            },
+                            "shacl:name": "type"
+                        },
+                        "schema-org:name": "enumParemeter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#73",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "arrayParameter",
+                        "http:schema": {
+                            "@id": "#74",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ArrayShape"
+                            ],
+                            "raml-shapes:items": {
+                                "@id": "#75",
+                                "@type": [
+                                    "doc:DomainElement",
+                                    "raml-shapes:Shape",
+                                    "shacl:Shape",
+                                    "raml-shapes:ScalarShape"
+                                ],
+                                "shacl:datatype": {
+                                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                },
+                                "shacl:name": "items"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "arrayParameter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#91",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "objectParameter",
+                        "http:schema": {
+                            "@id": "#92",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "shacl:NodeShape"
+                            ],
+                            "shacl:closed": false,
+                            "shacl:name": "schema",
+                            "shacl:property": [
+                                {
+                                    "@id": "#97",
+                                    "@type": "shacl:PropertyShape",
+                                    "raml-shapes:range": {
+                                        "@id": "#98",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "raml-shapes:Shape",
+                                            "shacl:Shape",
+                                            "raml-shapes:ScalarShape"
+                                        ],
+                                        "shacl:datatype": {
+                                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                        },
+                                        "shacl:in": {
+                                            "@id": "#98/list",
+                                            "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                                            "http://www.w3.org/2000/01/rdf-schema#_1": {
+                                                "@id": "#99",
+                                                "@type": "http://a.ml/vocabularies/data#Scalar",
+                                                "http://a.ml/vocabularies/data#value": "ObjectPropertyEnumValue1"
+                                            },
+                                            "http://www.w3.org/2000/01/rdf-schema#_2": {
+                                                "@id": "#100",
+                                                "@type": "http://a.ml/vocabularies/data#Scalar",
+                                                "http://a.ml/vocabularies/data#value": "ObjectPropertyEnumValue2"
+                                            },
+                                            "http://www.w3.org/2000/01/rdf-schema#_3": {
+                                                "@id": "#101",
+                                                "@type": "http://a.ml/vocabularies/data#Scalar",
+                                                "http://a.ml/vocabularies/data#value": "ObjectPropertyEnumValue3"
+                                            }
+                                        },
+                                        "shacl:name": "objectProperty3"
+                                    },
+                                    "shacl:minCount": 1,
+                                    "shacl:name": "objectProperty3",
+                                    "shacl:path": {
+                                        "@id": "http://a.ml/vocabularies/data#objectProperty3"
+                                    }
+                                },
+                                {
+                                    "@id": "#95",
+                                    "@type": "shacl:PropertyShape",
+                                    "raml-shapes:range": {
+                                        "@id": "#96",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "raml-shapes:Shape",
+                                            "shacl:Shape",
+                                            "raml-shapes:ScalarShape"
+                                        ],
+                                        "shacl:datatype": {
+                                            "@id": "raml-shapes:number"
+                                        },
+                                        "shacl:name": "objectProperty2"
+                                    },
+                                    "shacl:minCount": 1,
+                                    "shacl:name": "objectProperty2",
+                                    "shacl:path": {
+                                        "@id": "http://a.ml/vocabularies/data#objectProperty2"
+                                    }
+                                },
+                                {
+                                    "@id": "#93",
+                                    "@type": "shacl:PropertyShape",
+                                    "raml-shapes:range": {
+                                        "@id": "#94",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "raml-shapes:Shape",
+                                            "shacl:Shape",
+                                            "raml-shapes:ScalarShape"
+                                        ],
+                                        "shacl:datatype": {
+                                            "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                        },
+                                        "shacl:name": "objectProperty1"
+                                    },
+                                    "shacl:minCount": 1,
+                                    "shacl:name": "objectProperty1",
+                                    "shacl:path": {
+                                        "@id": "http://a.ml/vocabularies/data#objectProperty1"
+                                    }
+                                }
+                            ]
+                        },
+                        "schema-org:name": "objectParameter",
+                        "hydra:required": false
+                    },
+                    {
+                        "@id": "#80",
+                        "@type": "http:Parameter",
+                        "http:binding": "query",
+                        "http:paramName": "stringParameter",
+                        "http:schema": {
+                            "@id": "#81",
+                            "@type": [
+                                "doc:DomainElement",
+                                "raml-shapes:Shape",
+                                "shacl:Shape",
+                                "raml-shapes:ScalarShape"
+                            ],
+                            "shacl:datatype": {
+                                "@id": "http://www.w3.org/2001/XMLSchema#string"
+                            },
+                            "shacl:name": "schema"
+                        },
+                        "schema-org:name": "stringParameter",
+                        "hydra:required": true
+                    }
+                ]
+            },
+            "hydra:method": "get",
+            "hydra:returns": {
+                "@id": "#112",
+                "@type": "http:Response",
+                "http:payload": {
+                    "@id": "#113",
+                    "@type": "http:Payload",
+                    "http:mediaType": "application/json",
+                    "http:schema": {
+                        "@id": "#37",
+                        "@type": [
+                            "doc:DomainElement",
+                            "raml-shapes:Shape",
+                            "shacl:Shape",
+                            "shacl:NodeShape"
+                        ],
+                        "shacl:closed": false,
+                        "shacl:name": "User",
+                        "shacl:property": [
+                            {
+                                "@id": "#44",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#12",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "shacl:NodeShape"
+                                    ],
+                                    "doc:examples": {
+                                        "@id": "#17",
+                                        "@type": [
+                                            "doc:DomainElement",
+                                            "doc:Example"
+                                        ],
+                                        "doc:strict": true,
+                                        "doc:structuredValue": {
+                                            "@id": "#18",
+                                            "@type": "http://a.ml/vocabularies/data#Object",
+                                            "http://a.ml/vocabularies/data#number": {
+                                                "@id": "#19"
+                                            },
+                                            "http://a.ml/vocabularies/data#street": {
+                                                "@id": "#20"
+                                            }
+                                        },
+                                        "shacl:raw": "\n                number: 20\n                street: Pepe\n"
+                                    },
+                                    "shacl:closed": false,
+                                    "shacl:name": "Address",
+                                    "shacl:property": [
+                                        {
+                                            "@id": "#15",
+                                            "@type": "shacl:PropertyShape",
+                                            "raml-shapes:range": {
+                                                "@id": "#16",
+                                                "@type": [
+                                                    "doc:DomainElement",
+                                                    "raml-shapes:Shape",
+                                                    "shacl:Shape",
+                                                    "raml-shapes:ScalarShape"
+                                                ],
+                                                "shacl:datatype": {
+                                                    "@id": "raml-shapes:number"
+                                                },
+                                                "shacl:maxInclusive": 99999999,
+                                                "shacl:minInclusive": 1,
+                                                "shacl:name": "number"
+                                            },
+                                            "shacl:minCount": 1,
+                                            "shacl:name": "number",
+                                            "shacl:path": {
+                                                "@id": "http://a.ml/vocabularies/data#number"
+                                            }
+                                        },
+                                        {
+                                            "@id": "#13",
+                                            "@type": "shacl:PropertyShape",
+                                            "raml-shapes:range": {
+                                                "@id": "#14",
+                                                "@type": [
+                                                    "doc:DomainElement",
+                                                    "raml-shapes:Shape",
+                                                    "shacl:Shape",
+                                                    "raml-shapes:ScalarShape"
+                                                ],
+                                                "shacl:datatype": {
+                                                    "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                                },
+                                                "shacl:name": "street"
+                                            },
+                                            "shacl:minCount": 1,
+                                            "shacl:name": "street",
+                                            "shacl:path": {
+                                                "@id": "http://a.ml/vocabularies/data#street"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "address",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#address"
+                                }
+                            },
+                            {
+                                "@id": "#38",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#39",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:maxLength": 50,
+                                    "shacl:name": "name"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "name",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#name"
+                                }
+                            },
+                            {
+                                "@id": "#42",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#43",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#date"
+                                    },
+                                    "shacl:name": "birthday"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "birthday",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#birthday"
+                                }
+                            },
+                            {
+                                "@id": "#45",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#46",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:in": {
+                                        "@id": "#46/list",
+                                        "@type": "http://www.w3.org/2000/01/rdf-schema#Seq",
+                                        "http://www.w3.org/2000/01/rdf-schema#_1": {
+                                            "@id": "#47",
+                                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                                            "http://a.ml/vocabularies/data#value": "Admin"
+                                        },
+                                        "http://www.w3.org/2000/01/rdf-schema#_2": {
+                                            "@id": "#48",
+                                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                                            "http://a.ml/vocabularies/data#value": "User"
+                                        },
+                                        "http://www.w3.org/2000/01/rdf-schema#_3": {
+                                            "@id": "#49",
+                                            "@type": "http://a.ml/vocabularies/data#Scalar",
+                                            "http://a.ml/vocabularies/data#value": "System"
+                                        }
+                                    },
+                                    "shacl:name": "type"
+                                },
+                                "shacl:minCount": 0,
+                                "shacl:name": "type",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#type"
+                                }
+                            },
+                            {
+                                "@id": "#40",
+                                "@type": "shacl:PropertyShape",
+                                "raml-shapes:range": {
+                                    "@id": "#41",
+                                    "@type": [
+                                        "doc:DomainElement",
+                                        "raml-shapes:Shape",
+                                        "shacl:Shape",
+                                        "raml-shapes:ScalarShape"
+                                    ],
+                                    "shacl:datatype": {
+                                        "@id": "http://www.w3.org/2001/XMLSchema#string"
+                                    },
+                                    "shacl:minLength": 10,
+                                    "shacl:name": "password"
+                                },
+                                "shacl:minCount": 1,
+                                "shacl:name": "password",
+                                "shacl:path": {
+                                    "@id": "http://a.ml/vocabularies/data#password"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "schema-org:description": "asd",
+                "schema-org:name": "200",
+                "hydra:statusCode": "200"
+            }
+        }
+    ],
+    "@context": {
+        "@base": "amf://id",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "shacl": "http://www.w3.org/ns/shacl#",
+        "doc": "http://a.ml/vocabularies/document#",
+        "schema-org": "http://schema.org/",
+        "http": "http://a.ml/vocabularies/http#",
+        "raml-shapes": "http://a.ml/vocabularies/shapes#",
+        "smap": "http://a.ml/vocabularies/document-source-maps"
+    }
+}

@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+description: product
+properties:
+  sku:
+    type: string
+    description:  Item SKU
+  photo:
+  description:
+  upc:
+  seriesName:
+  weight:
+    type: number
+    multipleOf: 0.001
+examples:
+  application/json: !include ../examples/product.json

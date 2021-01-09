@@ -1,0 +1,15 @@
+#%RAML 1.0 SecurityScheme
+description: Secures API with OUath bearer token
+type: OAuth 2.0
+settings:
+  authorizationGrants:
+    [ client_credentials, password, authorization_code, implicit ]
+  accessTokenUri: https://login.microsoftonline.com/MasterAshley.onmicrosoft.com/oauth2/v2.0/token
+  authorizationUri: https://login.microsoftonline.com/MasterAshley.onmicrosoft.com/oauth2/v2.0/authorize
+describedBy:
+  headers:
+    Authorization:
+      description: Bearer {access_token}
+  responses:
+    401:
+      description: Unauthorized.

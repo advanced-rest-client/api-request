@@ -1,0 +1,8 @@
+#%RAML 1.0 Trait
+description: Searchable endpoint query parameters
+queryParameters:
+  query:
+    description: |
+      JSON array [{"field1","value1","operator1"},{"field2","value2","operator2"}]
+    example: |
+      [ {"propertyA", "abc", "like"}, {"propertyB", "abc", "equals"} ]

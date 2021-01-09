@@ -1,0 +1,20 @@
+#%RAML 1.0 DataType
+description: error
+properties:
+  domain:
+    type: string
+    description: "error domain"
+  reason:
+    type: string
+    description: "error reason"
+  message:
+    type: string
+    description: "error message"
+  location:
+    type: string
+    description: "error location"
+  locationType:
+    type: string
+    description: "error location type"
+examples:
+  application/json: !include examples/innerError.json

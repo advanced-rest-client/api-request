@@ -1,0 +1,61 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: OAS OAuth flows API
+
+servers:
+  - url: https://{customerId}.saas-app.com:{port}/v2
+    variables:
+      customerId:
+        default: demo
+        description: Customer ID assigned by the service provider
+      port:
+        enum:
+          - '443'
+          - '8443'
+        default: '443'
+
+components:
+  securitySchemes:
+    oAuthSample:
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        implicit:
+          authorizationUrl: https://api.example.com/oauth2/authorize
+          scopes:
+            read_pets: read your pets
+            write_pets: modify pets in your account
+        authorizationCode:
+          authorizationUrl: /oauth2/authorize
+          tokenUrl: /oauth2/token
+          refreshUrl: /oauth2/refresh
+          scopes:
+            all: full access
+        password:
+          tokenUrl: /oauth2/token-password
+          refreshUrl: /oauth2/refresh-password
+          scopes:
+            read_pets: read your pets
+        clientCredentials:
+          tokenUrl: /oauth2/token-client
+          refreshUrl: /oauth2/refresh-client
+          scopes: {}
+
+security:
+  - oAuthSample:
+    - write_pets
+    - read_pets
+
+paths:
+  /pets:
+    patch:
+      summary: Add a new pet
+      security:
+        - oAuthSample:
+          - write_pets
+          - read_pets
+      responses:
+        default:
+          description: Unexpected error
