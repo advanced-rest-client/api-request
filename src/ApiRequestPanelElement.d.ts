@@ -28,6 +28,7 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
   amf: any;
   /**
    * AMF HTTP method (operation in AMF vocabulary) ID.
+   * @attribute
    */
   selected: string;
   /**
@@ -35,17 +36,20 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * property. When using `api-navigation` element
    * by setting this property the element listens for navigation events
    * and updates the state
+   * @attribute
    */
   handleNavigationEvents: boolean;
   /**
    * Hides the URL editor from the view.
    * The editor is still in the DOM and the `urlInvalid` property still will be set.
+   * @attribute
    */
   noUrlEditor: boolean;
   /**
    * When set it renders a label with the computed URL.
    * This intended to be used with `noUrlEditor` set to true.
    * This way it replaces the editor with a simple label.
+   * @attribute
    */
   urlLabel: boolean;
   /**
@@ -53,27 +57,33 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * declaration and this produces invalid URL input. This information
    * is passed to the URL editor that prefixes the URL with `baseUri` value
    * if passed URL is a relative URL.
+   * @attribute
    */
   baseUri: string;
   /**
    * OAuth2 redirect URI.
    * This value **must** be set in order for OAuth 1/2 to work properly.
+   * @attribute
    */
   redirectUri: string;
   /**
    * Enables compatibility with Anypoint styling
+   * @attribute
    */
   compatibility: boolean;
   /**
    * Enables Material Design outlined style
+   * @attribute
    */
   outlined: boolean;
   /**
    * When set the editor is in read only mode.
+   * @attribute
    */
   readOnly: boolean;
   /**
    * When set all controls are disabled in the form
+   * @attribute
    */
   disabled: boolean;
   /**
@@ -106,17 +116,20 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * If the proxy require a to pass the URL as a query parameter define value as follows:
    * `https://proxy.com/path/?url=`. In this case be sure to set `proxy-encode-url`
    * attribute.
+   * @attribute
    */
   proxy: string;
   /**
    * If `proxy` is set, it will URL encode the request URL before appending it to the proxy URL.
    * `http://domain.com/path/?query=some+value` will become
    * `https://proxy.com/?url=http%3A%2F%2Fdomain.com%2Fpath%2F%3Fquery%3Dsome%2Bvalue`
+   * @attribute
    */
   proxyEncodeUrl: boolean;
   /**
    * Location of the `node_modules` folder.
    * It should be a path from server's root path including node_modules.
+   * @attribute
    */
   authPopupLocation: string;
   /**
@@ -127,22 +140,26 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    *
    * This system allows to use different request panels on single app
    * and don't mix the results.
+   * @attribute
    */
   lastRequestId: string;
   /**
    * If set it computes `hasOptional` property and shows checkbox in the
    * form to show / hide optional properties.
+   * @attribute
    */
   allowHideOptional: boolean;
   /**
    * If set, enable / disable param checkbox is rendered next to each
    * form item.
+   * @attribute
    */
   allowDisableParams: boolean;
   /**
    * When set, renders "add custom" item button.
    * If the element is to be used without AMF model this should always
    * be enabled. Otherwise users won't be able to add a parameter.
+   * @attribute
    */
   allowCustom: boolean;
   /**
@@ -176,26 +193,31 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * instead of web api to be passed to the `api-url-data-model` element.
    *
    * Do not set with full AMF web API model.
+   * @attribute
    */
   version: string;
   /**
    * Holds the value of the currently selected server
    * Data type: URI
+   * @attribute
    */
   serverValue: string;
   /**
    * Holds the type of the currently selected server
    * Values: `server` | `slot` | `custom`
+   * @attribute
    */
   serverType: string;
   /**
    * Optional property to set
    * If true, the server selector is not rendered
+   * @attribute
    */
   noServerSelector: boolean;
   /**
    * Optional property to set
    * If true, the server selector custom base URI option is rendered
+   * @attribute
    */
   allowCustomBaseUri: boolean;
 

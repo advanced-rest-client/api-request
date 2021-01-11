@@ -195,6 +195,10 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
   _endpointUri: string;
   _apiBaseUri: string;
   /**
+   * @attribute
+   */
+  serversCount: number;
+  /**
    * Holds the value of the currently selected server
    * Data type: URI
    * @attribute
@@ -218,6 +222,8 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @attribute
    */
   allowCustomBaseUri: boolean;
+
+  servers: any[];
 
   get httpMethod(): string;
 
@@ -279,7 +285,7 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * Dispatches bubbling and composed custom event.
    * By default the event is cancelable until `cancelable` property is set to false.
    */
-  _dispatch(type: string, detail?: any, cancelable?: boolean): void;
+  _dispatch(type: string, detail?: any, cancelable?: boolean): CustomEvent;
 
   /**
    * Clears the request properties.

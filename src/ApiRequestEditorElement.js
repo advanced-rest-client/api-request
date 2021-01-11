@@ -508,7 +508,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @param {string} type Event type
    * @param {any=} detail A detail to set
    * @param {boolean=} cancelable When false the event is not cancelable.
-   * @return {CustomEvent}
+   * @returns {CustomEvent}
    */
   _dispatch(type, detail, cancelable=true) {
     const e = new CustomEvent(type, {
