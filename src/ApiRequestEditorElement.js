@@ -1068,7 +1068,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       allowHideOptional,
     } = this;
     return html`
-    <div class="editor-section" ?hidden="${!_apiHeaders}">
+    <div class="editor-section" ?hidden="${!_apiHeaders && !allowCustom}">
       <div role="heading" aria-level="2" class="section-title">Headers</div>
       <api-headers-editor
         @change="${this._headersHandler}"
