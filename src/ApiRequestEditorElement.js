@@ -19,7 +19,7 @@ import { apiFormStyles } from '@api-components/api-forms';
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { TelemetryEvents } from '@advanced-rest-client/arc-events';
 import { v4 } from '@advanced-rest-client/uuid-generator';
-import { UrlParser } from '@advanced-rest-client/arc-url';
+import { UrlParser } from '@advanced-rest-client/arc-url/src/UrlParser.js';
 import { HeadersParser } from '@advanced-rest-client/arc-headers';
 import '@api-components/api-url/api-url-editor.js';
 import '@api-components/api-url/api-url-params-editor.js';
