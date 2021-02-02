@@ -731,6 +731,23 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.abort();
   }
 
+  requestHeaders() {
+    let headers = this.headers || ''
+    const contentType = HeadersParser.contentType(headers);
+    const method = (this.httpMethod || 'get').toUpperCase()
+    const isPayloadMethod = ['GET', 'HEAD'].indexOf(method) === -1
+
+    if (isPayloadMethod && contentType && contentType.includes('multipart') && !contentType.includes('boundary')) {
+      const request = new Request('/', {
+        method,
+        body: this._payload
+      });
+      headers = request.headers.get('content-type')
+    }
+
+    return headers
+  }
+
   /**
    * Returns an object with the request properties.
    * The object contains:
@@ -759,7 +776,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const result = /** @type ApiConsoleRequest */ ({
       method: (this.httpMethod || 'get').toUpperCase(),
       url: this.url,
-      headers: this.headers || '',
+      headers: this.requestHeaders()
     });
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
       result.payload = this._payload;
