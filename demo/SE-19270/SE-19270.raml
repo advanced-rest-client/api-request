@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: FileUpload
+
+/fileUpload:
+  post:
+    body:
+      multipart/form-data:
+      application/json: 
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {Result : "File uploaded successfully"}

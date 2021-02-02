@@ -999,4 +999,31 @@ describe('ApiRequestEditorElement', () => {
       });
     });
   });
+
+  [
+    ['Compact model', true],
+    ['Regular model', false]
+  ].forEach(([, compact]) => {
+    describe('SE-19270', () => {
+      let element = /** @type ApiRequestEditorElement */ (null);
+      beforeEach(async () => {
+        const amf = await AmfLoader.load({ fileName: 'SE-19270', compact });
+        const methodId = AmfLoader.lookupOperation(amf, '/fileUpload', 'post')['@id'];
+        element = await modelFixture(amf, methodId);
+        await nextFrame();
+      });
+
+      it('Returns false for GET', async () => {
+        element._headers = 'content-type: multipart/form-data'
+
+        const payload = new FormData()
+        payload.append('test', new Blob(['test']));
+        element._payload = payload
+
+        const result = element.serializeRequest();
+        assert.ok(result);
+        assert.isTrue(result.headers.includes('multipart/form-data; boundary='))
+      });
+    });
+  })
 });
