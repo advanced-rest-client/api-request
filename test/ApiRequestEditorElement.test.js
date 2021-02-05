@@ -995,8 +995,32 @@ describe('ApiRequestEditorElement', () => {
           await nextFrame();
           assert.lengthOf(element.servers, 2);
         });
-
       });
+    });
+  });
+
+  describe('serializeRequest()', () => {
+    let element = /** @type ApiRequestEditorElement */ (null);
+    beforeEach(async () => {
+      element = await basicFixture();
+      element._httpMethod = 'POST';
+      element.url = 'some-url';
+    });
+
+    it('should remove multipart content type if form data payload', () => {
+      element._headers = 'content-type: multipart/form-data';
+      element._payload = new FormData()
+      const request = element.serializeRequest()
+
+      assert.equal(request.headers, '');
+    });
+
+    it('should not modify headers if content type not defined and form data payload', () => {
+      element._headers = '';
+      element._payload = new FormData()
+      const request = element.serializeRequest()
+
+      assert.equal(request.headers, '');
     });
   });
 });
