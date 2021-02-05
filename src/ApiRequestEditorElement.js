@@ -756,12 +756,18 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {ApiConsoleRequest}
    */
   serializeRequest() {
+    const method = (this.httpMethod || 'get').toUpperCase()
     const result = /** @type ApiConsoleRequest */ ({
-      method: (this.httpMethod || 'get').toUpperCase(),
+      method,
       url: this.url,
       headers: this.headers || '',
     });
+
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
+      const payload = this._payload
+      if (payload instanceof FormData) {
+        result.headers = HeadersParser.replace(result.headers, 'content-type', null);
+      }
       result.payload = this._payload;
     }
 
