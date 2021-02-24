@@ -766,7 +766,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
       const payload = this._payload
       if (payload instanceof FormData) {
-        result.headers = HeadersParser.replace(result.headers, 'content-type', null);
+        result.headers = /** @type string */ (HeadersParser.replace(result.headers, 'content-type', null));
       }
       result.payload = this._payload;
     }

@@ -10,8 +10,9 @@ import elementStyles from './styles/Response.styles.js';
 export const saveFileHandler = Symbol('saveFileHandler');
 
 export class ApiResponseViewElement extends ResponseViewElement {
+  // @ts-ignore
   get styles() {
-    return elementStyles;
+    return [elementStyles, super.styles];
   }
 
   constructor() {
@@ -62,6 +63,7 @@ export class ApiResponseViewElement extends ResponseViewElement {
       return html``;
     }
     return html`
+    <style>${this.styles}</style>
     ${this[urlStatusTemplate]()}
     ${this[responseHeadersTemplate]()}
     ${this[responseTemplate]('response', true)}
