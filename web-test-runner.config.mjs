@@ -9,7 +9,7 @@ export default {
 			return next();
 		}
 	],
-	testsFinishTimeout: 10000,
+	testsFinishTimeout: 60000,
 	testRunnerHtml: (testFramework) =>
     `<html>
 		<body>
