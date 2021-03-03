@@ -740,6 +740,26 @@ describe('ApiRequestEditorElement', () => {
           assert.equal(text, 'http://production.domain.com/people');
         });
       });
+
+      describe('slotted servers', () => {
+        let element = /** @type ApiRequestEditorElement */ (null);
+        let amf;
+
+        beforeEach(async () => {
+          element = await customBaseUriSlotFixture();
+          amf = await AmfLoader.load({ compact });
+          element.amf = amf;
+          const op = AmfLoader.lookupOperation(amf, '/people', 'get')
+          element.selected = op['@id'];
+          await aTimeout(0);
+        });
+
+        it('should update api-url-editor value after selecting slotted base uri', async () => {
+          element._serverHandler(new CustomEvent('apiserverchanged', { detail: { value: 'http://customServer.com', type: 'uri' } }));
+          await aTimeout(0);
+          assert.equal(element.shadowRoot.querySelector('api-url-editor').value, 'http://customServer.com/people');
+        });
+      })
     });
   });
 
