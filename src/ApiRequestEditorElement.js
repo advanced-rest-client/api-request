@@ -310,6 +310,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     }
     this._serverValue = value;
     this._updateServer();
+    this.readUrlData();
     this.requestUpdate('serverValue', old);
   }
 
