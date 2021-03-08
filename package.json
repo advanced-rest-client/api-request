@@ -40,7 +40,7 @@
     "@anypoint-web-components/anypoint-button": "^1.1.1",
     "@anypoint-web-components/anypoint-item": "^1.1.0",
     "@api-components/amf-helper-mixin": "^4.3.4",
-    "@api-components/api-authorization": "^0.5.1",
+    "@api-components/api-authorization": "^0.6.0",
     "@api-components/api-body-editor": "^4.0.5",
     "@api-components/api-forms": "^0.2.1",
     "@api-components/api-headers": "^0.1.0",
