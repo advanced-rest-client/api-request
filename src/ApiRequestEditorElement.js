@@ -225,6 +225,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * If true, the server selector custom base URI option is rendered
        */
       allowCustomBaseUri: { type: Boolean },
+      /**
+       * List of credentials source
+       */
+      credentialsSource: { type: Array },
     };
   }
 
@@ -434,6 +438,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.allowDisableParams = false;
     this.allowHideOptional = false;
     this.allowCustomBaseUri = false;
+    this.credentialsSource = [];
 
     /**
      * @type string
@@ -1143,6 +1148,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       outlined,
       compatibility,
       _securedBy,
+      credentialsSource
     } = this;
     return html`<div class="editor-section">
       <div role="heading" aria-level="2" class="section-title">Credentials</div>
@@ -1154,6 +1160,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         ?disabled="${disabled}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
+        .credentialsSource="${credentialsSource}"
         @change=${this._authChanged}
       ></api-authorization>
     </div>`;
