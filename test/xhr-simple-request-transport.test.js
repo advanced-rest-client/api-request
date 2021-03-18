@@ -171,10 +171,27 @@ describe('<xhr-simple-request-transport>', () => {
       assert.equal(headers['x-b'], 'test2');
     });
 
-    it('adds request headers', async () => {
+    it('adds request string headers', async () => {
       element.send({
         url: 'http://success.domain.com/headers',
         headers: 'accept: application/json\nx-test:true',
+        method: 'GET',
+      });
+      const result = await element.completes;
+      const headers = JSON.parse(result.response);
+      assert.equal(headers['x-a'], 'test1');
+      assert.equal(headers['x-b'], 'test2');
+      assert.equal(headers.accept, 'application/json');
+      assert.equal(headers['x-test'], 'true');
+    });
+
+    it('adds request headers', async () => {
+      const requestHeaders = new Headers()
+      requestHeaders.set('accept', 'application/json');
+      requestHeaders.set('nx-test', 'true');
+      element.send({
+        url: 'http://success.domain.com/headers',
+        headers: requestHeaders,
         method: 'GET',
       });
       const result = await element.completes;
