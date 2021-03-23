@@ -162,6 +162,21 @@ describe('ApiRequestPanelElement', () => {
       assert.equal(spy.args[0][0].detail.headers, 'x-test: header-value');
     });
 
+    it('Should add string headers to api-request event', async () => {
+      const element = await basicFixture();
+
+      const headers = new Headers()
+      headers.append('content-type', 'application/json');
+      appendRequestData(element, { headers });
+
+      const spy = sinon.spy();
+      element.addEventListener('api-request', spy);
+      const editor = element.shadowRoot.querySelector('api-request-editor');
+      editor.execute();
+
+      assert.equal(spy.args[0][0].detail.headers, 'content-type: application/json');
+    });
+
     it('Replaces headers in the request', async () => {
       const element = await addHeadersFixture();
       appendRequestData(element, {
