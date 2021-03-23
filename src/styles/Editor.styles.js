@@ -58,10 +58,11 @@ api-url-editor {
 }
 
 .section-title {
-  margin: 0.83em 8px;
-  letter-spacing: 0.1rem;
-  font-size: 20px;
-  font-weight: 200;
+  margin: var(--arc-font-subhead-margin, 0.83em 8px);
+  letter-spacing: var(--arc-font-subhead-letter-spacing, 0.1rem);
+  font-size: var(--arc-font-subhead-font-size, 20px);
+  font-weight: var(--arc-font-subhead-font-weight, 200);
+  line-height: var(--arc-font-subhead-line-height);
 }
 
 .editor-section {
