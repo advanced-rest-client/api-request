@@ -78,9 +78,11 @@ authorization-panel {
 }
 
 :host([compatibility]) .section-title {
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: initial;
+  font-size: var(--anypoint-subhead-font-size, var(---arc-font-subhead-font-size, 18px));
+  font-weight: var(--anypoint-subhead-font-weight, var(--arc-font-subhead-font-weight, 400));
+  letter-spacing: var(--anypoint-subhead-letter-spacing, var(--arc-font-subhead-letter-spacing, initial));
+  margin: var(--anypoint-subhead-margin, var(--arc-font-subhead-margin, 0.83em 8px));
+  line-height: var(--anypoint-subhead-line-height, var(--arc-font-subhead-line-height));
 }
 
 :host([narrow]) .content {
