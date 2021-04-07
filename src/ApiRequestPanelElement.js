@@ -534,7 +534,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       .serverType="${serverType}"
       ?noServerSelector="${noServerSelector}"
       ?allowCustomBaseUri="${allowCustomBaseUri}"
-      credentialsSource="${credentialsSource}"
+      .credentialsSource="${credentialsSource}"
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-request-editor>`;
