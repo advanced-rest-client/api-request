@@ -285,7 +285,6 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     this.serverType = undefined;
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
-    this.credentialsSource = [];
 
     /**  
      * @type {TransportRequest}
