@@ -1,7 +1,6 @@
 import { HTTPRequest } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
 import { ApiAuthorizationSettings } from '@api-components/api-authorization/src/types';
 import { XhrSimpleRequestTransportElement } from './XhrSimpleRequestTransportElement';
-import { CredentialSource } from '@api-components/api-authorization/src/types';
 
 export declare interface ApiConsoleRequest extends HTTPRequest {
   /**
@@ -48,5 +47,3 @@ export declare interface XHRQueueItem {
   request: ApiConsoleRequest;
   xhr: XhrSimpleRequestTransportElement;
 }
-
-export {CredentialSource}
