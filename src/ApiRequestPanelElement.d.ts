@@ -223,7 +223,6 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
   allowCustomBaseUri: boolean;
   /**
    * List of credentials source
-   * @attribute
    */
   credentialsSource: Array<CredentialSource>
 
