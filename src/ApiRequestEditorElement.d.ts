@@ -18,9 +18,8 @@ import { AmfHelperMixin } from '@api-components/amf-helper-mixin';
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
 import { ApiAuthorization } from '@api-components/api-authorization';
-import { CredentialSource } from '@api-components/api-authorization/src/types';
 import { ApiAuthorizationSettings, AuthorizationParams } from '@api-components/api-authorization/src/types';
-import { ApiConsoleRequest } from './types';
+import { ApiConsoleRequest, CredentialSource } from './types';
 
 export const EventCategory = 'API Request editor';
 
