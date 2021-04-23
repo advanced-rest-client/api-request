@@ -92,16 +92,14 @@ describe('<xhr-simple-request-transport>', () => {
       assert.isFalse(element.timedOut);
     });
 
-    it('sets resolveCompletes', async done => {
+    it('sets resolveCompletes', async () => {
       await nextFrame();
       assert.ok(element.resolveCompletes);
-      done()
     });
 
-    it('sets rejectCompletes', async done => {
+    it('sets rejectCompletes', async () => {
       await nextFrame();
       assert.ok(element.rejectCompletes);
-      done();
     });
   });
 
