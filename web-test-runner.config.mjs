@@ -11,7 +11,7 @@ export default {
   ],
   testFramework: {
     config: {
-      timeout: 20000,
+      timeout: 40000,
     },
   },
   testRunnerHtml: (testFramework) =>
