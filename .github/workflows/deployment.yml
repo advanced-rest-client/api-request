@@ -11,6 +11,7 @@ on:
     branches:
       - master
       - main
+      - stage
 jobs:
   test_linux:
     name: ${{ matrix.os }}
