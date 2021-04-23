@@ -217,6 +217,10 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        * If true, the server selector custom base URI option is rendered
        */
       allowCustomBaseUri: { type: Boolean },
+      /**
+       * List of credentials source
+       */
+      credentialsSource: { type: Array },
     };
   }
 
@@ -503,6 +507,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       serverType,
       noServerSelector,
       allowCustomBaseUri,
+      credentialsSource
     } = this;
 
     return html`
@@ -528,6 +533,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       .serverType="${serverType}"
       ?noServerSelector="${noServerSelector}"
       ?allowCustomBaseUri="${allowCustomBaseUri}"
+      .credentialsSource="${credentialsSource}"
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-request-editor>`;

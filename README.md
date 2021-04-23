@@ -4,7 +4,7 @@ A set of composite components that are used to build an HTTP request editor with
 
 [![Published on NPM](https://img.shields.io/npm/v/@api-components/api-request.svg)](https://www.npmjs.com/package/@advanced-rest-client/api-request)
 
-[![Build Status](https://travis-ci.com/advanced-rest-client/api-request.svg)](https://travis-ci.com/advanced-rest-client/api-request)
+[![Tests and publishing](https://github.com/advanced-rest-client/api-request/actions/workflows/deployment.yml/badge.svg)](https://github.com/advanced-rest-client/api-request/actions/workflows/deployment.yml)
 
 ## Usage
 

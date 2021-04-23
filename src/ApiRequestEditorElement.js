@@ -1049,6 +1049,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       disabled,
       outlined,
       compatibility,
+      allowDisableParams,
+      allowHideOptional,
     } = this;
     return html`
     <div class="editor-section">
@@ -1063,6 +1065,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         .disabled="${disabled}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
+        ?allowDisableParams="${allowDisableParams}"
+        ?allowHideOptional="${allowHideOptional}"
       ></api-url-params-editor>
     </div>`;
   }
