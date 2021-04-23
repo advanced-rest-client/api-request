@@ -7,10 +7,12 @@ on:
       - master
       - main
       - develop
+      - stage
   pull_request:
     branches:
       - master
       - main
+      - stage
 jobs:
   test_linux:
     name: ${{ matrix.os }}
