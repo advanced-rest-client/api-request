@@ -1043,4 +1043,32 @@ describe('ApiRequestEditorElement', () => {
       assert.equal(request.headers, '');
     });
   });
+
+  describe('allowHideOptional', () => {
+    let element
+
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('should pass down value to api-url-params-editor', async () => {
+      element.allowHideOptional = true;
+      await nextFrame();
+      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowHideOptional);
+    });
+  });
+
+  describe('allowDisableParams', () => {
+    let element
+
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('should pass down value to api-url-params-editor', async () => {
+      element.allowDisableParams = true;
+      await nextFrame();
+      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowDisableParams);
+    });
+  });
 });
