@@ -10,6 +10,7 @@ import {
   responsePrefixTemplate,
 } from '@advanced-rest-client/arc-response/src/internals.js';
 import { DataExportEventTypes } from '@advanced-rest-client/arc-events';
+import { dataValue, providerOptionsValue } from '@advanced-rest-client/arc-events/src/dataexport/Events.js';
 import '@anypoint-web-components/anypoint-item/anypoint-icon-item.js';
 import '@advanced-rest-client/arc-icons/arc-icon.js';
 import '@advanced-rest-client/arc-headers/headers-list.js';
@@ -78,7 +79,8 @@ export class ApiResponseViewElement extends ResponseViewElement {
    * @param {ArcExportFilesystemEvent} e
    */
   [saveFileHandler](e) {
-    const { providerOptions, data } = e;
+    const data = e[dataValue];
+    const providerOptions = e[providerOptionsValue];
     const { file, contentType='text/plain' } = providerOptions;
     this.downloadFile(data, contentType, file);
   }
