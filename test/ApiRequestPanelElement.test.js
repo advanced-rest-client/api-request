@@ -165,7 +165,7 @@ describe('ApiRequestPanelElement', () => {
     it('Should add string headers to api-request event', async () => {
       const element = await basicFixture();
 
-      const headers = new Headers()
+      const headers = new Headers();
       headers.append('content-type', 'application/json');
       appendRequestData(element, { headers });
 

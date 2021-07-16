@@ -991,7 +991,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       headersArray.push({ name: 'content-type', value: this.contentType, enabled: true });
       return HeadersParser.toString(headersArray);
     }
-    return headersString;
+    return HeadersParser.toString(headersString);
   }
 
   render() {
