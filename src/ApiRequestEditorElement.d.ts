@@ -155,9 +155,13 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    */
   url: string;
   /**
-   * Current content type.
+   * Current content type as defined by headers.
    */
-  _contentType: string;
+  _headerContentType: string;
+  /**
+   * Current content type as defined by body editor.
+   */
+  _bodyContentType: string;
   /**
    * Computed value of security scheme from selected method.
    */
@@ -479,6 +483,12 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * Handler for the change dispatched from the server selector.
    */
   _serverHandler(e: CustomEvent): void;
+
+  /**
+   * Given a headers string, if it does not contain a Content-Type header,
+   * set it manually and return the computed headers string.
+   */
+  _ensureContentTypeInHeaders(headersString: string): string
 
   render(): TemplateResult;
 
