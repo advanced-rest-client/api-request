@@ -688,6 +688,14 @@ describe('ApiRequestEditorElement', () => {
           const result = element.serializeRequest();
           assert.isUndefined(result.payload);
         });
+
+        it('sets Content-Type header if not present but set in component', async () => {
+          const element = await basicFixture();
+          element._headerContentType = 'application/json';
+          element._headers = '';
+          const result = element.serializeRequest();
+          assert.equal(result.headers, 'content-type: application/json');
+        });
       });
 
       describe('_sendHandler()', () => {
