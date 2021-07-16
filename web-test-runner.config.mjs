@@ -9,6 +9,9 @@ export default {
 			return next();
 		}
 	],
+	browserStartTimeout: 20000,
+	testsStartTimeout: 20000,
+	testsFinishTimeout: 20000,
 	testRunnerHtml: (testFramework) =>
     `<html>
 		<body>
@@ -29,5 +32,5 @@ export default {
 			<script src="node_modules/codemirror/addon/lint/json-lint.js"></script>
 		  <script type="module" src="${testFramework}"></script>
 		</body>
-	  </html>`
+	  </html>`,
 };

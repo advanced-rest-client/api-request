@@ -20,7 +20,7 @@ import { ApiUrlDataModel } from '@api-components/api-url';
 import { TelemetryEvents } from '@advanced-rest-client/arc-events';
 import { v4 } from '@advanced-rest-client/uuid-generator';
 import { UrlParser } from '@advanced-rest-client/arc-url';
-import { HeadersParser } from '@advanced-rest-client/arc-headers';
+import { HeadersParser } from '@advanced-rest-client/arc-headers'
 import '@api-components/api-url/api-url-editor.js';
 import '@api-components/api-url/api-url-params-editor.js';
 import '@api-components/api-authorization/api-authorization.js';
@@ -34,6 +34,7 @@ import elementStyles from './styles/Editor.styles.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
+/** @typedef {import('@advanced-rest-client/arc-types').FormTypes.FormItem} FormItem */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.ArcBaseRequest} ArcBaseRequest */
 /** @typedef {import('@api-components/api-authorization/src/ApiAuthorization').ApiAuthorization} ApiAuthorization */
 /** @typedef {import('@api-components/api-authorization/src/types').ApiAuthorizationSettings} ApiAuthorizationSettings */
@@ -166,9 +167,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        */
       url: { type: String },
       /**
-       * Current content type.
+       * Current content type as defined by headers.
        */
-      _contentType: { type: String },
+      _headerContentType: { type: String },
+      /**
+       * Current content type as defined by body editor.
+       */
+      _bodyContentType: { type: String },
       /**
        * Computed value of security scheme from selected method.
        */
@@ -258,7 +263,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   }
 
   get contentType() {
-    return this._contentType;
+    return this._headerContentType || this._bodyContentType;
   }
 
   get securedBy() {
@@ -527,7 +532,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   clearRequest() {
     this.url = '';
     this._headers = '';
-    this._contentType = '';
+    this._headerContentType = '';
+    this._bodyContentType = '';
     this._payload = '';
     this.dispatchEvent(new CustomEvent('requestclearstate'));
     TelemetryEvents.event(this, {
@@ -759,7 +765,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const result = /** @type ApiConsoleRequest */ ({
       method: (this.httpMethod || 'get').toUpperCase(),
       url: this.url,
-      headers: this.headers || '',
+      headers: this._ensureContentTypeInHeaders(this.headers) || '',
     });
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
       result.payload = this._payload;
@@ -878,15 +884,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _headersHandler(e) {
     const { value } = e.target;
     this._headers = value;
-    this._contentType = HeadersParser.contentType(value);
+    this._headerContentType = HeadersParser.contentType(value);
   }
 
   _payloadHandler(e) {
     this._payload = e.detail.value;
   }
 
-  _contentTypeHandler(e) {
-    this._contentType = e.detail.value;
+  _bodyContentTypeHandler(e) {
+    this._bodyContentType = e.detail.value;
     this._headers = HeadersParser.replace(this._headers, 'content-type', e.detail.value);
   }
 
@@ -958,6 +964,22 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const { value, type } = e.detail;
     this.serverType = type;
     this.serverValue = value;
+  }
+
+  /**
+   * Given a headers string, if it does not contain a Content-Type header,
+   * set it manually and return the computed headers string.
+   * @param {String} headersString 
+   * @return {String} headers string with content type if not already present
+   */
+  _ensureContentTypeInHeaders(headersString) {
+    const headersArray = HeadersParser.toJSON(headersString);
+    const hasContentTypeHeader = headersArray.find((value) => value.name.toLowerCase() === 'content-type');
+    if (!hasContentTypeHeader && this.contentType) {
+      headersArray.push({ name: 'content-type', value: this.contentType, enabled: true });
+      return HeadersParser.toString(headersArray);
+    }
+    return headersString;
   }
 
   render() {
@@ -1098,7 +1120,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       disabled,
       outlined,
       compatibility,
-      _contentType,
+      contentType,
       allowDisableParams,
       allowHideOptional,
     } = this;
@@ -1107,7 +1129,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       <div role="heading" aria-level="2" class="section-title">Body</div>
       <api-body-editor
         @value-changed="${this._payloadHandler}"
-        @content-type-changed="${this._contentTypeHandler}"
+        @content-type-changed="${this._bodyContentTypeHandler}"
         .eventsTarget="${eventsTarget}"
         .amf="${amf}"
         .amfBody="${_apiPayload}"
@@ -1115,7 +1137,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         .disabled="${disabled}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
-        .contentType="${_contentType}"
+        .contentType="${contentType}"
         ?allowCustom="${allowCustom}"
         ?allowDisableParams="${allowDisableParams}"
         ?allowHideOptional="${allowHideOptional}"
