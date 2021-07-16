@@ -230,6 +230,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * If true, the server selector custom base URI option is rendered
        */
       allowCustomBaseUri: { type: Boolean },
+      /**
+       * List of credentials source
+       */
+      credentialsSource: { type: Array },
     };
   }
 
@@ -315,6 +319,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     }
     this._serverValue = value;
     this._updateServer();
+    this.readUrlData();
     this.requestUpdate('serverValue', old);
   }
 
@@ -438,6 +443,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.allowDisableParams = false;
     this.allowHideOptional = false;
     this.allowCustomBaseUri = false;
+    this.credentialsSource = [];
 
     /**
      * @type string
@@ -762,12 +768,18 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {ApiConsoleRequest}
    */
   serializeRequest() {
+    const method = (this.httpMethod || 'get').toUpperCase();
     const result = /** @type ApiConsoleRequest */ ({
-      method: (this.httpMethod || 'get').toUpperCase(),
+      method,
       url: this.url,
       headers: this._ensureContentTypeInHeaders(this.headers) || '',
     });
+
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
+      const payload = this._payload
+      if (payload instanceof FormData) {
+        result.headers = /** @type string */ (HeadersParser.replace(result.headers, 'content-type', null));
+      }
       result.payload = this._payload;
     }
 
@@ -1058,6 +1070,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       disabled,
       outlined,
       compatibility,
+      allowDisableParams,
+      allowHideOptional,
     } = this;
     return html`
     <div class="editor-section">
@@ -1072,6 +1086,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         .disabled="${disabled}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
+        ?allowDisableParams="${allowDisableParams}"
+        ?allowHideOptional="${allowHideOptional}"
       ></api-url-params-editor>
     </div>`;
   }
@@ -1158,6 +1174,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       outlined,
       compatibility,
       _securedBy,
+      credentialsSource
     } = this;
     return html`<div class="editor-section">
       <div role="heading" aria-level="2" class="section-title">Credentials</div>
@@ -1169,6 +1186,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         ?disabled="${disabled}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
+        .credentialsSource="${credentialsSource}"
         @change=${this._authChanged}
       ></api-authorization>
     </div>`;

@@ -3,7 +3,7 @@ import { ApiDemoPage } from '@advanced-rest-client/arc-demo-helper';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
-import '@advanced-rest-client/xhr-simple-request/xhr-simple-request.js';
+import '../xhr-simple-request.js';
 import '../api-request-editor.js';
 
 class ComponentDemo extends ApiDemoPage {

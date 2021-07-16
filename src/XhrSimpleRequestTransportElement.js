@@ -263,7 +263,7 @@ export class XhrSimpleRequestTransportElement extends LitElement {
    * Applies headers to the XHR object.
    *
    * @param {XMLHttpRequest} xhr
-   * @param {string=} headers HTTP headers string
+   * @param {string|Headers} headers HTTP headers
    * @param {boolean=} isFormData Prevents setting content-type header for
    * Multipart requests.
    */
@@ -281,7 +281,7 @@ export class XhrSimpleRequestTransportElement extends LitElement {
       });
     }
     if (headers) {
-      const data = HeadersParser.toJSON(String(headers));
+      const data = HeadersParser.toJSON(headers);
       data.forEach((item) => {
         if (fixedNames.indexOf(item.name) !== -1) {
           return;

@@ -16,6 +16,7 @@ import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import { ErrorResponse, Response as ArcResponse } from '@advanced-rest-client/arc-types/src/request/ArcResponse';
 import { TransportRequest } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
 import { ApiConsoleResponse } from './types';
+import { CredentialSource } from '@api-components/api-authorization/src/types';
 
 export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   get styles(): CSSResult;
@@ -220,6 +221,10 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * @attribute
    */
   allowCustomBaseUri: boolean;
+  /**
+   * List of credentials source
+   */
+  credentialsSource: Array<CredentialSource>
 
   constructor();
 

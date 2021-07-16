@@ -748,6 +748,26 @@ describe('ApiRequestEditorElement', () => {
           assert.equal(text, 'http://production.domain.com/people');
         });
       });
+
+      describe('slotted servers', () => {
+        let element = /** @type ApiRequestEditorElement */ (null);
+        let amf;
+
+        beforeEach(async () => {
+          element = await customBaseUriSlotFixture();
+          amf = await AmfLoader.load({ compact });
+          element.amf = amf;
+          const op = AmfLoader.lookupOperation(amf, '/people', 'get')
+          element.selected = op['@id'];
+          await aTimeout(0);
+        });
+
+        it('should update api-url-editor value after selecting slotted base uri', async () => {
+          element._serverHandler(new CustomEvent('apiserverchanged', { detail: { value: 'http://customServer.com', type: 'uri' } }));
+          await aTimeout(0);
+          assert.equal(element.shadowRoot.querySelector('api-url-editor').value, 'http://customServer.com/people');
+        });
+      })
     });
   });
 
@@ -1003,8 +1023,60 @@ describe('ApiRequestEditorElement', () => {
           await nextFrame();
           assert.lengthOf(element.servers, 2);
         });
-
       });
+    });
+  });
+
+  describe('serializeRequest()', () => {
+    let element = /** @type ApiRequestEditorElement */ (null);
+    beforeEach(async () => {
+      element = await basicFixture();
+      element._httpMethod = 'POST';
+      element.url = 'some-url';
+    });
+
+    it('should remove multipart content type if form data payload', () => {
+      element._headers = 'content-type: multipart/form-data';
+      element._payload = new FormData()
+      const request = element.serializeRequest()
+
+      assert.equal(request.headers, '');
+    });
+
+    it('should not modify headers if content type not defined and form data payload', () => {
+      element._headers = '';
+      element._payload = new FormData()
+      const request = element.serializeRequest()
+
+      assert.equal(request.headers, '');
+    });
+  });
+
+  describe('allowHideOptional', () => {
+    let element
+
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('should pass down value to api-url-params-editor', async () => {
+      element.allowHideOptional = true;
+      await nextFrame();
+      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowHideOptional);
+    });
+  });
+
+  describe('allowDisableParams', () => {
+    let element
+
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('should pass down value to api-url-params-editor', async () => {
+      element.allowDisableParams = true;
+      await nextFrame();
+      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowDisableParams);
     });
   });
 });

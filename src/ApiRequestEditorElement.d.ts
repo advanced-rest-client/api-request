@@ -18,6 +18,7 @@ import { AmfHelperMixin } from '@api-components/amf-helper-mixin';
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
 import { ApiAuthorization } from '@api-components/api-authorization';
+import { CredentialSource } from '@api-components/api-authorization/src/types';
 import { ApiAuthorizationSettings, AuthorizationParams } from '@api-components/api-authorization/src/types';
 import { ApiConsoleRequest } from './types';
 
@@ -133,6 +134,11 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @attribute
    */
   redirectUri: string;
+  /**
+   * List of credentials source
+   * @attribute
+   */
+  credentialsSource: Array<CredentialSource>
   /**
    * Computed from AMF model for the method HTTP method name.
    */
