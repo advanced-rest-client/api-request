@@ -16,7 +16,7 @@ export default {
   },
 	browserStartTimeout: 20000,
 	testsStartTimeout: 20000,
-	testsFinishTimeout: 60000,
+	testsFinishTimeout: 90000,
   testRunnerHtml: (testFramework) =>
     `<html>
 		<body>
