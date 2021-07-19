@@ -11,12 +11,12 @@ export default {
   ],
   testFramework: {
     config: {
-      timeout: 80000,
+      timeout: 90000,
     },
   },
 	browserStartTimeout: 20000,
 	testsStartTimeout: 20000,
-	testsFinishTimeout: 80000,
+	testsFinishTimeout: 90000,
   testRunnerHtml: (testFramework) =>
     `<html>
 		<body>
