@@ -1079,4 +1079,33 @@ describe('ApiRequestEditorElement', () => {
       assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowDisableParams);
     });
   });
+
+  describe('Persisting cache', () => {
+    it('should not clear cache without AMF change', async () => {
+      const clearCacheSpy = sinon.spy();
+      ApiViewModel.prototype.clearCache = clearCacheSpy
+      await basicFixture();
+      await nextFrame();
+      assert.isFalse(clearCacheSpy.called);
+    });
+
+    it('should clear cache after AMF change', async () => {
+      const clearCacheSpy = sinon.spy();
+      ApiViewModel.prototype.clearCache = clearCacheSpy
+      const element = await basicFixture();
+      element.amf = await AmfLoader.load();
+      await nextFrame();
+      assert.isTrue(clearCacheSpy.called);
+    });
+
+    it('should not clear cache after AMF change with persistCache', async () => {
+      const clearCacheSpy = sinon.spy();
+      ApiViewModel.prototype.clearCache = clearCacheSpy
+      const element = await basicFixture();
+      element.persistCache = true;
+      element.amf = await AmfLoader.load();
+      await nextFrame();
+      assert.isFalse(clearCacheSpy.called);
+    });
+  });
 });
