@@ -225,6 +225,11 @@ export declare class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * List of credentials source
    */
   credentialsSource: Array<CredentialSource>
+  /**
+   * When enabled, does not clear cache on AMF change
+   * @attribute
+   */
+  persistCache: boolean;
 
   constructor();
 

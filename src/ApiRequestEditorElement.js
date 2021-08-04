@@ -234,6 +234,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * List of credentials source
        */
       credentialsSource: { type: Array },
+      /**
+       * When enabled, does not clear cache on AMF change
+       */
       persistCache: { type: Boolean },
     };
   }

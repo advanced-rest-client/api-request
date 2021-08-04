@@ -221,6 +221,10 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        * List of credentials source
        */
       credentialsSource: { type: Array },
+      /**
+       * When enabled, does not clear cache on AMF change
+       */
+      persistCache: { type: Boolean }
     };
   }
 
@@ -285,6 +289,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     this.serverType = undefined;
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
+    this.persistCache = false;
 
     /**  
      * @type {TransportRequest}
@@ -507,7 +512,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       serverType,
       noServerSelector,
       allowCustomBaseUri,
-      credentialsSource
+      credentialsSource,
+      persistCache,
     } = this;
 
     return html`
@@ -534,6 +540,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       ?noServerSelector="${noServerSelector}"
       ?allowCustomBaseUri="${allowCustomBaseUri}"
       .credentialsSource="${credentialsSource}"
+      ?persistCache="${persistCache}"
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-request-editor>`;
