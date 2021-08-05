@@ -234,6 +234,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * List of credentials source
        */
       credentialsSource: { type: Array },
+      /**
+       * When enabled, does not clear cache on AMF change
+       */
+      persistCache: { type: Boolean },
     };
   }
 
@@ -444,6 +448,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.allowHideOptional = false;
     this.allowCustomBaseUri = false;
     this.credentialsSource = [];
+    this.persistCache = false;
 
     /**
      * @type string
@@ -479,7 +484,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   __amfChanged(amf) {
     const { urlFactory } = this;
     if (urlFactory) {
-      urlFactory.clearCache();
+      if (!this.persistCache) {
+        urlFactory.clearCache();
+      }
       urlFactory.amf = amf;
       this.readUrlData();
     }

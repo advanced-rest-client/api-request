@@ -232,6 +232,11 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @attribute
    */
   allowCustomBaseUri: boolean;
+  /**
+   * When enabled, does not clear cache on AMF change
+   * @attribute
+   */
+  persistCache: boolean;
 
   servers: any[];
 
