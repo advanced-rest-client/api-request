@@ -352,7 +352,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('constructor()', () => {
-        console.log('constructor()')
         let element = /** @type XhrSimpleRequestTransportElement */ (null);
         beforeEach(async () => {
           element = await basicFixture();
@@ -402,7 +401,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('send()', () => {
-        console.log('send()')
         let srv;
         before(() => {
           srv = new MockServer();
@@ -452,7 +450,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('_errorHandler()', () => {
-        console.log('_errorHandler()')
         let element = /** @type XhrSimpleRequestTransportElement */ (null);
         let error;
         beforeEach(async () => {
@@ -510,7 +507,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('_timeoutHandler()', () => {
-        console.log('_timeoutHandler()')
         let element = /** @type XhrSimpleRequestTransportElement */ (null);
         let error;
         beforeEach(async () => {
@@ -544,7 +540,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('_abortHandler()', () => {
-        console.log('_abortHandler()')
         let element = /** @type XhrSimpleRequestTransportElement */ (null);
         beforeEach(async () => {
           element = await basicFixture();
@@ -583,7 +578,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('Multipart request', () => {
-        console.log('Multipart request')
         let srv;
         before(() => {
           srv = new MockServer();
@@ -615,7 +609,6 @@ describe('<xhr-simple-request-transport>', () => {
       });
     
       describe('a11y', () => {
-        console.log('a11y')
         it('adds aria-hidden attribute', async () => {
           const element = await basicFixture();
           assert.equal(element.getAttribute('aria-hidden'), 'true');
