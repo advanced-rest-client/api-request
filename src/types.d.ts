@@ -47,3 +47,9 @@ export declare interface XHRQueueItem {
   request: ApiConsoleRequest;
   xhr: XhrSimpleRequestTransportElement;
 }
+
+export declare interface PopulationInfo {
+  annotationName: string;
+  annotationValue: string;
+  fieldValue: string;
+}

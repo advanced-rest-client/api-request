@@ -40,6 +40,7 @@ import elementStyles from './styles/Editor.styles.js';
 /** @typedef {import('@api-components/api-authorization/src/types').ApiAuthorizationSettings} ApiAuthorizationSettings */
 /** @typedef {import('@api-components/api-authorization/src/types').AuthorizationParams} AuthorizationParams */
 /** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
+/** @typedef {import('./types').PopulationInfo} PopulationInfo */
 
 export const EventCategory = 'API Request editor';
 
@@ -435,6 +436,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     super();
     this._responseHandler = this._responseHandler.bind(this);
     this._authRedirectChangedHandler = this._authRedirectChangedHandler.bind(this);
+    this._populateAnnotatedFieldsHandler = this._populateAnnotatedFieldsHandler.bind(this);
 
     this.urlLabel = false;
     this.outlined = false;
@@ -469,11 +471,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _attachListeners(node) {
     node.addEventListener('api-response', this._responseHandler);
     node.addEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
+    node.addEventListener('populate-annotated-fields', this._populateAnnotatedFieldsHandler);
   }
 
   _detachListeners(node) {
     node.removeEventListener('api-response', this._responseHandler);
     node.removeEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
+    node.removeEventListener('populate-annotated-fields', this._populateAnnotatedFieldsHandler);
   }
 
   /**
@@ -886,6 +890,149 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    */
   _authRedirectChangedHandler(e) {
     this.redirectUri = e.detail.value;
+  }
+
+  /**
+   * Handle event for populating annotated fields in the editor.
+   * @param {CustomEvent} e 
+   */
+  _populateAnnotatedFieldsHandler(e) {
+    const { values } = e.detail;
+    this._updateAnnotatedQueryParameters(values);
+    this._updateAnnotatedHeaders(values);
+    /** @TODO */
+    // this._updateAnnotatedSecuritySchemeFields(values);
+  }
+
+  /**
+   * Given an array of PopulationInfo objects, look for query parameters
+   * annotated with the matching information, and update their values
+   * in the component's view model.
+   * @param {PopulationInfo[]} populationInfoArray 
+   */
+  _updateAnnotatedQueryParameters(populationInfoArray) {
+    const method = this._computeMethodAmfModel(this.amf, this.selected);
+    if (!method) {
+      return;
+    }
+    const expects = this._computeExpects(method)
+    const queryParameters = this._computeQueryParameters(expects);
+    if (!queryParameters) {
+      return;
+    }
+    this._updateAnnotatedFields(populationInfoArray, queryParameters, this._updateQueryModelParameter.bind(this));
+  }
+
+  /**
+   * Given an array of PopulationInfo objects, look for headers
+   * annotated with the matching information, and update their values
+   * in the component's view model.
+   * @param {PopulationInfo[]} populationInfoArray 
+   */
+  _updateAnnotatedHeaders(populationInfoArray) {
+    const headers = this._apiHeaders;
+    this._updateAnnotatedFields(populationInfoArray, headers, this._updateHeader.bind(this));
+  }
+
+  /**
+   * Generic function for updating the nodes whose custom property information matches
+   * with the `populationInfoArray` objects provided. To update, it calls the `updateCallbackFn`
+   * which is one of the function's arguments.
+   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {Object[]} parameterNodes AMF parameter nodes
+   * @param {Function} updateCallbackFn Function to call to update a node's editor value
+   */
+  _updateAnnotatedFields(populationInfoArray, parameterNodes, updateCallbackFn) {
+    if (!parameterNodes || !updateCallbackFn || !populationInfoArray) {
+      return;
+    }
+    populationInfoArray.forEach(({ annotationName, annotationValue, fieldValue }) => {
+      parameterNodes
+        .filter(node => this._computeHasCustomPropertyValue(node, annotationName, annotationValue))
+        .forEach(node => updateCallbackFn(node, fieldValue));
+    });
+  }
+
+  /**
+   * Returns all of the custom domain properties for an AMF node
+   * @param {Object} shape AMF node
+   * @return {Object[]} Array of all custom domain property nodes
+   */
+  _computeCustomProperties(shape) {
+    const key = this._getAmfKey(this.ns.aml.vocabularies.document.customDomainProperties);
+    const ids = (this._getValueArray(shape, key) || []).map(result => {
+      if (Array.isArray(result)) {
+        // eslint-disable-next-line no-param-reassign
+        [result] = result;
+      }
+      if (typeof result === 'string') {
+        return result
+      }
+      return /** @type string */ (this._getValue(/** @type object */ (result), '@id'));
+    });
+    return ids.map(id => {
+      const propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
+      return shape[propertyKey];
+    });
+  }
+
+  /**
+   * Function to determine whether a shape has a custom domain property whose name
+   * and value match with the provided information.
+   * @param {Object} shape AMF node
+   * @param {string} propertyName Custom domain property name to search for
+   * @param {string} propertyValue Custom domain property value to match with
+   * @return {boolean}
+   */
+  _computeHasCustomPropertyValue(shape, propertyName, propertyValue) {
+    if (Array.isArray(shape)) {
+      // eslint-disable-next-line no-param-reassign
+      [shape] = shape;
+    }
+    if (!shape) {
+      return false;
+    }
+    const properties = this._computeCustomProperties(shape) || [];
+    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.extensionName);
+    const valueKey = this._getAmfKey(this.ns.aml.vocabularies.data.value);
+    return Boolean(properties.find(property => {
+      const actualPropName = this._getValue(property, nameKey);
+      const actualPropValue = this._getValue(property, valueKey);
+      return actualPropName === propertyName && actualPropValue === propertyValue;
+    }));
+  }
+
+  /**
+   * Given a query parameter AMF node, update the parameter's representation
+   * in this component's view model with the given value.
+   * @param {Object} queryParamNode AMF node for query parameter
+   * @param {*} value The new value for the query parameter field
+   */
+  _updateQueryModelParameter(queryParamNode, value) {
+    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.name);
+    const name = this._getValue(queryParamNode, nameKey);
+    const queryParamItem = this._queryModel.find(item => item.name === name);
+    if (queryParamItem) {
+      queryParamItem.value = value;
+    }
+  }
+
+  /**
+   * Given a header AMF node, update the header's representation in
+   * this component's `_headers` property. To do this, first transform
+   * the `_headers` string to a JSON, then change the value, then
+   * set the new string for the `_headers` property.
+   * @param {Object} headerNode AMF node for header
+   * @param {*} value The new value for the header field
+   */
+  _updateHeader(headerNode, value) {
+    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.name);
+    const name = this._getValue(headerNode, nameKey);
+    const headers = HeadersParser.stringToJSON(this._headers);
+    const headerItem = headers.find(header => header.name === name);
+    headerItem.value = value;
+    // We can't call the HeadersParser.toString() method because it removes the empty headers
+    this._headers = headers.map(header => HeadersParser.itemToString(header)).join('\n');
   }
 
   _urlHandler(e) {
