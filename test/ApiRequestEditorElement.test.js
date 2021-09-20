@@ -1108,4 +1108,52 @@ describe('ApiRequestEditorElement', () => {
       assert.isFalse(clearCacheSpy.called);
     });
   });
+
+  [
+    { label: 'Compact model', compact: true },
+    { label: 'Regular model', compact:false }
+  ].forEach(({label, compact}) => {
+    describe(`Populating annotated fields - ${label}`, () => {
+      const annotatedParametersApi = 'annotated-parameters';
+      let amf = null;
+      let element = null;
+
+      beforeEach(async () => {
+        clearCache();
+        amf = await AmfLoader.load({ fileName: annotatedParametersApi, compact });
+        const selected = AmfLoader.lookupOperation(amf, '/test', 'get')['@id'];
+        element = await modelFixture(amf, selected);
+      });
+
+      it('should populate annotated query parameter field', async () => {
+        const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value' }] };
+        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        await aTimeout(50);
+        const finalValues = element._queryModel.map(qm => qm.value);
+        assert.deepEqual(finalValues, ['', 'test value']);
+      });
+
+      it('should populate annotated header field', async () => {
+        const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value' }] };
+        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        await aTimeout(50);
+        const finalValues = element._headers;
+        assert.equal(finalValues, 'annotatedHeader: test value\nnormalHeader: ');
+      });
+
+      it('should populate annotated query parameter and header fields', async () => {
+        const detail = { values: [
+          { annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value 1' },
+          { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
+        ] };
+        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        await aTimeout(50);
+        const headers = element._headers;
+        assert.equal(headers, 'annotatedHeader: test value 2\nnormalHeader: ');
+        const queryParams = element._queryModel.map(qm => qm.value);
+        assert.deepEqual(queryParams, ['', 'test value 1']);
+      });
+    });
+  });
+  
 });
