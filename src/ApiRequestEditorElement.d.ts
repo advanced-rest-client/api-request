@@ -20,7 +20,7 @@ import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes
 import { ApiAuthorization } from '@api-components/api-authorization';
 import { CredentialSource } from '@api-components/api-authorization/src/types';
 import { ApiAuthorizationSettings, AuthorizationParams } from '@api-components/api-authorization/src/types';
-import { ApiConsoleRequest } from './types';
+import { ApiConsoleRequest, PopulationInfo } from './types';
 
 export const EventCategory = 'API Request editor';
 
@@ -447,6 +447,70 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * the `redirectUri` property.
    */
   _authRedirectChangedHandler(e: CustomEvent): void;
+
+  /**
+   * Handle event for populating annotated fields in the editor.
+   * @param {CustomEvent} e 
+   */
+  _populateAnnotatedFieldsHandler(e: CustomEvent): void;
+
+  /**
+   * Given an array of PopulationInfo objects, look for query parameters
+   * annotated with the matching information, and update their values
+   * in the component's view model.
+   */
+  _updateAnnotatedQueryParameters(populationInfoArray: PopulationInfo[]): void;
+
+  /**
+   * Given an array of PopulationInfo objects, look for headers
+   * annotated with the matching information, and update their values
+   * in the component's view model.
+   */
+  _updateAnnotatedHeaders(populationInfoArray: PopulationInfo[]): void;
+
+  /**
+   * Generic function for updating the nodes whose custom property information matches
+   * with the `populationInfoArray` objects provided. To update, it calls the `updateCallbackFn`
+   * which is one of the function's arguments.
+   * @param populationInfoArray 
+   * @param parameterNodes AMF parameter nodes
+   * @param updateCallbackFn Function to call to update a node's editor value
+   */
+  _updateAnnotatedFields(populationInfoArray: PopulationInfo[], parameterNodes: Object[], updateCallbackFn: Function): void;
+
+  /**
+   * Returns all of the custom domain properties for an AMF node
+   * @param shape AMF node
+   * @return Array of all custom domain property nodes
+   */
+  _computeCustomProperties(shape: Object): Object[]
+
+  /**
+   * Function to determine whether a shape has a custom domain property whose name
+   * and value match with the provided information.
+   * @param shape AMF node
+   * @param propertyName Custom domain property name to search for
+   * @param propertyValue Custom domain property value to match with
+   */
+  _computeHasCustomPropertyValue(shape: Object, propertyName: string, propertyValue: string): boolean;
+
+  /**
+   * Given a query parameter AMF node, update the parameter's representation
+   * in this component's view model with the given value.
+   * @param {Object} queryParamNode AMF node for query parameter
+   * @param {*} value The new value for the query parameter field
+   */
+  _updateQueryModelParameter(queryParamNode: Object, value: any): void;
+
+  /**
+   * Given a header AMF node, update the header's representation in
+   * this component's `_headers` property. To do this, first transform
+   * the `_headers` string to a JSON, then change the value, then
+   * set the new string for the `_headers` property.
+   * @param headerNode AMF node for header
+   * @param value The new value for the header field
+   */
+  _updateHeader(headerNode: Object, value: any): void;
 
   _urlHandler(e: Event): void;
 
