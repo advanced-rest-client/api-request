@@ -1,0 +1,18 @@
+#%RAML 1.0
+title: Annotated Parameters API
+
+annotationTypes:
+  credentialType: string
+
+/test:
+  get:
+    queryParameters:
+      normalQueryparam: string
+      annotatedQueryParam:
+        (credentialType): id
+        type: string
+    headers:
+      annotatedHeader:
+        (credentialType): secret
+        type: string
+      normalHeader: string
