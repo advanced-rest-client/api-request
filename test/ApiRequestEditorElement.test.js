@@ -1127,7 +1127,7 @@ describe('ApiRequestEditorElement', () => {
 
       it('should populate annotated query parameter field', async () => {
         const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value' }] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
         await aTimeout(50);
         const finalValues = element._queryModel.map(qm => qm.value);
         assert.deepEqual(finalValues, ['', 'test value']);
@@ -1135,7 +1135,7 @@ describe('ApiRequestEditorElement', () => {
 
       it('should populate annotated header field', async () => {
         const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value' }] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
         await aTimeout(50);
         const finalValues = element._headers;
         assert.equal(finalValues, 'annotatedHeader: test value\nnormalHeader: ');
@@ -1146,7 +1146,7 @@ describe('ApiRequestEditorElement', () => {
           { annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value 1' },
           { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
         ] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+        document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
         await aTimeout(50);
         const headers = element._headers;
         assert.equal(headers, 'annotatedHeader: test value 2\nnormalHeader: ');

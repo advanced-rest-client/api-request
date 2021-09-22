@@ -471,13 +471,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _attachListeners(node) {
     node.addEventListener('api-response', this._responseHandler);
     node.addEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
-    node.addEventListener('populate-annotated-fields', this._populateAnnotatedFieldsHandler);
+    node.addEventListener('populate_annotated_fields', this._populateAnnotatedFieldsHandler);
   }
 
   _detachListeners(node) {
     node.removeEventListener('api-response', this._responseHandler);
     node.removeEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
-    node.removeEventListener('populate-annotated-fields', this._populateAnnotatedFieldsHandler);
+    node.removeEventListener('populate_annotated_fields', this._populateAnnotatedFieldsHandler);
   }
 
   /**
