@@ -1,7 +1,7 @@
 {
   "cSpell.words": [
-    "Applian",
     "apiserverchanged",
+    "Applian",
     "cryptojslib",
     "customevent",
     "httpbin",
@@ -10,6 +10,7 @@
     "pathmodelchange",
     "querymodelchange",
     "requestclearstate",
+    "securitysettingsinfochanged",
     "serverscountchanged"
   ]
 }

@@ -23,6 +23,7 @@ class ComponentDemo extends ApiDemoPage {
       'renderCustomServer',
       'allowCustomBaseUri',
       'noServerSelector',
+      'applyAuthorization',
     ]);
     this.componentName = 'api-request-editor';
     this.allowCustom = false;
@@ -35,6 +36,7 @@ class ComponentDemo extends ApiDemoPage {
     this.renderCustomServer = false;
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
+    this.applyAuthorization = true;
 
     this.demoStates = ['Filled', 'Outlined', 'Anypoint'];
     this._demoStateHandler = this._demoStateHandler.bind(this);
@@ -71,16 +73,16 @@ class ComponentDemo extends ApiDemoPage {
 
   _apiListTemplate() {
     return [
+      ['demo-api', 'Demo API'],
       ['google-drive-api', 'Google Drive'],
       ['multi-server', 'Multiple servers'],
       ['httpbin', 'httpbin.org'],
-      ['demo-api', 'Demo API'],
       ['SE-12042', 'SE-12042: Default values issue'],
       ['SE-12224', 'SE-12224: Scope is not an array issues'],
       ['APIC-168', 'APIC-168: Custom scheme support'],
       ['APIC-289', 'OAS param names'],
-      ['oas-demo', 'OAS Demo API'],
       ['api-keys', 'API key'],
+      ['oas-demo', 'OAS Demo API'],
       ['oauth-flows', 'OAS OAuth Flow'],
       ['oas-bearer', 'OAS Bearer'],
     ].map(([file, label]) => html`
@@ -121,6 +123,7 @@ class ComponentDemo extends ApiDemoPage {
       urlLabel,
       noServerSelector,
       allowCustomBaseUri,
+      applyAuthorization,
     } = this;
     return html `
     <section class="documentation-section">
@@ -150,6 +153,8 @@ class ComponentDemo extends ApiDemoPage {
             ?disabled="${disabled}"
             ?noUrlEditor="${noUrlEditor}"
             ?urlLabel="${urlLabel}"
+            ?applyAuthorization="${applyAuthorization}"
+            globalCache
             .redirectUri="${redirectUri}"
             ?noServerSelector="${noServerSelector}"
             ?allowCustomBaseUri="${allowCustomBaseUri}"
@@ -234,8 +239,19 @@ class ComponentDemo extends ApiDemoPage {
           slot="options"
           name="noServerSelector"
           @change="${this._toggleMainOption}"
-          >Remove Server Selector</anypoint-checkbox
         >
+          Remove Server Selector
+        </anypoint-checkbox>
+        <anypoint-checkbox
+          aria-describedby="mainOptionsLabel"
+          slot="options"
+          name="applyAuthorization"
+          .checked="${applyAuthorization}"
+          @change="${this._toggleMainOption}"
+          title="Applies authorization configuration to the request when dispatching the event"
+        >
+          Apply authorization
+        </anypoint-checkbox>
       </arc-interactive-demo>
     </section>`;
   }

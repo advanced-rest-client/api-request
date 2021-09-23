@@ -35,7 +35,7 @@ paths:
     get:
       summary: "A get method"
       responses:
-        200:
+        '200':
           description: Successful response
   /copy:
     description: Has half of default servers
@@ -55,7 +55,7 @@ paths:
     get:
       summary: "A get method"
       responses:
-        200:
+        '200':
           description: Successful response
   /files:
     description: File upload and download operations
@@ -65,7 +65,7 @@ paths:
     get:
       summary: "A get method"
       responses:
-        200:
+        '200':
           description: Successful response
   /ping:
     servers:
@@ -79,10 +79,10 @@ paths:
           description: Also overrides base path for the GET /ping operation
       summary: "A get method"
       responses:
-        200:
+        '200':
           description: Successful response
     post:
       summary: "A post method"
       responses:
-        201:
+        '201':
           description: Successful create

@@ -5,7 +5,7 @@
   "swagger": "2.0",
   "basePath": "/",
   "definitions": {},
-  "host": "https://httpbin.org",
+  "host": "httpbin.org",
   "info": {
     "contact": {
       "email": "me@kennethreitz.org",
@@ -22,7 +22,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -218,7 +219,8 @@
             "default": "SFRUUEJJTiBpcyBhd2Vzb21l",
             "in": "path",
             "name": "value",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -241,12 +243,14 @@
           {
             "in": "path",
             "name": "user",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "passwd",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -254,7 +258,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "401": {
             "description": "Unsuccessful authentication."
@@ -280,7 +284,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "401": {
             "description": "Unsuccessful authentication."
@@ -314,7 +318,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -368,7 +373,8 @@
           {
             "in": "path",
             "name": "value",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -405,13 +411,9 @@
       "get": {
         "parameters": [
           {
-            "allowEmptyValue": true,
-            "in": "query",
             "name": "freeform",
-            "schema":{
-              "type":"object",
-              "additionalProperties": true
-            }
+            "in": "query",
+            "type": "string"
           }
         ],
         "produces": [
@@ -432,17 +434,9 @@
       "get": {
         "parameters": [
           {
-            "allowEmptyValue": true,
-            "explode": true,
-            "in": "query",
             "name": "freeform",
-            "schema": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object"
-            },
-            "style": "form"
+            "in": "query",
+            "type": "string"
           }
         ],
         "produces": [
@@ -465,12 +459,14 @@
           {
             "in": "path",
             "name": "name",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "value",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -510,7 +506,8 @@
             "in": "path",
             "name": "delay",
             "type": "integer",
-            "description": "Number of seconds to wait before sending the response."
+            "description": "Number of seconds to wait before sending the response.",
+            "required": true
           }
         ],
         "produces": [
@@ -531,7 +528,8 @@
           {
             "in": "path",
             "name": "delay",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -552,7 +550,8 @@
           {
             "in": "path",
             "name": "delay",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -573,7 +572,8 @@
           {
             "in": "path",
             "name": "delay",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -594,7 +594,8 @@
           {
             "in": "path",
             "name": "delay",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -615,7 +616,8 @@
           {
             "in": "path",
             "name": "delay",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -671,17 +673,20 @@
             "description": "auth or auth-int",
             "in": "path",
             "name": "qop",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "user",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "passwd",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -689,7 +694,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "401": {
             "description": "Unsuccessful authentication."
@@ -708,24 +713,28 @@
             "description": "auth or auth-int",
             "in": "path",
             "name": "qop",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "user",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "passwd",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "default": "MD5",
             "description": "MD5, SHA-256, SHA-512",
             "in": "path",
             "name": "algorithm",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -733,7 +742,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "401": {
             "description": "Unsuccessful authentication."
@@ -753,30 +762,35 @@
             "description": "auth or auth-int",
             "in": "path",
             "name": "qop",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "user",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "passwd",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "default": "MD5",
             "description": "MD5, SHA-256, SHA-512",
             "in": "path",
             "name": "algorithm",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "default": "never",
             "in": "path",
             "name": "stale_after",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -784,7 +798,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "401": {
             "description": "Unsuccessful authentication."
@@ -867,11 +881,13 @@
         "parameters": [
           {
             "in": "header",
-            "name": "If-None-Match"
+            "name": "If-None-Match",
+            "type": "string"
           },
           {
             "in": "header",
-            "name": "If-Match"
+            "name": "If-Match",
+            "type": "string"
           }
         ],
         "produces": [
@@ -945,12 +961,14 @@
           {
             "in": "path",
             "name": "user",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "in": "path",
             "name": "passwd",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "produces": [
@@ -958,7 +976,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sucessful authentication."
+            "description": "Successful authentication."
           },
           "404": {
             "description": "Unsuccessful authentication."
@@ -1108,12 +1126,14 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           },
           {
             "in": "path",
             "name": "offset",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -1137,7 +1157,8 @@
             "in": "body",
             "schema": {
               "type": "object"
-            }
+            },
+            "name": "body"
           }
         ],
         "produces": [
@@ -1161,7 +1182,8 @@
             "in": "body",
             "schema": {
               "type": "object"
-            }
+            },
+            "name": "body"
           }
         ],
         "produces": [
@@ -1185,7 +1207,8 @@
             "in": "body",
             "schema": {
               "type": "object"
-            }
+            },
+            "name": "body"
           }
         ],
         "produces": [
@@ -1208,7 +1231,8 @@
           {
             "in": "path",
             "name": "numbytes",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -1358,7 +1382,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -1381,7 +1406,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -1402,17 +1428,9 @@
       "get": {
         "parameters": [
           {
-            "allowEmptyValue": true,
-            "explode": true,
             "in": "query",
             "name": "freeform",
-            "schema": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object"
-            },
-            "style": "form"
+            "type": "string"
           }
         ],
         "produces": [
@@ -1431,17 +1449,9 @@
       "post": {
         "parameters": [
           {
-            "allowEmptyValue": true,
-            "explode": true,
             "in": "query",
             "name": "freeform",
-            "schema": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object"
-            },
-            "style": "form"
+            "type": "string"
           }
         ],
         "produces": [
@@ -1479,7 +1489,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1511,7 +1523,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1543,7 +1557,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1575,7 +1591,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1607,7 +1625,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1639,7 +1659,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "codes"
+            "name": "codes",
+            "required": true,
+            "type": "number"
           }
         ],
         "produces": [
@@ -1674,7 +1696,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [
@@ -1697,7 +1720,8 @@
           {
             "in": "path",
             "name": "n",
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ],
         "produces": [

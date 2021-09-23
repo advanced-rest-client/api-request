@@ -34,7 +34,7 @@ documentation:
   - title: Search for file
     content: !include docs/search-for-file.md
 /files:
-  type: [standardRequest]
+  type: standardRequest
   displayName: Files
   post:
     securedBy: [ oauth_2_0: { scopes: ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive.appdata", "https://www.googleapis.com/auth/drive.apps.readonly"] } ]
@@ -160,7 +160,7 @@ documentation:
             example: !include examples/fileList-example.json
   /{fileId}:
     displayName: Get file
-    type: [standardRequest]
+    type: standardRequest
     uriParameters:
       fileId:
         type: string

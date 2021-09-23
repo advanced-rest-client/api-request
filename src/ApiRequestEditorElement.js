@@ -14,35 +14,48 @@ the License.
 */
 import { html, LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
-import { AmfHelperMixin } from '@api-components/amf-helper-mixin';
+import { AmfHelperMixin, AmfSerializer } from '@api-components/amf-helper-mixin';
 import { apiFormStyles } from '@api-components/api-forms';
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { TelemetryEvents } from '@advanced-rest-client/arc-events';
 import { v4 } from '@advanced-rest-client/uuid-generator';
-import { UrlParser } from '@advanced-rest-client/arc-url';
 import { HeadersParser } from '@advanced-rest-client/arc-headers'
 import '@api-components/api-url/api-url-editor.js';
 import '@api-components/api-url/api-url-params-editor.js';
-import '@api-components/api-authorization/api-authorization.js';
 import '@api-components/api-headers/api-headers-editor.js';
-import '@api-components/api-body-editor/api-body-editor.js';
+import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
+import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
+import '@anypoint-web-components/anypoint-item/anypoint-item.js';
+import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
+// import '@api-components/api-body-editor/api-body-editor.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
-import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
-import '@advanced-rest-client/oauth-authorization/oauth1-authorization.js';
 import '@api-components/api-server-selector/api-server-selector.js';
 import elementStyles from './styles/Editor.styles.js';
+import '../api-authorization-editor.js'
+import { SecurityProcessor } from './lib/SecurityProcessor.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.FormItem} FormItem */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.ArcBaseRequest} ArcBaseRequest */
-/** @typedef {import('@api-components/api-authorization/src/ApiAuthorization').ApiAuthorization} ApiAuthorization */
-/** @typedef {import('@api-components/api-authorization/src/types').ApiAuthorizationSettings} ApiAuthorizationSettings */
-/** @typedef {import('@api-components/api-authorization/src/types').AuthorizationParams} AuthorizationParams */
+/** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
+/** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
+/** @typedef {import('./elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
 /** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('./types').PopulationInfo} PopulationInfo */
+/** @typedef {import('./types').SecuritySelectorListItem} SecuritySelectorListItem */
 
 export const EventCategory = 'API Request editor';
+
+export const operationValue = Symbol('currentModel');
+export const processSecurity = Symbol('processSecurity');
+export const securityList = Symbol('securityList');
+export const authSelectorHandler = Symbol('authSelectorHandler');
+export const authorizationTemplate = Symbol('authorizationTemplate');
+export const authorizationSelectorTemplate = Symbol('authorizationSelectorTemplate');
+export const authorizationSelectorItemTemplate = Symbol('authorizationSelectorItemTemplate');
 
 export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
   get styles() {
@@ -148,10 +161,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        */
       redirectUri: { type: String },
       /**
-       * Computed from AMF model for the method HTTP method name.
-       */
-      _httpMethod: { type: String },
-      /**
        * Headers for the request.
        */
       _headers: { type: String },
@@ -175,10 +184,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * Current content type as defined by body editor.
        */
       _bodyContentType: { type: String },
-      /**
-       * Computed value of security scheme from selected method.
-       */
-      _securedBy: { type: Array },
       /**
        * Computed list of headers in the AMF model
        */
@@ -239,6 +244,39 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * When enabled, does not clear cache on AMF change
        */
       persistCache: { type: Boolean },
+      /** 
+       * The index of the selected security definition to apply.
+       */
+      selectedSecurity: { type: Number },
+      /** 
+       * When set it applies the authorization values to the request dispatched
+       * with the API request event.
+       * If possible, it applies the authorization values to query parameter or headers
+       * depending on the configuration.
+       * 
+       * When the values arr applied to the request the authorization config is kept in the
+       * request object, but its `enabled` state is always `false`, meaning other potential
+       * processors should ignore this values.
+       * 
+       * If this property is not set then the application hosting this component should
+       * process the authorization data and apply them to the request.
+       */
+      applyAuthorization: { type: Boolean },
+      /**
+       * By default the element stores user input in a map that is associated with the specific
+       * instance of this element. This way the element can be used multiple times in the same document.
+       * However, this way parameter values generated by the generators or entered by the user won't
+       * get populated in different operations.
+       *
+       * By setting this value the element prefers a global cache for values. Once the user enter
+       * a value it is registered in the global cache and restored when the same parameter is used again.
+       *
+       * Do not use this option when the element is embedded multiple times in the page. It will result
+       * in generating request data from the cache and not what's in the form inputs and these may not be in sync.
+       *
+       * These values are stored in memory only. Listen to the `change` event to learn that something changed.
+       */
+      globalCache: { type: Boolean, reflect: true },
     };
   }
 
@@ -259,8 +297,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.readUrlData();
   }
 
+  /**
+   * @returns {string} The HTTP method name.
+   */
   get httpMethod() {
-    return this._httpMethod;
+    const op = this[operationValue];
+    if (!op) {
+      return undefined;
+    }
+    return op.method;
   }
 
   get headers() {
@@ -273,10 +318,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   get contentType() {
     return this._headerContentType || this._bodyContentType;
-  }
-
-  get securedBy() {
-    return this._securedBy;
   }
 
   get apiHeaders() {
@@ -423,10 +464,14 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   }
 
   /**
-   * @return {ApiAuthorization} A reference to the authorization panel, if exists
+   * @returns {SecuritySelectorListItem[]|undefined} The security requirement for the operation or undefined.
    */
-  get _auth() {
-    return /** @type {ApiAuthorization} */ (this.shadowRoot.querySelector('api-authorization'));
+  get security() {
+    const items = this[securityList];
+    if (Array.isArray(items) && items.length) {
+      return items;
+    }
+    return undefined;
   }
 
   /**
@@ -449,8 +494,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.allowDisableParams = false;
     this.allowHideOptional = false;
     this.allowCustomBaseUri = false;
-    this.credentialsSource = [];
+    /** @type Oauth2Credentials[] */
+    this.credentialsSource = undefined;
     this.persistCache = false;
+    this.selectedSecurity = 0;
 
     /**
      * @type string
@@ -466,6 +513,24 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.protocols = undefined;
 
     this.urlFactory = new ApiUrlDataModel();
+
+    /** 
+     * Set when the selection change, this is a JS object created form the 
+     * supportedOperation definition of the AMF graph.
+     * @type {ApiOperation}
+     */
+    this[operationValue] = undefined;
+    /** 
+     * The list of security list items to render.
+     * An operation may have multiple security definition in an or/and fashion.
+     * This allows to render the selector to pick the current security.
+     * @type {SecuritySelectorListItem[]} 
+     */
+    this[securityList] = undefined;
+    /** @type boolean */
+    this.applyAuthorization = undefined;
+    /** @type boolean */
+    this.globalCache = undefined;
   }
 
   _attachListeners(node) {
@@ -559,22 +624,50 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     });
   }
 
+  reset() {
+    this[securityList] = undefined;
+  }
+
   _selectedChanged() {
     const { amf, selected } = this;
     if (!amf || !selected) {
+      this.reset();
       return;
     }
     const model = this._computeMethodAmfModel(amf, selected);
     if (!model) {
+      this.reset();
       return;
     }
+    const factory = new AmfSerializer(amf);
+    const operation = factory.operation(model);
+    this[operationValue] = operation;
+    this[processSecurity]();
     this._authSettings = undefined;
     const method = /** @type string */ (this._getValue(model, this.ns.aml.vocabularies.apiContract.method));
-    this._httpMethod = method;
     this._isPayloadRequest = this._computeIsPayloadRequest(method);
-    this._securedBy = this._computeSecuredBy(model);
     this._apiHeaders = this. _computeHeaders(model);
     this._apiPayload = this._computeApiPayload(model);
+  }
+
+  /**
+   * Processes security information for the UI.
+   */
+  [processSecurity]() {
+    const operation = this[operationValue];
+    const { security } = operation;
+    this[securityList] = SecurityProcessor.readSecurityList(security);
+    this.selectedSecurity = 0;
+  }
+
+  /**
+   * @param {Event} e
+   */
+  [authSelectorHandler](e) {
+    const list = /** @type AnypointListbox */ (e.target);
+    const { selected } = list;
+    this.selectedSecurity = Number(selected);
+    this.requestUpdate();
   }
 
   _computeMethodAmfModel(model, selected) {
@@ -595,24 +688,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       return undefined;
     }
     return methods.find((item) => item['@id'] === selected);
-  }
-
-  /**
-   * Computes AMF model for authorization panel.
-   *
-   * @param {any} model Current method model.
-   * @return {any[]|undefined} List of security definitions for the endpoint.
-   */
-  _computeSecuredBy(model) {
-    if (!model) {
-      return undefined;
-    }
-    const key = this._getAmfKey(this.ns.aml.vocabularies.security.security);
-    let data = model[key];
-    if (data && !Array.isArray(data)) {
-      data = [data];
-    }
-    return data;
   }
 
   /**
@@ -691,15 +766,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * condition and call authorization function automatically.
    */
   async authAndExecute() {
-    this.__requestAuthAwaiting = true;
-    const panel = this._auth;
-    let result;
+    const panel = this.shadowRoot.querySelector('api-authorization-editor');
     if (panel) {
-      result = await panel.forceAuthorization(false);
-    }
-    if (!result) {
-      // const toast = this.shadowRoot.querySelector('#authFormError');
-      // toast.opened = true;
+      await panel.authorize();
+      const valid = panel.validate();
+      if (valid) {
+        this.execute();
+      }
     }
   }
 
@@ -793,81 +866,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       }
       result.payload = this._payload;
     }
-
-    if (this._securedBy) {
-      const node = this._auth;
-      const { settings=[] } = node;
-      if (settings.length) {
-        const params = node.createAuthParams();
-        this._applyAuthorization(result, settings, params);
-        const oa1 = this.shadowRoot.querySelector('oauth1-authorization');
-        oa1.signRequest(result, settings);
+    const authElement = this.shadowRoot.querySelector('api-authorization-editor');
+    if (authElement) {
+      const auth = authElement.serialize();
+      result.authorization = auth;
+      if (this.applyAuthorization) {
+        SecurityProcessor.applyAuthorization(result, auth);
       }
     }
     return result;
-  }
-
-  /**
-   * A function that applies authorization parameters to the request object.
-   *
-   * @param {ApiConsoleRequest} request The request object
-   * @param {ApiAuthorizationSettings[]} settings The authorization settings from the auth panel
-   * @param {AuthorizationParams} authParams A parameters to apply to the request
-   */
-  _applyAuthorization(request, settings, authParams) {
-    request.auth = settings;
-    const { headers, params } = authParams;
-    this._applyQueryParams(request, params);
-    this._applyHeaders(request, headers);
-  }
-
-  /**
-   * Applies a map of query parameters to the request object.
-   * @param {ApiConsoleRequest} request The request object
-   * @param {Record<string, string>} params A map of query parameters to apply to the request
-   */
-  _applyQueryParams(request, params) {
-    const keys = Object.keys(params);
-    if (!keys.length) {
-      return;
-    }
-    const parser = new UrlParser(request.url);
-    const sParams = parser.searchParams;
-    keys.forEach((name) => {
-      const value = params[name];
-      const index = sParams.findIndex((item) => item[0] === name);
-      if (index !== -1) {
-        sParams.splice(index, 1);
-      }
-      sParams.push([name, value]);
-    });
-    parser.searchParams = sParams;
-    request.url = parser.toString();
-  }
-
-  /**
-   * Applies a map of headers to the request object.
-   * @param {ApiConsoleRequest} request The request object
-   * @param {Record<string, string>} headers A map of headers to apply to the request
-   */
-  _applyHeaders(request, headers) {
-    const keys = Object.keys(headers);
-    if (!keys.length) {
-      return;
-    }
-    if (request.headers === undefined) {
-      request.headers = '';
-    }
-    const list = HeadersParser.toJSON(request.headers);
-    keys.forEach((name) => {
-      const value = headers[name];
-      const index = list.findIndex((item) => item.name === name);
-      if (index !== -1) {
-        list.splice(index, 1);
-      }
-      list.push({ name, value });
-    });
-    request.headers = HeadersParser.toString(list);
   }
 
   /**
@@ -1062,14 +1069,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this._headers = HeadersParser.replace(this._headers, 'content-type', e.detail.value);
   }
 
-  _authChanged(e) {
-    const valid = e.target.validate();
-    if (valid && this.__requestAuthAwaiting) {
-      this.__requestAuthAwaiting = false;
-      this.execute();
-    }
-  }
-
   /**
    * Computes a current server value for selection made in the server selector.
    */
@@ -1151,7 +1150,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   render() {
     const { styles } = this;
     return html`<style>${styles}</style>
-    ${this._oauthHandlersTemplate()}
     <div class="content">
       ${this._serverSelectorTemplate()}
       ${this._urlEditorTemplate()}
@@ -1159,16 +1157,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       ${this._paramsEditorTemplate()}
       ${this._headersEditorTemplate()}
       ${this._bodyEditorTemplate()}
-      ${this._authTemplate()}
+      ${this[authorizationTemplate]()}
       ${this._formActionsTemplate()}
     </div>`;
-  }
-
-  _oauthHandlersTemplate() {
-    const { eventsTarget } = this;
-    return html`
-    <oauth2-authorization .eventsTarget="${eventsTarget}"></oauth2-authorization>
-    <oauth1-authorization .eventsTarget="${eventsTarget}" ignoreBeforeRequest></oauth1-authorization>`;
   }
 
   _urlEditorTemplate() {
@@ -1316,34 +1307,73 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     </div>`;
   }
 
-  _authTemplate() {
-    if (!this._securedBy) {
+  [authorizationTemplate]() {
+    const { security } = this;
+    if (!security) {
       return '';
     }
-    const {
-      amf,
-      redirectUri,
-      readOnly,
-      disabled,
-      outlined,
-      compatibility,
-      _securedBy,
-      credentialsSource
-    } = this;
-    return html`<div class="editor-section">
-      <div role="heading" aria-level="2" class="section-title">Credentials</div>
-      <api-authorization
+    const { selectedSecurity = 0, amf, compatibility, redirectUri, credentialsSource, globalCache } = this;
+    const rendered = security[selectedSecurity];
+    return html`
+    <section class="authorization params-section">
+      ${security.length > 1 ? this[authorizationSelectorTemplate](security, selectedSecurity) : ''}
+      <api-authorization-editor 
         .amf="${amf}"
-        .security="${_securedBy}"
-        .redirectUri="${redirectUri}"
-        ?readOnly="${readOnly}"
-        ?disabled="${disabled}"
-        ?outlined="${outlined}"
-        ?compatibility="${compatibility}"
+        .security="${rendered.security}"
+        .compatibility="${compatibility}"
+        .oauth2RedirectUri="${redirectUri}"
         .credentialsSource="${credentialsSource}"
-        @change=${this._authChanged}
-      ></api-authorization>
-    </div>`;
+        ?globalCache="${globalCache}"></api-authorization-editor>
+    </section>
+    `;
+  }
+
+  /**
+   * @param {SecuritySelectorListItem[]} security
+   * @param {number} selected
+   * @returns {TemplateResult} The template for the security drop down selector.
+   */
+  [authorizationSelectorTemplate](security, selected) {
+    const { compatibility } = this;
+    return html`
+    <anypoint-dropdown-menu
+      name="selected"
+      .compatibility="${compatibility}"
+      class="auth-selector"
+    >
+      <label slot="label">Authorization method</label>
+      <anypoint-listbox slot="dropdown-content"
+        .selected="${selected}"
+        @selected-changed="${this[authSelectorHandler]}"
+        .compatibility="${compatibility}"
+        attrForItemTitle="data-label"
+      >
+        ${security.map((item) => this[authorizationSelectorItemTemplate](item))}
+      </anypoint-listbox>
+    </anypoint-dropdown-menu>
+    `;
+  }
+
+  /**
+   * @param {SecuritySelectorListItem} info
+   * @returns {TemplateResult} The template for the security drop down selector list item.
+   */
+  [authorizationSelectorItemTemplate](info) {
+    const { labels, types } = info;
+    const label = labels.join(', ');
+    const type = types.join(', ');
+    const single = !type;
+    return html`
+    <anypoint-item
+      .compatibility="${this.compatibility}"
+      data-label="${label}"
+    >
+      <anypoint-item-body ?twoline="${!single}">
+        <div>${label}</div>
+        ${!single ? html`<div data-secondary>${type}</div>` : ''}
+      </anypoint-item-body>
+    </anypoint-item>
+    `;
   }
 
   _formActionsTemplate() {

@@ -1,5 +1,5 @@
-import { HTTPRequest } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
-import { ApiAuthorizationSettings } from '@api-components/api-authorization/src/types';
+import { HTTPRequest, RequestAuthorization } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
+import { ApiParameter, ApiShapeUnion, ApiSecurityRequirement } from '@api-components/amf-helper-mixin';
 import { XhrSimpleRequestTransportElement } from './XhrSimpleRequestTransportElement';
 
 export declare interface ApiConsoleRequest extends HTTPRequest {
@@ -7,12 +7,11 @@ export declare interface ApiConsoleRequest extends HTTPRequest {
    * The authorization settings.
    * Some of them are already applied to the request object.
    */
-  auth?: ApiAuthorizationSettings[];
+  authorization?: RequestAuthorization[];
   /**
    * The id of the request generated when the Api request event is dispatched.
    */
   id?: string;
-
   /**
    * Whether or not to send credentials on the request. Default is false.
    */
@@ -52,4 +51,26 @@ export declare interface PopulationInfo {
   annotationName: string;
   annotationValue: string;
   fieldValue: string;
+}
+
+export interface OperationParameter {
+  parameter: ApiParameter;
+  schema?: ApiShapeUnion;
+  paramId: string;
+  schemaId?: string;
+  binding: string;
+  source: string;
+}
+
+export interface ShapeTemplateOptions {
+  nillable?: boolean;
+  arrayItem?: boolean;
+  index?: number;
+  value?: any;
+}
+
+export interface SecuritySelectorListItem {
+  types: string[];
+  labels: string[];
+  security: ApiSecurityRequirement;
 }

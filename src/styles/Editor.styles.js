@@ -109,4 +109,8 @@ authorization-panel {
 .params-editor {
   margin: 0 8px;
 }
+
+.auth-selector {
+  margin: 12px 0;
+}
 `;

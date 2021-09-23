@@ -54,7 +54,7 @@ components:
           description: You can put whatever you want here
           type: string
         Accept:
-          description: You must specificy accept type for response
+          description: You must specifically accept type for response
           type: string
         x-request-id:
           description: Request id for tracing errors

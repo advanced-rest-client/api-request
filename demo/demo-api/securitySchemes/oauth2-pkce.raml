@@ -1,0 +1,13 @@
+#%RAML 1.0 SecurityScheme
+type: OAuth 2.0
+displayName: This OAuth2 has PKCE annotation
+settings:
+  (pkce): true
+  accessTokenUri: https://token.com
+  authorizationUri: https://auth.com
+  scopes: [profile, email]
+describedBy:
+  queryParameters:
+    access_token:
+      type: string
+      description: Apply access token here.
