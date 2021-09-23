@@ -1,9 +1,9 @@
 import { fixture, assert, nextFrame, html } from '@open-wc/testing';
 import sinon from 'sinon';
 import { MockServer } from './server.js';
-import '../xhr-simple-request-transport.js';
+import '../../xhr-simple-request-transport.js';
 
-/** @typedef {import('../').XhrSimpleRequestTransportElement} XhrSimpleRequestTransportElement */
+/** @typedef {import('../../').XhrSimpleRequestTransportElement} XhrSimpleRequestTransportElement */
 
 describe('<xhr-simple-request-transport>', () => {
   /**

@@ -15,5 +15,6 @@
   "multi-server/multi-server.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
   "loan-ms/loan-microservice.json": { "type": "OAS 2.0", "mime": "application/json" },
   "async-api/async-api.yaml": "ASYNC 2.0",
-  "annotated-parameters/annotated-parameters.raml": "RAML 1.0"
+  "annotated-parameters/annotated-parameters.raml": "RAML 1.0",
+  "secured-unions/secured-unions.yaml": { "type": "OAS 3.0" }
 }

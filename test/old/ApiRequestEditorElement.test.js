@@ -2,10 +2,10 @@
 import { fixture, assert, html, nextFrame, aTimeout } from '@open-wc/testing';
 import * as sinon from 'sinon';
 import { ApiViewModel } from '@api-components/api-forms'
-import { AmfLoader } from './amf-loader.js';
-import '../api-request-editor.js';
+import { AmfLoader } from '../AmfLoader.js';
+import '../../api-request-editor.js';
 
-/** @typedef {import('..').ApiRequestEditorElement} ApiRequestEditorElement */
+/** @typedef {import('../../').ApiRequestEditorElement} ApiRequestEditorElement */
 
 describe('ApiRequestEditorElement', () => {
   /**
