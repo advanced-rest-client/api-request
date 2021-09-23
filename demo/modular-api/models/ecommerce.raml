@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+types:
+  CustomerReference:
+    properties:
+      id:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+  ShoppingSessionReference:
+    properties:
+      id:
+        type: string
+      amount_total:
+        type: number
+        format: float
+  LineItemCollection:
+    properties:
+      url:
+        type: string
+      has_more:
+        type: boolean
+      data:
+        items: ecommerce_canonical.LineItem
+  LineItemReference:
+    properties:
+      id:
+        type: string
+      price:
+        type: number
+        format: float
+      amount:
+        type: integer
+uses:
+  ecommerce_canonical: ecommerce-canonical.raml

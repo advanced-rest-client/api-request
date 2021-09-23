@@ -57,30 +57,31 @@ export default class CustomAuth extends ApiUiBase {
     if (!type || !type.startsWith('x-')) {
       return;
     }
-
     const params = this.parametersValue;
     const { headers, queryParameters, queryString } = scheme;
     if (Array.isArray(headers)) {
       headers.forEach((p) => {
+        const param = { ...p, required: true };
         params.push({
-          binding: p.binding,
-          paramId: p.id,
-          parameter: p,
+          binding: param.binding,
+          paramId: param.id,
+          parameter: param,
           source,
-          schemaId: p.schema && p.schema.id,
-          schema: p.schema,
+          schemaId: param.schema && param.schema.id,
+          schema: param.schema,
         });
       });
     }
     if (Array.isArray(queryParameters)) {
       queryParameters.forEach((p) => {
+        const param = { ...p, required: true };
         params.push({
-          binding: p.binding,
-          paramId: p.id,
-          parameter: p,
+          binding: param.binding,
+          paramId: param.id,
+          parameter: param,
           source,
-          schemaId: p.schema && p.schema.id,
-          schema: p.schema,
+          schemaId: param.schema && param.schema.id,
+          schema: param.schema,
         });
       });
     }
@@ -241,7 +242,7 @@ export default class CustomAuth extends ApiUiBase {
    */
   toggleDescription() {
     this.descriptionOpened = !this.descriptionOpened;
-    this.notifyChange();
+    this.requestUpdate();
   }
 
   /**

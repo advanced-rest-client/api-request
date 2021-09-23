@@ -85,6 +85,7 @@ class ComponentDemo extends ApiDemoPage {
       ['oas-demo', 'OAS Demo API'],
       ['oauth-flows', 'OAS OAuth Flow'],
       ['oas-bearer', 'OAS Bearer'],
+      ['secured-api', 'Security demo'],
     ].map(([file, label]) => html`
       <anypoint-item data-src="${file}-compact.json">${label} - compact model</anypoint-item>
       <anypoint-item data-src="${file}.json">${label}</anypoint-item>

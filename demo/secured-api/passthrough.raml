@@ -1,0 +1,24 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  This API supports Pass Through Authentication.
+type: Pass Through
+describedBy:
+  queryParameters:
+    query:
+      type: string
+      example: my-value
+      description: |
+        This demonstrates how Pass Through authentication
+        works with `api-authorization-method` component.
+    debugTokenParam:
+      description: Select one of available values to run the request in the debug mode with selected level.
+      enum: [Info, Log, Warning, Error, Critical]
+      type: string
+      required: false
+  headers:
+    api_key:
+      type: string
+      pattern: "[0-9a-zA-Z\\.-]+"
+      description: |
+        This headers has pattern included in the definition.

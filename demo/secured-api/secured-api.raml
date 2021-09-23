@@ -1,0 +1,231 @@
+#%RAML 1.0
+title: Authorization Test API
+version: v1
+baseUri: http://api.domain.com/
+
+annotationTypes:
+  oauth-2-custom-settings: !include oauth-2-custom-settings.raml
+
+types:
+  apiTokens: # each is optional, not exclusive with anything
+    properties:
+      userToken: number
+      applicationToken?: number
+
+securitySchemes:
+  basic:
+    type: Basic Authentication
+    description: |
+      This API supports Basic Authentication.
+  digest:
+    description: |
+      This API supports DigestSecurityScheme Authentication.
+    type: Digest Authentication
+  passthrough: !include passthrough.raml
+  passthroughQueryString: !include passthrough-querystring.raml
+  custom_scheme:
+    description: |
+      A custom security scheme for authenticating requests.
+    type: x-custom
+    displayName: RAML's custom scheme
+    describedBy:
+      headers:
+        SpecialToken:
+          description: |
+            Used to send a custom token.
+          type: string
+      queryString:
+        type: apiTokens
+        examples:
+          first:
+            value:
+              userToken: 1234
+              applicationToken: 5678
+          second:
+            value:
+              start: 1239874566
+              page-size: 987321456
+      responses:
+        401:
+          description: |
+            Bad token.
+        403:
+  custom1: !include x-custom.raml
+  custom2: !include x-other.raml
+  custom3: !include x-query-string.raml
+  oauth2:
+    type: OAuth 2.0
+    displayName: Regular OAuth 2.0 definition
+    settings:
+      accessTokenUri: https://token.com
+      authorizationUri: https://auth.com
+      scopes: [profile, email]
+    describedBy:
+      queryParameters:
+        access_token:
+          type: string
+          description: Apply access token here.
+      headers:
+        Authorization:
+          type: string
+  oauth2grants:
+    type: OAuth 2.0
+    displayName: Regular OAuth 2.0 definition
+    settings:
+      accessTokenUri: https://token.com
+      authorizationUri: https://auth.com
+      authorizationGrants: authorization_code
+      scopes: [profile, email]
+    describedBy:
+      queryParameters:
+        access_token:
+          type: string
+          description: Apply access token here.
+      headers:
+        Authorization:
+          type: string
+  oauth2Annotation:
+    type: OAuth 2.0
+    displayName: OAuth 2.0 with annotation
+    settings:
+      (oauth-2-custom-settings):
+        # ignoreDefaultGrants:
+        authorizationGrants: [annotated_custom_grant, annotated_custom_grant2]
+        authorizationSettings:
+          queryParameters:
+            resource:
+              type: string
+              required: true
+              description: |
+                A resource ID that defines a domain of authorization.
+              displayName: Hello query parameeter
+              default: default
+              examples:
+                named: named example value
+                otherExample: test example value
+              pattern: "[a-zA-Z]+"
+              maxLength: 12
+              minLength: 3
+            numericParam:
+              type: number
+              minimum: 10
+              maximum: 20
+              multipleOf: 2
+              format: float
+              required: false
+              example: 22
+            dateParam:
+              type: date-only
+              required: false
+            repeatableParam1:
+              type: string[]
+              required: false
+            repetableParam2:
+              type: array
+              items: integer
+              required: false
+        accessTokenSettings:
+          queryParameters:
+            queryTokenResource: string
+            detailedTokenResource:
+              type: number
+              description: some description
+              required: false
+          headers:
+            x-token-resource:
+              type: number
+              default: 123
+          body:
+            bodyTokenResource: string
+            bodyDetailed:
+              type: boolean
+              required: true
+              displayName: Body detailed property
+              default: true
+      accessTokenUri: https://token.com
+      authorizationUri: https://auth.com
+      authorizationGrants: [authorization_code, password, client_credentials, implicit]
+      scopes: [profile, email]
+    describedBy:
+      queryParameters:
+        access_token:
+          type: string
+          description: Apply access token here.
+  oauth2queryDelivery: !include oauth2-query-delivery.raml
+  oauth2headerDelivery: !include oauth2-header-delivery.raml
+  oauth2noDelivery: !include oauth2-no-delivery.raml
+  oauth2noGrants: !include oauth2-no-grants.raml
+  oauth2pkce: !include oauth2-pkce.raml
+  oauth1: !include oauth_1_0.raml
+  oauth1signature: !include oauth_1_0_signature.raml
+  oauth1noSignature: !include oauth_1_0_no-signature.raml
+  oauth1noSettings: !include oauth_1_0_no-settings.raml
+/basic:
+  get:
+    securedBy: basic
+/digest:
+  get:
+    securedBy: digest
+/passthrough:
+  get:
+    securedBy: passthrough
+/passthrough-query-string:
+  get:
+    securedBy: passthroughQueryString
+/custom-query-string:
+  get:
+    securedBy: custom_scheme
+/custom1:
+  get:
+    securedBy: [custom1]
+/custom2:
+  get:
+    securedBy: [custom2]
+/custom3:
+  get:
+    securedBy: [custom3]
+/oauth2:
+  post:
+    securedBy: [oauth2]
+/oauth2-with-annotations:
+  get:
+    securedBy: [oauth2Annotation]
+/oauth2-with-grant-list:
+  get:
+    securedBy: [oauth2grants]
+/oauth2-query-delivery:
+  get:
+    securedBy: [oauth2queryDelivery]
+/oauth2-header-delivery:
+  get:
+    securedBy: [oauth2headerDelivery]
+/oauth2-no-delivery:
+  get:
+    securedBy: [oauth2noDelivery]
+/oauth2-no-grants:
+  get:
+    securedBy: [oauth2noGrants]
+/oauth2-pkce:
+  get:
+    securedBy: [oauth2pkce]
+/oauth1:
+  get:
+    securedBy: [oauth1]
+/oauth1-signature:
+  get:
+    securedBy: [oauth1signature]
+/oauth1-nosignature:
+  get:
+    securedBy: [oauth1noSignature]
+/oauth1-nosettings:
+  get:
+    securedBy: [oauth1noSettings]
+/combo-types:
+  get:
+    securedBy: [basic, digest, passthroughQueryString, custom1, oauth2, oauth1]
+/all-oauth2:
+  get:
+    securedBy: [oauth2, oauth2Annotation, oauth2grants, oauth2queryDelivery, oauth2headerDelivery, oauth2noDelivery, oauth2noGrants]
+/nil-oauth2:
+  get:
+    securedBy: [null, oauth2]

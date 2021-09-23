@@ -61,11 +61,11 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
 
   constructor();
 
-  /**
-   * A handler for the global authorization settings change event.
-   * It applies the the event settings to the current configuration.
-   */
-  [settingsHandler](e: CustomEvent): void;
+  // /**
+  //  * A handler for the global authorization settings change event.
+  //  * It applies the the event settings to the current configuration.
+  //  */
+  // [settingsHandler](e: CustomEvent): void;
 
   /**
    * A function called when `type` changed.

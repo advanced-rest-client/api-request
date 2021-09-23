@@ -1,10 +1,11 @@
-import { html, fixture, assert, nextFrame, oneEvent } from '@open-wc/testing';
+import { html, fixture, assert, nextFrame } from '@open-wc/testing';
 import sinon from 'sinon';
-import '../../amf-authorization-editor.js';
-import { TestHelper } from "../TestHelper.js";
-import { methodsValue } from '../../src/elements/AmfAuthorizationEditorElement.js';
+import { AmfLoader } from "../AmfLoader.js";
+import '../../api-authorization-editor.js';
+import { methodsValue } from '../../src/elements/ApiAuthorizationEditorElement.js';
 
-/** @typedef {import('../../index').AmfAuthorizationEditorElement} AmfAuthorizationEditorElement */
+/** @typedef {import('../../index').ApiAuthorizationEditorElement} ApiAuthorizationEditorElement */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.BasicAuthorization} BasicAuthorization */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.OAuth2Authorization} OAuth2Authorization */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.OAuth1Authorization} OAuth1Authorization */
@@ -12,58 +13,56 @@ import { methodsValue } from '../../src/elements/AmfAuthorizationEditorElement.j
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.BearerAuthorization} BearerAuthorization */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.PassThroughAuthorization} PassThroughAuthorization */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.RamlCustomAuthorization} RamlCustomAuthorization */
-/** @typedef {import('@api-client/amf-store/worker.index').AmfStoreService} AmfStoreService */
-/** @typedef {import('@api-client/amf-store/worker.index').ApiSecurityRequirementRecursive} ApiSecurityRequirementRecursive */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.ApiKeyAuthorization} ApiKeyAuthorization */
 
-describe('AmfAuthorizationEditorElement RAML tests', () => {
+describe('ApiAuthorizationEditorElement', () => {
   /**
-   * @param {string} domainId
-   * @returns {Promise<AmfAuthorizationEditorElement>} 
+   * @param {AmfDocument} model
+   * @param {ApiSecurityRequirement} security
+   * @returns {Promise<ApiAuthorizationEditorElement>} 
    */
-  async function basicFixture(domainId) {
-    const element = /** @type AmfAuthorizationEditorElement */ (await fixture(html`<amf-authorization-editor
-      .domainId="${domainId}"
+  async function basicFixture(model, security) {
+    const element = /** @type ApiAuthorizationEditorElement */ (await fixture(html`<api-authorization-editor
+      .amf="${model}"
+      .security="${security}"
       oauth2RedirectUri="https://api.rdr.com"
-    ></amf-authorization-editor>`));
-    await oneEvent(element, 'ready');
+    ></api-authorization-editor>`));
     return element;
   }
 
-  /** @type AmfStoreService */
+  /** @type AmfLoader */
   let store;
   before(async () => {
-    store = await TestHelper.initStore();
-  });
-
-  after(async () => {
-    store.worker.terminate();
+    store = new AmfLoader();
   });
 
   /**
+   * @param {AmfDocument} model
    * @param {string} path
    * @param {string} method
-   * @returns {Promise<ApiSecurityRequirementRecursive>} 
+   * @returns {ApiSecurityRequirement} 
    */
-  async function getSecurityRequirement(path, method) {
-    const operation = await store.getOperationRecursive(method, path);
+  function getSecurityRequirement(model, path, method) {
+    const operation = store.getOperation(model, path, method);
     return operation.security[0];
   }
 
   describe('RAML tests', () => {
+    /** @type AmfDocument */
+    let model;
     before(async () => {
-      const model = await TestHelper.getGraph('secured-api');
-      await store.loadGraph(model, 'RAML 1.0');
+      model = await store.getGraph(false, 'secured-api');
     });
 
     describe(`Basic method`, () => {
       const username = 'uname';
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/basic', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/basic', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('has "types" in the authorization object', () => {
@@ -79,7 +78,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('notifies changes when panel value change', () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         const spy = sinon.spy();
         element.addEventListener('change', spy);
         form.username = username;
@@ -98,7 +97,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('element is valid with username', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.username = username;
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
@@ -108,7 +107,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('creates params with serialize()', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.username = username;
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
@@ -121,12 +120,12 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
 
     describe(`Digest method`, () => {
       const username = 'uname';
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/digest', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/digest', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('has "types" in the authorization object', () => {
@@ -142,7 +141,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('notifies changes when panel value change', () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         const spy = sinon.spy();
         element.addEventListener('change', spy);
         form.username = username;
@@ -161,7 +160,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('element is valid with required values', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.username = username;
         form.realm = 'realm';
         form.nonce = 'nonce';
@@ -177,7 +176,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       it('produces authorization settings', async () => {
         element.httpMethod = 'GET';
         element.requestUrl = 'https://api.domain.com/endpoint';
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.username = username;
         form.realm = 'realm';
         form.nonce = 'nonce';
@@ -208,12 +207,12 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
     });
 
     describe(`Pass through method`, () => {
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/passthrough', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/passthrough', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('has "types" in the authorization object', () => {
@@ -229,7 +228,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('notifies changes when panel value change', () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         const spy = sinon.spy();
         element.addEventListener('change', spy);
         form.updateHeader('api_key', 'test');
@@ -244,8 +243,9 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('element is valid with required values', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('api_key', 'test');
+        form.updateQueryParameter('query', 'value');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
         const result = element.validate();
@@ -254,8 +254,9 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('produces authorization settings', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('api_key', 'test');
+        form.updateQueryParameter('query', 'value');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
         const result = element.serialize();
@@ -273,12 +274,12 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
     });
 
     describe(`RAML Custom method`, () => {
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/custom1', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/custom1', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('has "types" in the authorization object', () => {
@@ -294,7 +295,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('notifies changes when panel value change', () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         const spy = sinon.spy();
         element.addEventListener('change', spy);
         form.updateHeader('SpecialTokenHeader', 'test');
@@ -309,7 +310,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       // });
 
       it('element is valid with required values', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('SpecialTokenHeader', 'test');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
@@ -319,7 +320,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('produces authorization settings', async () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('SpecialTokenHeader', 'test');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
@@ -338,12 +339,12 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
 
     describe(`Oauth 2 method`, () => {
       describe('Basics', () => {
-        /** @type AmfAuthorizationEditorElement */
+        /** @type ApiAuthorizationEditorElement */
         let element;
 
         beforeEach(async () => {
-          const security = await getSecurityRequirement('/oauth2', 'post');
-          element = await basicFixture(security.id);
+          const security = getSecurityRequirement(model, '/oauth2', 'post');
+          element = await basicFixture(model, security);
         });
 
         it('has "types" in the authorization object', () => {
@@ -359,7 +360,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('notifies changes when panel value change', () => {
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           const spy = sinon.spy();
           element.addEventListener('change', spy);
           form.clientId = 'test';
@@ -374,7 +375,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('element is valid with required values', async () => {
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = 'test-client-id';
           form.accessToken = 'test-token';
           form.dispatchEvent(new CustomEvent('change'));
@@ -386,7 +387,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
 
         it('produces authorization settings', async () => {
           element.oauth2RedirectUri = 'https://rdr.com';
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = 'test-client-id';
           form.accessToken = 'test-token';
           form.dispatchEvent(new CustomEvent('change'));
@@ -417,10 +418,10 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         const clientId = 'test-client-id';
 
         it('creates params', async () => {
-          const security = await getSecurityRequirement('/oauth2', 'post');
-          const element = await basicFixture(security.id);
+          const security = getSecurityRequirement(model, '/oauth2', 'post');
+          const element = await basicFixture(model, security);
 
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = clientId;
           form.accessToken = accessToken;
           form.dispatchEvent(new CustomEvent('change'));
@@ -440,10 +441,10 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('marks invalid when no token', async () => {
-          const security = await getSecurityRequirement('/oauth2', 'post');
-          const element = await basicFixture(security.id);
+          const security = await getSecurityRequirement(model, '/oauth2', 'post');
+          const element = await basicFixture(model, security);
 
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = clientId;
           form.dispatchEvent(new CustomEvent('change'));
           await nextFrame();
@@ -455,10 +456,10 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('respects delivery method (query)', async () => {
-          const security = await getSecurityRequirement('/oauth2-query-delivery', 'get');
-          const element = await basicFixture(security.id);
+          const security = await getSecurityRequirement(model, '/oauth2-query-delivery', 'get');
+          const element = await basicFixture(model, security);
 
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = clientId;
           form.clientSecret = 'test';
           form.accessToken = accessToken;
@@ -473,10 +474,10 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('respects delivery method (header)', async () => {
-          const security = await getSecurityRequirement('/oauth2-header-delivery', 'get');
-          const element = await basicFixture(security.id);
+          const security = await getSecurityRequirement(model, '/oauth2-header-delivery', 'get');
+          const element = await basicFixture(model, security);
 
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = clientId;
           form.clientSecret = 'test';
           form.accessToken = accessToken;
@@ -491,10 +492,10 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         });
 
         it('uses default delivery', async () => {
-          const security = await getSecurityRequirement('/oauth2-no-delivery', 'get');
-          const element = await basicFixture(security.id);
+          const security = await getSecurityRequirement(model, '/oauth2-no-delivery', 'get');
+          const element = await basicFixture(model, security);
 
-          const form = element.shadowRoot.querySelector('amf-authorization-method');
+          const form = element.shadowRoot.querySelector('api-authorization-method');
           form.clientId = clientId;
           form.clientSecret = 'test';
           form.accessToken = accessToken;
@@ -511,12 +512,12 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
     });
 
     describe(`OAuth 1 method`, () => {
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/oauth1', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/oauth1', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('has "types" in the authorization object', () => {
@@ -532,7 +533,7 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
       });
 
       it('notifies changes when panel value change', () => {
-        const form = element.shadowRoot.querySelector('amf-authorization-method');
+        const form = element.shadowRoot.querySelector('api-authorization-method');
         const spy = sinon.spy();
         element.addEventListener('change', spy);
         form.consumerKey = 'test';
@@ -554,7 +555,6 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
         assert.isFalse(auth.valid, 'valid is true');
         assert.isTrue(auth.enabled, 'enabled is true');
         assert.equal(auth.type, 'oauth 1', 'type is set');
-
         assert.equal(settings.signatureMethod, 'HMAC-SHA1', 'has signatureMethod');
         assert.equal(settings.requestTokenUri, 'http://api.domain.com/oauth1/request_token', 'has requestTokenUri');
         assert.equal(settings.accessTokenUri, 'http://api.domain.com/oauth1/access_token', 'has accessTokenUri');
@@ -566,16 +566,16 @@ describe('AmfAuthorizationEditorElement RAML tests', () => {
     });
 
     describe(`RAML null method`, () => {
-      /** @type AmfAuthorizationEditorElement */
+      /** @type ApiAuthorizationEditorElement */
       let element;
 
       beforeEach(async () => {
-        const security = await getSecurityRequirement('/nil-oauth2', 'get');
-        element = await basicFixture(security.id);
+        const security = getSecurityRequirement(model, '/nil-oauth2', 'get');
+        element = await basicFixture(model, security);
       });
 
       it('does not render authorization method', () => {
-        const node = element.shadowRoot.querySelector('amf-authorization-method');
+        const node = element.shadowRoot.querySelector('api-authorization-method');
         assert.notOk(node);
       });
     });

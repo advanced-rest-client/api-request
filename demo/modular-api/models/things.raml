@@ -1,0 +1,32 @@
+#%RAML 1.0 Library
+types:
+  Thing:
+    type: object
+  Data:
+    type: Thing
+    properties: 
+      id:
+        (key): nil
+        type: string
+        description: A default database id.
+        required: true
+      created:
+        type: datetime
+        description: When the record was created
+        required: true
+      updated:
+        type: datetime
+        description: When the record was last updated
+        required: false
+  Person:
+    type: Data
+    description: Represents a person entity in the system.
+    properties: 
+      firstName:
+        type: string
+        description: The person first name
+        displayName: First name
+      lastName:
+        type: string
+        description: The person last name
+        displayName: Last name

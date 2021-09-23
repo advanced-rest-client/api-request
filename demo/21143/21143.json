@@ -1,0 +1,638 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "My Zurich API - Claims Endpoint - 1.0",
+    "description": "Endpoint for claims data for My Zurich Standard API.",
+    "termsOfService": "None",
+    "contact": {
+      "name": "My Zurich Team",
+      "email": "myzurich@zurich.com"
+    }
+  },
+  "host": "uat.myzurich.com",
+  "basePath": "/",
+  "paths": {
+    "/myz-api/claims/claims": {
+      "get": {
+        "tags": [
+          "Claim"
+        ],
+        "summary": "Returns claims",
+        "description": "\nClaim product specific fields:<br>\nFinancial: causeOfLoss, occurredOn<br>\nLiability: causeOfLoss, occurredOn<br>\nMarine: carrierName, conveyanceCode, transportDocumentDate, interestInsured, transportDocumentId, clientReferenceId<br>\nMotor: bodilyInjury, faultCode, makeAndModel, roadType, timeOfAccident, usageOfVehicle, vehicleType, vehicleRegistration<br>\nProperty: causeOfLoss, lossLocation<br>\nTechnical: causeOfLoss, lossLocation<br>\nEmployeesRisk: decisionDate, reviewDate, sumAssured, offsetAmount<br>\nSpecialities: no specific fields (there are currently no claims for specialities-policies, nevertheless there might be in future and are covered by basic attributes)\n",
+        "operationId": "GetClaims",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Determines the page size. Allowed range (2-1024), default: 128",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items to skip. Allowed range (0-2147483647), default: 0",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "modifiedSince",
+            "in": "query",
+            "description": "Get claims that have been modified after the specified time. This parameter uses the UTC\r\nformat ISO 8601 e.g. 2017-04-16T05:07:44.5740000Z. If not defined returns all data",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Specifies claim ID",
+            "required": false,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "policyId",
+            "in": "query",
+            "description": "Specifies policy ID",
+            "required": false,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "globalClaimId",
+            "in": "query",
+            "description": "Specifies global claim ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sourceId",
+            "in": "query",
+            "description": "Specifies source ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Specifies status of the claim (e.g. Closed / Open)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "description": "Specifies claim product (e.g. Motor, Liability, Financial)",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Financial",
+              "Liability",
+              "Marine",
+              "Motor",
+              "Property",
+              "Speciality",
+              "Technical",
+              "EmployeesRisk"
+            ]
+          },
+          {
+            "name": "dateOfLoss",
+            "in": "query",
+            "description": "Get claims that have loss date equal to the specified date. This parameter uses only date part of the UTC\r\n                format ISO 8601 e.g. 2017-04-16. If not defined returns all data",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "occuredIn",
+            "in": "query",
+            "description": "Specifies the country where loss occured. Country coded as ISO 3166-1 alpha-2 (e.g. CH for Switzerland)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tpaClaimId",
+            "in": "query",
+            "description": "Specifies the Third Party Adjuster Claim ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "customerAccountId",
+            "in": "query",
+            "description": "Get claims for the specified customer account",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "smartTpaClaimId",
+            "in": "query",
+            "description": "Specifies the Third Party Adjuster Claim ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The requested API version",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClaimFullModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "MyZurich.Api"
+            ]
+          }
+        ]
+      }
+    },
+    "/myz-api/claims/bookings": {
+      "get": {
+        "tags": [
+          "ClaimBooking"
+        ],
+        "summary": "Returns claim bookings",
+        "operationId": "GetClaimBookings",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Determines the page size. Allowed range (2-1024), default: 128",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items to skip. Allowed range (0-2147483647), default: 0",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Get claim booking with specific ID",
+            "required": false,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "claimId",
+            "in": "query",
+            "description": "Get claim bookings by claim ID",
+            "required": false,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "policyId",
+            "in": "query",
+            "description": "Get claim bookings by policy ID",
+            "required": false,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "sourceId",
+            "in": "query",
+            "description": "Get claim booking by source ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "description": "Get claim bookings by claim product (e.g. Motor, Liability, Financial)",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "Financial",
+              "Liability",
+              "Marine",
+              "Motor",
+              "Property",
+              "Speciality",
+              "Technical",
+              "EmployeesRisk"
+            ]
+          },
+          {
+            "name": "modifiedSince",
+            "in": "query",
+            "description": "Get claim bookings that have been modified after the specified time. This parameter uses the UTC\r\nformat ISO 8601 e.g. 2017-04-16T05:07:44.5740000Z. If not defined returns all data",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "localBookingDate",
+            "in": "query",
+            "description": "Get claim bookings that have booking date equal to the specified date. This parameter uses only date part of the UTC\r\n                format ISO 8601 e.g. 2017-04-16. If not defined returns all data",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "customerAccountId",
+            "in": "query",
+            "description": "Get claim bookings for the specified customer account",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "description": "The requested API version",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClaimBookingModel"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [
+              "MyZurich.Api"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ClaimFullModel": {
+      "required": [
+        "occurredIn",
+        "status",
+        "dateOfLoss",
+        "number",
+        "typeOfLoss"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "description": "Unique techical ID of the claim",
+          "type": "string"
+        },
+        "policyId": {
+          "format": "uuid",
+          "description": "Unique techical ID of the policy where the claim belongs to",
+          "type": "string"
+        },
+        "globalClaimId": {
+          "description": "Global ID of the claim",
+          "type": "string"
+        },
+        "sourceId": {
+          "description": "Unique ID of the claim in the source system",
+          "type": "string"
+        },
+        "sourcePolicyId": {
+          "description": "Unique ID of the policy in the source system",
+          "type": "string"
+        },
+        "product": {
+          "description": "Claim product",
+          "enum": [
+            "Financial",
+            "Liability",
+            "Marine",
+            "Motor",
+            "Property",
+            "Speciality",
+            "Technical",
+            "EmployeesRisk"
+          ],
+          "type": "string"
+        },
+        "occurredIn": {
+          "description": "Claim occurred in country",
+          "maxLength": 2,
+          "minLength": 0,
+          "type": "string"
+        },
+        "tpaClaimId": {
+          "description": "Free text the Third Party Administrator reference (VeNeZuela 2)",
+          "type": "string"
+        },
+        "smartTpaClaimId": {
+          "description": "Calculated SmartTpaClaimId",
+          "type": "string"
+        },
+        "reportedToZurichOn": {
+          "format": "date-time",
+          "description": "The date the claim is reported to the Zurich Network (Zurich Group, partner company or Third Party Administrator).",
+          "type": "string"
+        },
+        "status": {
+          "description": "Status of a claim as of the reporting date (e.g. Open, Closed, Reopened). The status can change over time. The status can be:",
+          "maxLength": 20,
+          "minLength": 0,
+          "type": "string"
+        },
+        "currency": {
+          "description": "Claim currency",
+          "type": "string"
+        },
+        "dateOfLoss": {
+          "format": "date-time",
+          "description": "The actual date of the loss depending on the trigger of the policy (Causation, Occurrence, Manifestation, Claims Made).",
+          "type": "string"
+        },
+        "litigation": {
+          "description": "Indicates if the claim is in dispute in a court of law and for Financial Lines it specifies type of the lawsuit (Class action, Single-party lawsuit, Not applicable).",
+          "type": "string"
+        },
+        "number": {
+          "description": "Local claim number, as shown in the My Zurich portal.",
+          "maxLength": 20,
+          "minLength": 0,
+          "type": "string"
+        },
+        "typeOfLoss": {
+          "description": "Indicates the general type of loss, e.g. fire, sinking, etc.",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "lastModified": {
+          "format": "date-time",
+          "description": "Represents the last modified date in the source system in UTC.",
+          "type": "string"
+        },
+        "organizationStructure": {
+          "description": "Free text field needed for local fleet/claims management in Switzerland (VeNeZuela 2)",
+          "type": "string"
+        },
+        "claimDescription": {
+          "description": "Free text field for a detailed description of the claim.\r\nHelps for day-to-day claims coordination.\r\nThis field is masked if the claim is older than 10 years. (VeNeZuela 2)",
+          "type": "string"
+        },
+        "statusChangeDate": {
+          "format": "date-time",
+          "description": "Date of status change on the claim (VeNeZuela 2)\r\nStatus: open, closed, reopen",
+          "type": "string"
+        },
+        "causeOfLoss": {
+          "description": "Description indicating why an event has happened (e.g. Contamination, Fraud, Arson, Static Electricity, etc.).",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "occurredOn": {
+          "format": "date-time",
+          "description": "The date of the occurrence which triggered the loss for occurrence policies or the date the event occurred that ultimately triggered the loss for claims made or manifestation policies.",
+          "type": "string"
+        },
+        "carrierName": {
+          "description": "The name of the primary carrier (transportation company) that issued the Transport Document for transporting the goods (e.g. ocean or air carrier for international shipments, domestic trucker if inland transit movement).",
+          "type": "string"
+        },
+        "conveyanceCode": {
+          "description": "Description indicating the mode of transport of goods (e.g. Air, Parcel Post, Road, Train, etc.).",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "transportDocumentDate": {
+          "format": "date-time",
+          "description": "The date of the transport document given by a carrier when goods have been accepted for transportation.",
+          "type": "string"
+        },
+        "interestInsured": {
+          "description": "Type of goods covered by the policy (non-Hull coverage) or name of the vessel insured (Hull coverage only).",
+          "maxLength": 60,
+          "minLength": 0,
+          "type": "string"
+        },
+        "transportDocumentId": {
+          "description": "Unique identifier of the transport document given by the primary carrier at the origin of the shipment or the transport document of the carrier at the time in transit when the goods were damaged.",
+          "maxLength": 60,
+          "minLength": 0,
+          "type": "string"
+        },
+        "clientReferenceId": {
+          "description": "Free text for the customer's claim reference, if applicable.\r\nThis field is filled in with specific references as per customer-specific agreements. (VeNeZuela 2)",
+          "type": "string"
+        },
+        "bodilyInjury": {
+          "type": "boolean"
+        },
+        "faultCode": {
+          "description": "Indicates the degree of the insured's liability on a third party liability claim (e.g. To blame, Not to blame, Circumstances Unknown, etc.)",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "makeAndModel": {
+          "description": "Combined field for the vehicle manufacturer make and model.",
+          "maxLength": 60,
+          "minLength": 0,
+          "type": "string"
+        },
+        "roadType": {
+          "description": "Indicates the road type on which the vehicle was traveling or if the vehicle was stationary at the time of the accident (e.g. Highway, Off Road, Crossroad / Intersection, etc.).",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "timeOfAccident": {
+          "type": "string"
+        },
+        "usageOfVehicle": {
+          "description": "Indicates the usage of the vehicle at the time of the accident (e.g. Business, Private, Unauthorized, etc.).",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "vehicleType": {
+          "description": "Indicates the type of vehicle (e.g. Private Vehicle, Commercial Vehicle, Special Vehicle).",
+          "maxLength": 200,
+          "minLength": 0,
+          "type": "string"
+        },
+        "vehicleRegistration": {
+          "description": "Needed for local fleet/claims management (VeNeZuela 2)",
+          "type": "string"
+        },
+        "lossLocation": {
+          "description": "The name of the city where the incident occurred. In the event that no city is defined for the site of the loss, the area or site name is provided.",
+          "maxLength": 256,
+          "minLength": 0,
+          "type": "string"
+        },
+        "decisionDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "reviewDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "sumAssured": {
+          "$ref": "#/definitions/Money"
+        },
+        "offsetAmount": {
+          "$ref": "#/definitions/Money"
+        },
+        "customerAccountId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Money": {
+      "required": [
+        "currency"
+      ],
+      "type": "object",
+      "properties": {
+        "currency": {
+          "maxLength": 5,
+          "minLength": 0,
+          "type": "string"
+        },
+        "value": {
+          "format": "decimal",
+          "type": "number"
+        }
+      }
+    },
+    "ClaimBookingModel": {
+      "required": [
+        "id",
+        "claimId",
+        "policyId",
+        "localBookingDate"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique technical ID of the claim booking.",
+          "type": "string"
+        },
+        "claimId": {
+          "description": "Unique technical ID of the claim, to which the booking belongs.",
+          "type": "string"
+        },
+        "policyId": {
+          "description": "Unique technical ID of the policy, to which the booking belongs.",
+          "type": "string"
+        },
+        "sourceId": {
+          "description": "Unique ID of the claim in the source system, to which the booking belongs.",
+          "type": "string"
+        },
+        "localBookingDate": {
+          "format": "date-time",
+          "description": "Date on which the displayed booking was entered into the local system.",
+          "type": "string"
+        },
+        "product": {
+          "description": "Claim product",
+          "type": "string"
+        },
+        "paidIndemnity": {
+          "$ref": "#/definitions/Money",
+          "description": "Payments to the insured and / or third parties including when Zurich's contractual obligation includes that Zurich will pay the deductible amount from the ground up."
+        },
+        "paidExpenses": {
+          "$ref": "#/definitions/Money",
+          "description": "Payments in respect of allocated costs incurred by the claims handler (on behalf of the insurer) for the investigation, handling or settlement of the claim or in accordance with any claims handling arrangement. Such costs include adjuster, legal, medical and forensic fees as well as travel and accommodation costs directly incurred by the claims handler (on behalf of the insurer) and specifically related to the claim."
+        },
+        "recoveries": {
+          "$ref": "#/definitions/Money",
+          "description": "Refunds in respect of payments made under Paid Indemnity or Paid Expenses.  Expected recoveries are not included. Possible recoveries are: Subrogation from third parties, Salvage, Contribution from responsible parties, Amounts received from other carriers/insurers due to reciprocal laws in some countries (for Motor Fleet business)"
+        },
+        "appliedDeductibles": {
+          "$ref": "#/definitions/Money",
+          "description": "The applied deductible is the applied portion of the agreed deductible for the occurred claim for which the insured is responsible"
+        },
+        "outstandingIndemnity": {
+          "$ref": "#/definitions/Money",
+          "description": "Reserve indemnity amount to date (VeNeZuela 2)"
+        },
+        "outstandingExpenses": {
+          "$ref": "#/definitions/Money",
+          "description": "Reserve expense amount to date (VeNeZuela 2)"
+        },
+        "lastModified": {
+          "format": "date-time",
+          "description": "Represents the last modified date in the source system in UTC.",
+          "type": "string"
+        },
+        "customerAccountId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "flow": "application",
+      "tokenUrl": "https://uat.myzurich.com/login/connect/token",
+      "scopes": {
+        "MyZurich.Api": "General API scope",
+        "MyZurich.Api.Claims": "Claims API access"
+      },
+      "type": "oauth2"
+    }
+  }
+}

@@ -3,11 +3,14 @@ import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('../..').ApiRequestEditorElement} ApiRequestEditorElement */
 
 describe('ApiRequestEditorElement', () => {
   describe('APIC-289', () => {
     /**
+     * @param {AmfDocument} amf
+     * @param {string} selected
      * @returns {Promise<ApiRequestEditorElement>}
      */
     async function modelFixture(amf, selected) {
@@ -22,10 +25,15 @@ describe('ApiRequestEditorElement', () => {
       ['Full model', false]
     ].forEach(([label, compact]) => {
       describe(`${label}`, () => {
-        let factory = /** @type ApiViewModel */ (null);
+        /** @type AmfLoader */
+        let store;
+        /** @type AmfDocument */
         let amf;
+        /** @type ApiViewModel */
+        let factory;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: apiFile, compact });
+          store = new AmfLoader();
+          amf = await store.getGraph(Boolean(compact), apiFile);
           factory = new ApiViewModel();
         });
 
@@ -38,7 +46,7 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('generates query parameters model', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/organization', 'get');
+          const method = store.lookupOperation(amf, '/organization', 'get');
           const element = await modelFixture(amf, method['@id']);
           await aTimeout(0);
           await aTimeout(0);
@@ -47,7 +55,7 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('has OAS name on a parameter', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/organization', 'get');
+          const method = store.lookupOperation(amf, '/organization', 'get');
           const element = await modelFixture(amf, method['@id']);
           await aTimeout(0);
           await aTimeout(0);

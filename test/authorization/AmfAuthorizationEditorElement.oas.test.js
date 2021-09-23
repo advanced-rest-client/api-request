@@ -130,7 +130,7 @@ describe('ApiAuthorizationEditorElement OAS tests', () => {
         assert.isTrue(spy.called);
       });
 
-      // it.only('element is not invalid without required values', () => {
+      // it.skip('element is not invalid without required values', () => {
       //   const result = element.validate();
       //   assert.isFalse(result, 'validation result is false');
       //   console.log(element.serialize()[0].config);
@@ -165,7 +165,7 @@ describe('ApiAuthorizationEditorElement OAS tests', () => {
   });
 
   // due to an issue with AMF the http methods don't work when importing a graph model.
-  describe.skip('Bearer method', () => {
+  describe('Bearer method', () => {
     /** @type AmfDocument */
     let model;
     before(async () => {
@@ -177,7 +177,7 @@ describe('ApiAuthorizationEditorElement OAS tests', () => {
       let element;
       
       beforeEach(async () => {
-        const security = await getSecurityRequirement(model, '/bearer', 'get');
+        const security = getSecurityRequirement(model, '/bearer', 'get');
         element = await basicFixture(model, security);
       });
 
@@ -224,12 +224,10 @@ describe('ApiAuthorizationEditorElement OAS tests', () => {
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
         const [result] = element.serialize();
-        const cnf = /** @type ApiKeyAuthorization */ (result.config)
-        assert.deepEqual(cnf.header, {
-          authorization: 'Bearer test',
-        }, 'has headers');
-        assert.deepEqual(cnf.query, {}, 'has no params');
-        assert.deepEqual(cnf.cookie, {}, 'has no cookies');
+        const cnf = /** @type BearerAuthorization */ (result.config);
+        assert.deepEqual(cnf, {
+          token: 'test',
+        }, 'has the configuration');
       });
     });
   });

@@ -11,6 +11,7 @@ import { AmfParameterMixin } from '../AmfParameterMixin.js';
 
 const securityValue = Symbol("securityValue");
 const apiValue = Symbol("apiValue");
+const gtValue = Symbol("gtValue");
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/authorization').AuthUiInit} AuthUiInit */
@@ -74,12 +75,12 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
 
   // @ts-ignore
   get grantType() {
-    return super.grantType;
+    return this[gtValue];
   }
 
   set grantType(value) {
-    const old = super.grantType;
-    super.grantType = value;
+    const old = this[gtValue];
+    this[gtValue] = value;
     if (old !== value) {
       this.applyFlow(value);
     }

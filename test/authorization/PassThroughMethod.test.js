@@ -1,49 +1,50 @@
 import { fixture, assert, aTimeout, nextFrame, html } from '@open-wc/testing';
 import sinon from 'sinon';
-import '../../amf-authorization-method.js';
-import { TestHelper } from '../TestHelper.js';
+import { AmfLoader } from "../AmfLoader.js";
+import '../../api-authorization-method.js';
 
-/** @typedef {import('@api-client/amf-store/worker.index').AmfStoreService} AmfStoreService */
-/** @typedef {import('@api-client/amf-store/worker.index').ApiParametrizedSecuritySchemeRecursive} ApiParametrizedSecuritySchemeRecursive */
+/** @typedef {import('../../').ApiAuthorizationMethodElement} ApiAuthorizationMethodElement */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
-/** @typedef {import('../../').AmfAuthorizationMethodElement} AmfAuthorizationMethodElement */
 
 describe('Pass Through authorization', () => {
   /**
-   * @param {ApiParametrizedSecuritySchemeRecursive=} security
-   * @return {Promise<AmfAuthorizationMethodElement>} 
+   * @param {AmfDocument} model
+   * @param {ApiParametrizedSecurityScheme=} security
+   * @return {Promise<ApiAuthorizationMethodElement>} 
    */
-  async function methodFixture(security) {
-    return (fixture(html`<amf-authorization-method 
+  async function methodFixture(model, security) {
+    return (fixture(html`<api-authorization-method 
       type="Pass Through" 
+      .amf="${model}"
       .security="${security}"
-    ></amf-authorization-method>`));
+    ></api-authorization-method>`));
   }
 
-  /** @type AmfStoreService */
+  /** @type AmfLoader */
   let store;
+  /** @type AmfDocument */
+  let model;
   before(async () => {
-    store = await TestHelper.getModelStore('secured-api', 'RAML 1.0');
-  });
-
-  after(async () => {
-    store.worker.terminate();
+    store = new AmfLoader();
+    model = await store.getGraph(false, 'secured-api');
   });
 
   /**
    * @param {string} path
    * @param {string} method
-   * @returns {Promise<ApiParametrizedSecuritySchemeRecursive>} 
+   * @returns {ApiParametrizedSecurityScheme} 
    */
-  async function getApiParametrizedSecurityScheme(path, method) {
-    const operation = await store.getOperationRecursive(method, path);
+  function getApiParametrizedSecurityScheme(path, method) {
+    const operation = store.getOperation(model, path, method);
     return operation.security[0].schemes[0];
   }
 
   describe('initialization', () => {
     it('can be initialized in a template with model', async () => {
-      const operation = await store.getOperationRecursive('get', '/passthrough');
-      const element = await methodFixture(operation.security[0]);
+      const operation = store.getOperation(model, '/passthrough', 'get');
+      const element = await methodFixture(model, operation.security[0].schemes[0]);
       await aTimeout(0);
       assert.ok(element);
     });
@@ -51,37 +52,37 @@ describe('Pass Through authorization', () => {
 
   describe('content rendering', () => {
     it('renders headers', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const nodes = element.shadowRoot.querySelectorAll(`anypoint-input[data-binding="header"]`);
       assert.lengthOf(nodes, 1);
     });
 
     it('renders query parameters', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const nodes = element.shadowRoot.querySelectorAll(`[data-binding="query"]`);
       assert.lengthOf(nodes, 2);
     });
 
     it('renders scheme title', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const node = element.shadowRoot.querySelector(`.subtitle`);
       const result = node.textContent.trim();
       assert.equal(result, 'Scheme: passthrough');
     });
 
     it('renders scheme docs toggle button', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const node = element.shadowRoot.querySelector(`.subtitle .hint-icon`);
       assert.ok(node);
     });
 
     it('ignores other security schemes', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/basic', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/basic', 'get');
+      const element = await methodFixture(model, scheme);
       const nodes = element.shadowRoot.querySelectorAll(`anypoint-input`);
       assert.lengthOf(nodes, 0);
     });
@@ -89,16 +90,16 @@ describe('Pass Through authorization', () => {
 
   describe('description rendering', () => {
     it('does not render scheme description by default', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const node = element.shadowRoot.querySelector(`.subtitle`);
       const next = node.nextElementSibling;
       assert.equal(next.localName, 'form');
     });
 
     it('renders scheme description after activation', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const button = element.shadowRoot.querySelector(`.subtitle .hint-icon`);
       /** @type HTMLElement */ (button).click();
       await nextFrame();
@@ -110,8 +111,8 @@ describe('Pass Through authorization', () => {
 
   describe('change notification', () => {
     it('notifies when value change', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const input = /** @type HTMLInputElement */ (element.shadowRoot.querySelector(`[name="api_key"]`));
       input.value = 'test';
       const spy = sinon.spy();
@@ -121,8 +122,8 @@ describe('Pass Through authorization', () => {
     });
 
     it('notifies when selection change', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const input = element.shadowRoot.querySelector(`[name="debugTokenParam"]`);
       const option = input.querySelector(`[data-value="Log"]`);
       const spy = sinon.spy();
@@ -134,16 +135,16 @@ describe('Pass Through authorization', () => {
 
   describe('updateQueryParameter()', () => {
     it('updates query parameter value', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       element.updateQueryParameter('debugTokenParam', 'Log');
       const result = element.serialize();
       assert.equal(result.query.debugTokenParam, 'Log');
     });
 
     it('updates string value', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       element.updateQueryParameter('query', 'test');
       const result = element.serialize();
       assert.equal(result.query.query, 'test');
@@ -152,8 +153,8 @@ describe('Pass Through authorization', () => {
 
   describe('updateHeader()', () => {
     it('updates header value', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       element.updateHeader('api_key', 'testHeader');
       const result = element.serialize();
       assert.equal(result.header.api_key, 'testHeader');
@@ -162,8 +163,8 @@ describe('Pass Through authorization', () => {
 
   describe('restore()', () => {
     it('restores configuration from previously serialized values', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const values = {
         header: {
           api_key: 'test-restore-header'
@@ -181,8 +182,8 @@ describe('Pass Through authorization', () => {
     });
 
     it('ignores non existing model items`', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       const values = {
         header: {
           other: 'test'
@@ -198,20 +199,20 @@ describe('Pass Through authorization', () => {
     });
 
     it('ignores when no argument', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       element.restore();
       // no error
     });
   });
 
   describe('Support for queryString property', () => {
-    /** @type AmfAuthorizationMethodElement */
+    /** @type ApiAuthorizationMethodElement */
     let element;
 
     beforeEach(async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough-query-string', 'get');
-      element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough-query-string', 'get');
+      element = await methodFixture(model, scheme);
     });
 
     it('renders input filled for NodeShape', () => {
@@ -221,12 +222,12 @@ describe('Pass Through authorization', () => {
   });
 
   describe('validate()', () => {
-    /** @type AmfAuthorizationMethodElement */
+    /** @type ApiAuthorizationMethodElement */
     let element;
 
     beforeEach(async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough-query-string', 'get');
-      element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough-query-string', 'get');
+      element = await methodFixture(model, scheme);
     });
 
     it('returns false when required field is empty', () => {
@@ -252,18 +253,18 @@ describe('Pass Through authorization', () => {
 
   describe('a11y', () => {
     it('is accessible for custom fields (headers and qp)', async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      const element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      const element = await methodFixture(model, scheme);
       await assert.isAccessible(element);
     });
   });
 
   describe('clear()', () => {
-    /** @type AmfAuthorizationMethodElement */
+    /** @type ApiAuthorizationMethodElement */
     let element;
     beforeEach(async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/passthrough', 'get');
-      element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/passthrough', 'get');
+      element = await methodFixture(model, scheme);
     });
 
     it('clears headers', () => {

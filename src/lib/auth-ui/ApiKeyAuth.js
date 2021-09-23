@@ -184,12 +184,9 @@ export default class ApiKeyAuth extends ApiUiBase {
     const params = /** @type OperationParameter[] */ (this.parametersValue);
     return !params.some((param) => {
       if (nils.includes(param.paramId)) {
-        return false;
+        return true;
       }
       const value = InputCache.get(this.target, param.paramId, this.globalCache);
-      if (!value && !param.parameter.required) {
-        return false;
-      }
       return !value;
     });
   }

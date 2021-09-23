@@ -85,7 +85,7 @@
     "test": "web-test-runner test/**/*.test.js --coverage --node-resolve --playwright --browsers chromium firefox webkit",
     "test:watch": "web-test-runner test/**/*.test.js --node-resolve --watch --playwright --browsers chromium",
     "gen:wc": "wca analyze \"*.js\" --outFile custom-elements.json",
-    "prepare": "node demo/model.js"
+    "prepare": "node demo/model.mjs"
   },
   "eslintConfig": {
     "extends": [

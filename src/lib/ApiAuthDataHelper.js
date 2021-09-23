@@ -5,6 +5,7 @@ import CustomAuth from './auth-ui/CustomAuth.js';
 import ApiKeyAuth from './auth-ui/ApiKeyAuth.js';
 import PassThroughAuth from './auth-ui/PassThroughAuth.js';
 import OAuth2Auth from './auth-ui/OAuth2Auth.js';
+import OAuth1Auth from './auth-ui/OAuth1Auth.js';
 
 /** @typedef {import('@advanced-rest-client/authorization').AuthUiInit} AuthUiInit */
 /** @typedef {import('../elements/ApiAuthorizationMethodElement').default} ApiAuthorizationElement */
@@ -29,8 +30,7 @@ export class ApiAuthDataHelper extends UiDataHelper {
    * @param {CustomAuth} ui
    */
   static populateCustom(element, ui) {
-    element.schemeName = ui.schemeName;
-    element.schemeDescription = ui.schemeDescription;
+    // ...
   }
 
   /**
@@ -72,8 +72,7 @@ export class ApiAuthDataHelper extends UiDataHelper {
    * @param {PassThroughAuth} ui
    */
   static populatePassThrough(element, ui) {
-    element.schemeName = ui.schemeName;
-    element.schemeDescription = ui.schemeDescription;
+    // ...
   }
 
   /**
@@ -87,6 +86,19 @@ export class ApiAuthDataHelper extends UiDataHelper {
     i.globalCache = element.globalCache;
     // @ts-ignore
     UiDataHelper.setOAuth2Values(element, init);
+    return i;
+  }
+
+  /**
+   * @param {ApiAuthorizationElement} element
+   * @param {AuthUiInit} init
+   */
+  static setupOauth1(element, init) {
+    const i = new OAuth1Auth(init);
+    i.amf = element.amf;
+    i.security = element.security;
+    // @ts-ignore
+    UiDataHelper.setupOauth1(element, init);
     return i;
   }
 }

@@ -1,67 +1,73 @@
 import { fixture, assert, nextFrame, html } from '@open-wc/testing';
-import {
-  oauth2GrantTypes,
-} from '@advanced-rest-client/authorization/src/Oauth2MethodMixin.js';
-import '../../amf-authorization-method.js';
-import { TestHelper } from '../TestHelper.js';
+import { AmfLoader } from "../AmfLoader.js";
+import '../../api-authorization-method.js';
 
-/** @typedef {import('@api-client/amf-store/worker.index').AmfStoreService} AmfStoreService */
-/** @typedef {import('@api-client/amf-store/worker.index').ApiParametrizedSecuritySchemeRecursive} ApiParametrizedSecuritySchemeRecursive */
-/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
-/** @typedef {import('../../').AmfAuthorizationMethodElement} AmfAuthorizationMethodElement */
+/** @typedef {import('../../').ApiAuthorizationMethodElement} ApiAuthorizationMethodElement */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 
 describe('OAuth 2', () => {
   /**
-   * @param {ApiParametrizedSecuritySchemeRecursive=} security
-   * @return {Promise<AmfAuthorizationMethodElement>} 
+   * @param {AmfDocument} model
+   * @param {ApiParametrizedSecurityScheme=} security
+   * @return {Promise<ApiAuthorizationMethodElement>} 
    */
-  async function methodFixture(security) {
-    return (fixture(html`<amf-authorization-method 
+  async function methodFixture(model, security) {
+    return (fixture(html`<api-authorization-method 
       type="oauth 2" 
+      .amf="${model}"
       .security="${security}"
-    ></amf-authorization-method>`));
+    ></api-authorization-method>`));
   }
 
   /**
-   * @return {Promise<AmfAuthorizationMethodElement>} 
+   * @param {AmfDocument} model
+   * @return {Promise<ApiAuthorizationMethodElement>} 
    */
-  async function basicFixture() {
-    return (fixture(html`<amf-authorization-method 
+  async function basicFixture(model) {
+    return (fixture(html`<api-authorization-method 
+      .amf="${model}"
       type="oauth 2" 
-    ></amf-authorization-method>`));
+    ></api-authorization-method>`));
   }
 
-  /** @type AmfStoreService */
+  /** @type AmfLoader */
   let store;
+  /** @type AmfDocument */
+  let model;
   before(async () => {
-    store = await TestHelper.getModelStore('oauth-flows', 'OAS 3.0');
-  });
-
-  after(async () => {
-    store.worker.terminate();
+    store = new AmfLoader();
+    model = await store.getGraph(false, 'oauth-flows');
   });
 
   /**
    * @param {string} path
    * @param {string} method
-   * @returns {Promise<ApiParametrizedSecuritySchemeRecursive>} 
+   * @returns {ApiParametrizedSecurityScheme} 
    */
-  async function getApiParametrizedSecurityScheme(path, method) {
-    const operation = await store.getOperationRecursive(method, path);
+  function getApiParametrizedSecurityScheme(path, method) {
+    const operation = store.getOperation(model, path, method);
     return operation.security[0].schemes[0];
   }
 
   describe('OAS grant types (flows)', () => {
-    /** @type AmfAuthorizationMethodElement */
+    /** @type ApiAuthorizationMethodElement */
     let element;
 
     beforeEach(async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/pets', 'patch');
-      element = await methodFixture(scheme);
+      const scheme = getApiParametrizedSecurityScheme('/pets', 'patch');
+      element = await methodFixture(model, scheme);
     });
 
     it('renders all defined grant types', () => {
-      assert.deepEqual(element.grantTypes, oauth2GrantTypes);
+      const implicit = element.grantTypes.find(i => i.type === 'implicit');
+      const code = element.grantTypes.find(i => i.type === 'authorization_code');
+      const credentials = element.grantTypes.find(i => i.type === 'client_credentials');
+      const password = element.grantTypes.find(i => i.type === 'password');
+      assert.ok(implicit, 'has the implicit grant type');
+      assert.ok(code, 'has the authorization_code grant type');
+      assert.ok(credentials, 'has the client_credentials grant type');
+      assert.ok(password, 'has the password grant type');
     });
 
     it('initializes first flow by default', () => {
@@ -102,11 +108,10 @@ describe('OAuth 2', () => {
     });
 
     it('restores configuration when grant type is selected', async () => {
-      element = await basicFixture();
+      element = await basicFixture(model);
       element.grantType = 'authorization_code';
       await nextFrame();
-      const operation = await store.getOperationRecursive('patch', '/pets');
-      element.security = operation.security[0].schemes[0];
+      element.security = getApiParametrizedSecurityScheme('/pets', 'patch');
       await nextFrame();
       assert.equal(
         element.grantType,

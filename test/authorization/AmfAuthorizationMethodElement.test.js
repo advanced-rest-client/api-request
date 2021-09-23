@@ -1,16 +1,17 @@
 import { fixture, assert, html } from '@open-wc/testing';
-import '../../amf-authorization-method.js';
+import '../../api-authorization-method.js';
 
-/** @typedef {import('../../').AmfAuthorizationMethodElement} AmfAuthorizationMethodElement */
+/** @typedef {import('../../').ApiAuthorizationMethodElement} ApiAuthorizationMethodElement */
 
-describe('AmfAuthorizationMethodElement', () => {
+describe('ApiAuthorizationMethodElement', () => {
   /**
-   * @return {Promise<AmfAuthorizationMethodElement>} 
+   * @param {string} type
+   * @return {Promise<ApiAuthorizationMethodElement>} 
    */
   async function basicFixture(type) {
-    return (fixture(html`<amf-authorization-method
+    return (fixture(html`<api-authorization-method
       .type="${type}"
-    ></amf-authorization-method>`));
+    ></api-authorization-method>`));
   }
 
   describe('default behavior', () => {

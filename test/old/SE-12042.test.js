@@ -4,17 +4,21 @@ import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 
-/** @typedef {import('../').ApiRequestEditorElement} ApiRequestEditorElement */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
+/** @typedef {import('../..').ApiRequestEditorElement} ApiRequestEditorElement */
 
 describe('ApiRequestEditorElement', () => {
   describe('SE-12042', () => {
     /**
+     * @param {AmfDocument} amf
+     * @param {string} selected
      * @returns {Promise<ApiRequestEditorElement>}
      */
     async function modelFixture(amf, selected) {
       return (fixture(html`<api-request-editor
         .amf="${amf}"
-        .selected="${selected}"></api-request-editor>`));
+        .selected="${selected}"
+        applyAuthorization></api-request-editor>`));
     }
 
     const apiFile = 'SE-12042';
@@ -23,11 +27,16 @@ describe('ApiRequestEditorElement', () => {
       ['Full model', false]
     ].forEach(([label, compact]) => {
       describe(`${label}`, () => {
-        let factory = /** @type ApiViewModel */ (null);
         describe('http method computation', () => {
+          /** @type AmfLoader */
+          let store;
+          /** @type AmfDocument */
           let amf;
+          /** @type ApiViewModel */
+          let factory;
           before(async () => {
-            amf = await AmfLoader.load({ fileName: apiFile, compact });
+            store = new AmfLoader();
+            amf = await store.getGraph(Boolean(compact), apiFile);
             factory = new ApiViewModel();
           });
 
@@ -40,9 +49,9 @@ describe('ApiRequestEditorElement', () => {
           });
 
           it('sets headers from the authorization method', async () => {
-            const method = AmfLoader.lookupOperation(amf, '/check/api-status', 'get');
+            const method = store.lookupOperation(amf, '/check/api-status', 'get');
             const element = await modelFixture(amf, method['@id']);
-            await aTimeout(0);
+            await aTimeout(10);
             const spy = sinon.spy();
             element.addEventListener('api-request', spy);
             element.execute();
@@ -53,7 +62,7 @@ describe('ApiRequestEditorElement', () => {
           });
 
           it('sets query parameter from the authorization method', async () => {
-            const method = AmfLoader.lookupOperation(amf, '/check/api-status', 'get');
+            const method = store.lookupOperation(amf, '/check/api-status', 'get');
             const element = await modelFixture(amf, method['@id']);
             await aTimeout(0);
             const spy = sinon.spy();

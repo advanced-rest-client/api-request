@@ -1,0 +1,12 @@
+#%RAML 1.0
+title: Modular API.
+version: v1
+baseUri: http://domain.com/
+
+uses:
+  Things: models/things.raml
+  Ecommerce: models/ecommerce.raml
+  EcommerceCanonical: models/ecommerce-canonical.raml
+
+/:
+  displayName: Entry point.

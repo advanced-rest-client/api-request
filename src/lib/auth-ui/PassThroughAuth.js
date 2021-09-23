@@ -245,7 +245,7 @@ export default class PassThroughAuth extends ApiUiBase {
    */
   toggleDescription() {
     this.descriptionOpened = !this.descriptionOpened;
-    this.notifyChange();
+    this.requestUpdate();
   }
 
   /**

@@ -117,6 +117,10 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
     this.schemeName = undefined;
     /** @type {string} */
     this.schemeDescription = undefined;
+    /** @type {string} */
+    this.overrideAuthorizationUri = undefined;
+    /** @type {string} */
+    this.overrideAccessTokenUri = undefined;
     this[settingsHandler] = this[settingsHandler].bind(this);
   }
 
@@ -129,6 +133,21 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
   disconnectedCallback() {
     this.removeEventListener(EventTypes.Security.settingsChanged, this[settingsHandler]);
     super.disconnectedCallback();
+  }
+
+  /**
+   * Validates current method.
+   * @return {boolean}
+   */
+  validate() {
+    const instance = /** @type ApiUiBase */ (this[factory]);
+    const type = normalizeType(this.type);
+    switch(type) {
+      case METHOD_CUSTOM: 
+      case METHOD_PASS_THROUGH:
+      case METHOD_API_KEY: return instance.validate();
+      default: return super.validate();
+    }
   }
 
   /**
