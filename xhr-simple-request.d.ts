@@ -1,4 +1,4 @@
-import { XhrSimpleRequestElement } from './src/XhrSimpleRequestElement';
+import { XhrSimpleRequestElement } from './src/elements/XhrSimpleRequestElement';
 
 declare global {
   interface HTMLElementTagNameMap {

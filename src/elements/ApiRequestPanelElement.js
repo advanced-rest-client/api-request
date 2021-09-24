@@ -14,9 +14,9 @@ the License.
 import { html, LitElement } from 'lit-element';
 import { HeadersParser } from '@advanced-rest-client/arc-headers';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
-import elementStyles from './styles/Panel.styles.js';
-import '../api-request-editor.js';
-import '../api-response-view.js';
+import elementStyles from '../styles/Panel.styles.js';
+import '../../api-request-editor.js';
+import '../../api-response-view.js';
 
 // import '@advanced-rest-client/response-view/response-view.js';
 
@@ -24,11 +24,12 @@ import '../api-response-view.js';
 /* eslint-disable class-methods-use-this */
 
 /** @typedef {import('lit-html').TemplateResult} TemplateResult */
-/** @typedef {import('./types').ApiConsoleResponse} ApiConsoleResponse */
-/** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
+/** @typedef {import('../types').ApiConsoleResponse} ApiConsoleResponse */
+/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.Response} ArcResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.ErrorResponse} ErrorResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.TransportRequest} TransportRequest */
+/** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
 
 export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   get styles() {
@@ -290,6 +291,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
     this.persistCache = false;
+    /** @type Oauth2Credentials[] */
+    this.credentialsSource = undefined;
 
     /**  
      * @type {TransportRequest}

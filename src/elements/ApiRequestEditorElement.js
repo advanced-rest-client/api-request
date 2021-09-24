@@ -30,9 +30,9 @@ import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
 // import '@api-components/api-body-editor/api-body-editor.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@api-components/api-server-selector/api-server-selector.js';
-import elementStyles from './styles/Editor.styles.js';
-import '../api-authorization-editor.js'
-import { SecurityProcessor } from './lib/SecurityProcessor.js';
+import elementStyles from '../styles/Editor.styles.js';
+import '../../api-authorization-editor.js'
+import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
@@ -42,10 +42,10 @@ import { SecurityProcessor } from './lib/SecurityProcessor.js';
 /** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
-/** @typedef {import('./elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
-/** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
-/** @typedef {import('./types').PopulationInfo} PopulationInfo */
-/** @typedef {import('./types').SecuritySelectorListItem} SecuritySelectorListItem */
+/** @typedef {import('../elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
+/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
+/** @typedef {import('../types').PopulationInfo} PopulationInfo */
+/** @typedef {import('../types').SecuritySelectorListItem} SecuritySelectorListItem */
 
 export const EventCategory = 'API Request editor';
 

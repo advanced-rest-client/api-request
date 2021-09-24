@@ -21,7 +21,7 @@ import {
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
 import { Oauth2Credentials, } from '@advanced-rest-client/authorization';
-import { ApiConsoleRequest, PopulationInfo, SecuritySelectorListItem } from './types';
+import { ApiConsoleRequest, PopulationInfo, SecuritySelectorListItem } from '../types';
 
 export const EventCategory: string;
 export const operationValue: unique symbol;

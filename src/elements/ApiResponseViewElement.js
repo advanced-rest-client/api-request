@@ -14,7 +14,7 @@ import { dataValue, providerOptionsValue } from '@advanced-rest-client/arc-event
 import '@anypoint-web-components/anypoint-item/anypoint-icon-item.js';
 import '@advanced-rest-client/arc-icons/arc-icon.js';
 import '@advanced-rest-client/arc-headers/headers-list.js';
-import elementStyles from './styles/Response.styles.js';
+import elementStyles from '../styles/Response.styles.js';
 
 /** @typedef {import('@advanced-rest-client/arc-events').ArcExportFilesystemEvent} ArcExportFilesystemEvent */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.Response} Response */

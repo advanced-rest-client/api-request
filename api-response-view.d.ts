@@ -1,4 +1,4 @@
-import { ApiResponseViewElement } from './src/ApiResponseViewElement.js';
+import { ApiResponseViewElement } from './src/elements/ApiResponseViewElement.js';
 
 declare global {
   interface HTMLElementTagNameMap {

@@ -2,8 +2,8 @@ import { fixture, assert, html } from '@open-wc/testing';
 import sinon from 'sinon';
 import '../../api-request-panel.js';
 
-/** @typedef {import('../').ApiRequestPanelElement} ApiRequestPanelElement */
-/** @typedef {import('../').ApiRequestEditorElement} ApiRequestEditorElement */
+/** @typedef {import('../../').ApiRequestPanelElement} ApiRequestPanelElement */
+/** @typedef {import('../../').ApiRequestEditorElement} ApiRequestEditorElement */
 /** @typedef {import('../../src/types').ApiConsoleResponse} ApiConsoleResponse */
 
 describe('ApiRequestPanelElement', () => {

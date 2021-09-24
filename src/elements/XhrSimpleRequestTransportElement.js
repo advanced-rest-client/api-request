@@ -17,7 +17,7 @@ import { LitElement } from 'lit-element';
 import { HeadersParser } from '@advanced-rest-client/arc-headers';
 
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.FormItem} FormItem */
-/** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
+/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 
 /**
  * `xhr-simple-request`

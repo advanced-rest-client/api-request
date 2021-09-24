@@ -1,4 +1,4 @@
-import { ApiRequestEditorElement } from './src/ApiRequestEditorElement';
+import { ApiRequestEditorElement } from './src/elements/ApiRequestEditorElement';
 
 declare global {
   interface HTMLElementTagNameMap {

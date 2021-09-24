@@ -1,3 +1,3 @@
-import { ApiResponseViewElement } from './src/ApiResponseViewElement.js';
+import { ApiResponseViewElement } from './src/elements/ApiResponseViewElement.js';
 
 window.customElements.define('api-response-view', ApiResponseViewElement);

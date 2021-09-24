@@ -15,7 +15,7 @@ the License.
 */
 import { LitElement } from 'lit-element';
 import { FormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
-import { ApiConsoleRequest } from './types';
+import { ApiConsoleRequest } from '../types';
 
 /**
  * `xhr-simple-request`

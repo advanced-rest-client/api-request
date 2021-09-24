@@ -3,7 +3,7 @@ import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-input/anypoint-masked-input.js';
 
 function setupFormAction() {
-  const u = new URL(location.href)
+  const u = new URL(window.location.href)
   const state = u.searchParams.get('state');
   const redirectUri = decodeURIComponent(u.searchParams.get('redirect_uri'));
   let formUrl = redirectUri;
@@ -15,7 +15,7 @@ function setupFormAction() {
 
 function loginHandler() {
   const form = document.querySelector('form');
-  location.assign(form.action);
+  window.location.assign(form.action);
 }
 
 function addButtonAction() {

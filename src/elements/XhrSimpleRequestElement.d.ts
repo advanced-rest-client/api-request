@@ -14,7 +14,7 @@ the License.
 */
 import { LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
-import { ApiConsoleRequest, ApiConsoleResponse, XHRQueueItem } from './types';
+import { ApiConsoleRequest, ApiConsoleResponse, XHRQueueItem } from '../types';
 import { XhrSimpleRequestTransportElement } from './XhrSimpleRequestTransportElement';
 
 /**

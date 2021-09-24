@@ -1,3 +1,3 @@
-import { XhrSimpleRequestElement } from './src/XhrSimpleRequestElement.js';
+import { XhrSimpleRequestElement } from './src/elements/XhrSimpleRequestElement.js';
 
 window.customElements.define('xhr-simple-request', XhrSimpleRequestElement);

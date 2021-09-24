@@ -3,8 +3,8 @@ import { ApiDemoPage } from '@advanced-rest-client/arc-demo-helper';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@api-components/api-navigation/api-navigation.js';
-import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
-import '@advanced-rest-client/oauth-authorization/oauth1-authorization.js';
+import '@advanced-rest-client/authorization/oauth2-authorization.js';
+import '@advanced-rest-client/authorization/oauth1-authorization.js';
 import '../xhr-simple-request.js';
 import '../api-request-panel.js';
 

@@ -14,12 +14,12 @@ the License.
 */
 import { LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
-import '../xhr-simple-request-transport.js';
+import '../../xhr-simple-request-transport.js';
 
 /** @typedef {import('./XhrSimpleRequestTransportElement').XhrSimpleRequestTransportElement} XhrSimpleRequestTransportElement */
-/** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
-/** @typedef {import('./types').XHRQueueItem} XHRQueueItem */
-/** @typedef {import('./types').ApiConsoleResponse} ApiConsoleResponse */
+/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
+/** @typedef {import('../types').XHRQueueItem} XHRQueueItem */
+/** @typedef {import('../types').ApiConsoleResponse} ApiConsoleResponse */
 
 /**
  * `xhr-simple-request`
