@@ -37,9 +37,13 @@ import '@advanced-rest-client/body-editor/body-raw-editor.js';
 import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
 import { cachePayloadValue, getPayloadValue, readCachePayloadValue } from "../lib/PayloadUtils.js";
-import { ensureContentType } from "../lib/Utils.js";
-import '../../api-authorization-editor.js'
+import { ensureContentType, generateHeaders } from "../lib/Utils.js";
 import { SecurityProcessor } from '../lib/SecurityProcessor.js';
+import { AmfParameterMixin } from '../lib/AmfParameterMixin.js';
+import { AmfInputParser } from '../lib/AmfInputParser.js';
+import { applyUrlParameters, applyUrlVariables } from '../lib/UrlUtils.js';
+import * as InputCache from '../lib/InputCache.js';
+import '../../api-authorization-editor.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
@@ -49,21 +53,30 @@ import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
 /** @typedef {import('@advanced-rest-client/body-editor').BodyRawEditorElement} BodyRawEditorElement */
 /** @typedef {import('@advanced-rest-client/body-editor').BodyFormdataEditorElement} BodyFormdataEditorElement */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiEndPoint} ApiEndPoint */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiPayload} ApiPayload */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiParameter} ApiParameter */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 /** @typedef {import('@anypoint-web-components/anypoint-radio-button/index').AnypointRadioGroupElement} AnypointRadioGroupElement */
 /** @typedef {import('../elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
 /** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('../types').PopulationInfo} PopulationInfo */
 /** @typedef {import('../types').SecuritySelectorListItem} SecuritySelectorListItem */
+/** @typedef {import('../types').OperationParameter} OperationParameter */
 
 export const EventCategory = 'API Request editor';
 
 export const operationValue = Symbol('currentModel');
+export const endpointValue = Symbol('endpointValue');
+export const processOperation = Symbol('processOperation');
+export const processEndpoint = Symbol('processEndpoint');
 export const processSecurity = Symbol('processSecurity');
+export const appendToParams = Symbol('appendToParams');
 export const securityList = Symbol('securityList');
+export const updateServerParameters = Symbol('updateServerParameters');
+export const updateEndpointParameters = Symbol('updateEndpointParameters');
 export const authSelectorHandler = Symbol('authSelectorHandler');
 export const mediaTypeSelectHandler = Symbol('mediaTypeSelectHandler');
 export const modelBodyEditorChangeHandler = Symbol('modelBodyEditorChangeHandler');
@@ -76,8 +89,10 @@ export const bodyTemplate = Symbol('bodyTemplate');
 export const formDataEditorTemplate = Symbol('formDataEditorTemplate');
 export const multipartEditorTemplate = Symbol('multipartEditorTemplate');
 export const rawEditorTemplate = Symbol('rawEditorTemplate');
+export const headersTemplate = Symbol('headersTemplate');
+export const parametersTemplate = Symbol('parametersTemplate');
 
-export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
+export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(EventsTargetMixin(LitElement))) {
   get styles() {
     return [
       apiFormStyles,
@@ -212,10 +227,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        */
       _apiPayload: { type: Array },
       /**
-       * Computed value if the method can carry a payload.
-       */
-      _isPayloadRequest: { type: Boolean },
-      /**
        * Flag set when the request is being made.
        */
       _loadingRequest: { type: Boolean },
@@ -341,10 +352,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   get apiPayload() {
     return this._apiPayload;
-  }
-
-  get isPayloadRequest() {
-    return this._isPayloadRequest;
   }
 
   get loadingRequest() {
@@ -587,7 +594,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.globalCache = undefined;
     /** @type string */
     this.mimeType = undefined;
+    /** @type ApiEndPoint */
+    this[endpointValue] = undefined;
+
+    // for the AmfParameterMixin
+    this.target = this;
   }
+
+  // for the AmfParameterMixin
+  notifyChange() {  }
 
   _attachListeners(node) {
     node.addEventListener('api-response', this._responseHandler);
@@ -643,6 +658,65 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this._endpointUri = result.endpointPath;
     this._pathModel = result.pathModel;
     this._queryModel = result.queryModel;
+    this[updateServerParameters]()
+  }
+
+  /**
+   * Checks if the current server has variables and update the parameters array
+   */
+  async [updateServerParameters]() {
+    const { server } = this;
+    const source = 'server';
+    // clears previously set request parameters related to server configuration.
+    this.parametersValue = this.parametersValue.filter(item => item.source !== source);
+    if (!server) {
+      return;
+    }
+    const factory = new AmfSerializer(this.amf);
+    const model = factory.server(server);
+    if (Array.isArray(model.variables) && model.variables.length) {
+      model.variables.forEach((param) => {
+        const item = /** @type OperationParameter */ ({
+          binding: param.binding,
+          paramId: param.id,
+          parameter: param,
+          source,
+        });
+        if (param.schema) {
+          item.schema = param.schema;
+          item.schemaId = param.schema.id;
+        }
+        this.parametersValue.push(item);
+      });
+    }
+  }
+
+  /**
+   * Checks if the current endpoint has variables and requests them when needed.
+   */
+  async [updateEndpointParameters]() {
+    const source = 'endpoint';
+    // clears previously set request parameters related to server configuration.
+    this.parametersValue = this.parametersValue.filter(item => item.source !== source);
+    const endpoint = this[endpointValue];
+    if (!endpoint) {
+      return;
+    }
+    if (Array.isArray(endpoint.parameters) && endpoint.parameters.length) {
+      endpoint.parameters.forEach((param) => {
+        const item = /** @type OperationParameter */ ({
+          binding: param.binding,
+          paramId: param.id,
+          parameter: param,
+          source,
+        });
+        if (param.schema) {
+          item.schema = param.schema;
+          item.schemaId = param.schema.id;
+        }
+        this.parametersValue.push(item);
+      });
+    }
   }
 
   /**
@@ -667,6 +741,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   reset() {
     this[securityList] = undefined;
     this.mimeType = undefined;
+    this.parametersValue = /** @type {OperationParameter[]} */ ([]);
   }
 
   _selectedChanged() {
@@ -683,12 +758,41 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const factory = new AmfSerializer(amf);
     const operation = factory.operation(model);
     this[operationValue] = operation;
+    this[processEndpoint]();
+    this[processOperation]();
     this[processSecurity]();
-    this._authSettings = undefined;
-    const method = /** @type string */ (this._getValue(model, this.ns.aml.vocabularies.apiContract.method));
-    this._isPayloadRequest = this._computeIsPayloadRequest(method);
     this._apiHeaders = this. _computeHeaders(model);
     this._apiPayload = this._computeApiPayload(model);
+  }
+
+  /**
+   * Searches for the current operation endpoint and sets variables from the endpoint definition.
+   */
+  [processEndpoint]() {
+    const operation = this[operationValue];
+    const wa = this._computeWebApi(this.amf);
+    const model = this._computeMethodEndpoint(wa, operation.id);
+    const factory = new AmfSerializer(this.amf);
+    const endpoint = factory.endPoint(model);
+    this[endpointValue] = endpoint;
+    this[updateEndpointParameters]();
+  }
+
+  /**
+   * Collects operations input parameters into a single object.
+   */
+  [processOperation]() {
+    const source = 'request';
+    const operation = this[operationValue];
+    // clears previously set request parameters (query, path, headers)
+    this.parametersValue = this.parametersValue.filter(item => item.source !== source);
+    const { request } = operation;
+    if (!request) {
+      return;
+    }
+    this[appendToParams](request.queryParameters, source);
+    this[appendToParams](request.headers, source);
+    this[appendToParams](request.cookieParameters, source);
   }
 
   /**
@@ -699,6 +803,27 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const { security } = operation;
     this[securityList] = SecurityProcessor.readSecurityList(security);
     this.selectedSecurity = 0;
+  }
+
+  /**
+   * Appends a list of parameters to the list of rendered parameters
+   * @param {ApiParameter[]} list
+   * @param {string} source
+   */
+  [appendToParams](list, source) {
+    const params = this.parametersValue;
+    if (Array.isArray(list)) {
+      list.forEach((param) => {
+        params.push({
+          paramId: param.id,
+          parameter: param,
+          binding: param.binding,
+          source,
+          schema: param.schema,
+          schemaId: param.schema && param.schema.id ? param.schema.id : undefined,
+        });
+      });
+    }
   }
 
   /**
@@ -804,18 +929,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       payload = [payload];
     }
     return payload;
-  }
-
-  /**
-   * Computes value for `isPayloadRequest`.
-   * Only `GET` and `HEAD` methods are known as ones that can't carry a
-   * payload. For any other HTTP method this always returns true.
-   *
-   * @param {String} method HTTP method value
-   * @return {Boolean}
-   */
-  _computeIsPayloadRequest(method) {
-    return ['get', 'head'].indexOf(method) === -1;
   }
 
   /**
@@ -928,10 +1041,16 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       throw new Error(`No API is operation defined on the editor`);
     }
     const method = (op.method || 'get').toUpperCase();
+    const params = this.parametersValue.map(item => item.parameter);
+    const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
+    const serverUrl = `${this._apiBaseUri}${this._endpointUri}`;
+    let url = applyUrlVariables(serverUrl, report.path, true);
+    url = applyUrlParameters(url, report.query, true);
+    const headers = generateHeaders(report.header);
     const request = /** @type ApiConsoleRequest */ ({
       method,
-      url: this.url,
-      headers: this._ensureContentTypeInHeaders(this.headers) || '',
+      url,
+      headers,
     });
 
     if (!['GET', 'HEAD'].includes(method)) {
@@ -1247,8 +1366,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       ${this._serverSelectorTemplate()}
       ${this._urlEditorTemplate()}
       ${this._urlLabelTemplate()}
-      ${this._paramsEditorTemplate()}
-      ${this._headersEditorTemplate()}
+      ${this[parametersTemplate]()}
+      ${this[headersTemplate]()}
       ${this[mediaTypeSelectorTemplate]()}
       ${this[bodyTemplate]()}
       ${this[authorizationTemplate]()}
@@ -1299,106 +1418,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     }
     return html`<div class="url-label" title="Current request URL">${url}</div>`;
   }
-
-  _paramsEditorTemplate() {
-    const {
-      _queryModel,
-      _pathModel,
-      allowCustom,
-      readOnly,
-      disabled,
-      outlined,
-      compatibility,
-      allowDisableParams,
-      allowHideOptional,
-    } = this;
-    return html`
-    <div class="editor-section">
-      <api-url-params-editor
-        class="params-editor"
-        @pathmodelchange="${this._pathModelHandler}"
-        @querymodelchange="${this._queryModelHandler}"
-        .pathModel="${_pathModel}"
-        .queryModel="${_queryModel}"
-        ?allowCustom="${allowCustom}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
-        ?outlined="${outlined}"
-        ?compatibility="${compatibility}"
-        ?allowDisableParams="${allowDisableParams}"
-        ?allowHideOptional="${allowHideOptional}"
-      ></api-url-params-editor>
-    </div>`;
-  }
-
-  _headersEditorTemplate() {
-    const {
-      _apiHeaders,
-      eventsTarget,
-      amf,
-      allowCustom,
-      readOnly,
-      disabled,
-      outlined,
-      compatibility,
-      allowDisableParams,
-      allowHideOptional,
-    } = this;
-    return html`
-    <div class="editor-section" ?hidden="${!_apiHeaders && !allowCustom}">
-      <div role="heading" aria-level="2" class="section-title">Headers</div>
-      <api-headers-editor
-        @change="${this._headersHandler}"
-        .eventsTarget="${eventsTarget}"
-        .amf="${amf}"
-        .amfHeaders="${_apiHeaders}"
-        .readOnly="${readOnly || disabled}"
-        ?outlined="${outlined}"
-        ?compatibility="${compatibility}"
-        ?allowCustom="${allowCustom}"
-        ?allowDisableParams="${allowDisableParams}"
-        ?allowHideOptional="${allowHideOptional}"
-      ></api-headers-editor>
-    </div>`;
-  }
-
-  // _bodyEditorTemplate() {
-  //   if (!this._isPayloadRequest || !this._apiPayload) {
-  //     return '';
-  //   }
-  //   const {
-  //     _apiPayload,
-  //     eventsTarget,
-  //     amf,
-  //     allowCustom,
-  //     readOnly,
-  //     disabled,
-  //     outlined,
-  //     compatibility,
-  //     contentType,
-  //     allowDisableParams,
-  //     allowHideOptional,
-  //   } = this;
-
-  //   return html`<div class="editor-section">
-  //     <div role="heading" aria-level="2" class="section-title">Body</div>
-  //     <api-body-editor
-  //       @content-type-changed="${this._bodyContentTypeHandler}"
-  //       .eventsTarget="${eventsTarget}"
-  //       .amf="${amf}"
-  //       .amfBody="${_apiPayload}"
-  //       .readOnly="${readOnly}"
-  //       .disabled="${disabled}"
-  //       ?outlined="${outlined}"
-  //       ?compatibility="${compatibility}"
-  //       .contentType="${contentType}"
-  //       ?allowCustom="${allowCustom}"
-  //       ?allowDisableParams="${allowDisableParams}"
-  //       ?allowHideOptional="${allowHideOptional}"
-  //       lineNumbers
-  //     ></api-body-editor>
-  //   </div>`;
-  // }
 
   [authorizationTemplate]() {
     const { security } = this;
@@ -1545,6 +1564,44 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-server-selector>`;
+  }
+
+  [parametersTemplate]() {
+    /** @type OperationParameter[] */
+    const qp = [];
+    /** @type OperationParameter[] */
+    const path = [];
+    this.parametersValue.forEach((item) => {
+      if (item.binding === 'query') {
+        qp.push(item)
+      } else if (item.binding === 'path') {
+        path.push(item);
+      }
+    });
+    if (!qp.length && !path.length) {
+      return '';
+    }
+    const pathOptions = Object.freeze({ required: true });
+    return html`
+    <section class="params-section">
+      <div class="section-title"><span class="label">Parameters</span></div>
+      ${path.map(param => this.parameterTemplate(param, pathOptions))}
+      ${qp.map(param => this.parameterTemplate(param))}
+    </section>
+    `;
+  }
+
+  [headersTemplate]() {
+    const headers = this.parametersValue.filter(item => item.binding === 'header');
+    if (!headers.length) {
+      return '';
+    }
+    return html`
+    <section class="params-section">
+      <div class="section-title"><span class="label">Headers</span></div>
+      ${headers.map(param => this.parameterTemplate(param))}
+    </section>
+    `;
   }
 
   /**

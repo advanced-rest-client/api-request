@@ -9,7 +9,7 @@ import {
   ApiUnionShape,
 } from '@api-components/amf-helper-mixin';
 import { TemplateResult } from 'lit-element';
-import { OperationParameter, ShapeTemplateOptions } from '../types';
+import { OperationParameter, ShapeTemplateOptions, ParameterRenderOptions } from '../types';
 
 export declare function AmfParameterMixin<T extends new (...args: any[]) => {}>(base: T): T & AmfParameterMixinConstructor;
 
@@ -75,22 +75,22 @@ export declare interface AmfParameterMixin {
   /**
    * @returns The template for the request parameter form control.
    */
-  parameterTemplate(param: OperationParameter): TemplateResult | string;
+  parameterTemplate(param: OperationParameter, opts?: ParameterRenderOptions): TemplateResult | string;
 
   /**
    * @returns The template for the request parameter form control.
    */
-  parameterSchemaTemplate(parameter: ApiParameter, schema: ApiShapeUnion, opts?: ShapeTemplateOptions): TemplateResult | string;
+  parameterSchemaTemplate(parameter: ApiParameter, schema: ApiShapeUnion, userOpts?: ParameterRenderOptions, opts?: ShapeTemplateOptions): TemplateResult | string;
 
   /**
    * @returns The template for the schema parameter.
    */
-  scalarShapeTemplate(parameter: ApiParameter, schema: ApiScalarShape, opts?: ShapeTemplateOptions): TemplateResult | string;
+  scalarShapeTemplate(parameter: ApiParameter, schema: ApiScalarShape, userOpts?: ParameterRenderOptions, opts?: ShapeTemplateOptions): TemplateResult | string;
 
   /**
    * @return A template for an input form item for the given type and schema
    */
-  textInputTemplate(parameter: ApiParameter, schema: ApiScalarShape, type?: SupportedInputTypes, opts?: ShapeTemplateOptions): TemplateResult;
+  textInputTemplate(parameter: ApiParameter, schema: ApiScalarShape, type?: SupportedInputTypes, userOpts?: ParameterRenderOptions, opts?: ShapeTemplateOptions): TemplateResult;
 
   /**
    * @param paramId The ApiParameter id.
@@ -102,7 +102,7 @@ export declare interface AmfParameterMixin {
   /**
    * @returns The template for the enum input.
    */
-  enumTemplate(parameter: ApiParameter, schema: ApiScalarShape, opts?: ShapeTemplateOptions): TemplateResult;
+  enumTemplate(parameter: ApiParameter, schema: ApiScalarShape, userOpts?: ParameterRenderOptions, opts?: ShapeTemplateOptions): TemplateResult;
 
   /**
    * @returns The template for the checkbox input.

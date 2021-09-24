@@ -118,4 +118,21 @@ authorization-panel {
   display: flex;
   align-items: center;
 }
+
+.form-item {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.array-form-item {
+  padding-left: 8px;
+  border-left: 1px var(--api-request-editor-array-section-border-color, rgba(0, 0, 0, 0.14)) solid;
+}
+
+.api-server-selector, .param-selector, .form-input {
+  flex: 1 1 0%;
+  margin: 0px;
+}
 `;

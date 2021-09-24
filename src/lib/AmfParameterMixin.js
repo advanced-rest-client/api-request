@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable arrow-body-style */
 // eslint-disable-next-line no-unused-vars
-import { LitElement, html } from 'lit-element';
+import { html } from 'lit-element';
 import { dedupeMixin } from '@open-wc/dedupe-mixin';
 import { ns } from '@api-components/amf-helper-mixin';
 import { ApiSchemaValues } from '@api-components/api-schema';
@@ -14,6 +14,7 @@ import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@advanced-rest-client/arc-icons/arc-icon.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js'
+import { classMap } from 'lit-html/directives/class-map.js';
 import * as InputCache from './InputCache.js';
 import { readLabelValue } from './Utils.js';
 
@@ -31,6 +32,7 @@ import { readLabelValue } from './Utils.js';
 /** @typedef {import('@anypoint-web-components/anypoint-checkbox').AnypointCheckbox} AnypointCheckbox */
 /** @typedef {import('../types').OperationParameter} OperationParameter */
 /** @typedef {import('../types').ShapeTemplateOptions} ShapeTemplateOptions */
+/** @typedef {import('../types').ParameterRenderOptions} ParameterRenderOptions */
 
 /**
  * @param {any} base
@@ -218,27 +220,29 @@ const mxFunction = base => {
     }
 
     /**
-     * @param {OperationParameter} param
+     * @param {OperationParameter} param The parameter to render.
+     * @param {ParameterRenderOptions=} [opts={}] Render options
      * @returns {TemplateResult|string} The template for the request parameter form control.
      */
-    parameterTemplate(param) {
+    parameterTemplate(param, opts={}) {
       const { schema, parameter } = param;
       if (!schema) {
         return '';
       }
-      return this.parameterSchemaTemplate(parameter, schema);
+      return this.parameterSchemaTemplate(parameter, schema, opts);
     }
 
     /**
      * @param {ApiParameter} parameter
      * @param {ApiShapeUnion} schema
-     * @param {ShapeTemplateOptions=} opts
+     * @param {ParameterRenderOptions=} [userOpts={}] Render options
+     * @param {ShapeTemplateOptions=} [opts=[]] Internal Process options
      * @returns {TemplateResult|string} The template for the request parameter form control.
      */
-    parameterSchemaTemplate(parameter, schema, opts={}) {
+    parameterSchemaTemplate(parameter, schema, userOpts={}, opts={}) {
       const { types } = schema;
       if (types.includes(ns.aml.vocabularies.shapes.ScalarShape)) {
-        return this.scalarShapeTemplate(parameter, /** @type ApiScalarShape */ (schema), opts);
+        return this.scalarShapeTemplate(parameter, /** @type ApiScalarShape */ (schema), userOpts, opts);
       }
       if (types.includes(ns.w3.shacl.NodeShape)) {
         return this.nodeShapeTemplate();
@@ -264,36 +268,44 @@ const mxFunction = base => {
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
+     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @returns {TemplateResult|string} The template for the schema parameter.
      */
-    scalarShapeTemplate(parameter, schema, opts={}) {
+    scalarShapeTemplate(parameter, schema, userOpts={}, opts={}) {
       const { readOnly, values, dataType } = schema;
       if (readOnly) {
         return '';
       }
       if (values && values.length) {
-        return this.enumTemplate(parameter, schema, opts);
+        return this.enumTemplate(parameter, schema, userOpts, opts);
       }
       const inputType = ApiSchemaValues.readInputType(dataType);
       if (inputType === 'boolean') {
         return this.booleanTemplate(parameter, schema, opts);
       }
-      return this.textInputTemplate(parameter, schema, inputType, opts);
+      return this.textInputTemplate(parameter, schema, inputType, userOpts, opts);
     }
 
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
      * @param {SupportedInputTypes=} type The input type.
+     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @return {TemplateResult} A template for an input form item for the given type and schema
      */
-    textInputTemplate(parameter, schema, type, opts={}) {
+    textInputTemplate(parameter, schema, type, userOpts={}, opts={}) {
       const { id, binding } = parameter;
       const { pattern, minimum, minLength, maxLength, maximum, multipleOf } = schema;
+      let required;
+      if (typeof userOpts.required === 'boolean') {
+        required = userOpts.required;
+      } else {
+        required = parameter.required;
+      }
       const label = readLabelValue(parameter, schema);
-      const { required, allowEmptyValue, } = parameter;
+      const { allowEmptyValue, } = parameter;
       let value;
       if (opts.arrayItem) {
         value = opts.value || '';
@@ -313,8 +325,13 @@ const mxFunction = base => {
       const title = parameter.description || schema.description;
       const nillable = this.nilValues;
       const nillDisabled = !!opts.nillable && nillable.includes(id);
+      const classes = {
+        'form-item': true,
+        required,
+        optional: !required,
+      };
       return html`
-      <div class="form-item">
+      <div class="${classMap(classes)}">
         <anypoint-input 
           data-domain-id="${id}"
           data-is-array="${ifDefined(opts.arrayItem)}"
@@ -368,21 +385,33 @@ const mxFunction = base => {
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
+     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @returns {TemplateResult|string} The template for the enum input.
      */
-    enumTemplate(parameter, schema, opts={}) {
+    enumTemplate(parameter, schema, userOpts={}, opts={}) {
       const { anypoint } = this;
+      let required;
+      if (typeof userOpts.required === 'boolean') {
+        required = userOpts.required;
+      } else {
+        required = parameter.required;
+      }
       const label = readLabelValue(parameter, schema);
       const enumValues = /** @type ApiScalarNode[] */ (schema.values || []);
       const selectedValue = this.readInputValue(parameter, schema);
       const selected = enumValues.findIndex(i => i.value === selectedValue);
-      const { required, id, binding } = parameter;
+      const { id, binding } = parameter;
       const title = parameter.description || schema.description;
       const nillable = this.nilValues;
       const nillDisabled = !!opts.nillable && nillable.includes(id);
+      const classes = {
+        'form-item': true,
+        required,
+        optional: !required,
+      };
       return html`
-      <div class="form-item">
+      <div class="${classMap(classes)}">
         <anypoint-dropdown-menu
           class="param-selector"
           name="${parameter.name || schema.name}"
@@ -419,7 +448,7 @@ const mxFunction = base => {
      */
     booleanTemplate(parameter, schema, opts={}) {
       const label = readLabelValue(parameter, schema);
-      const { required, id } = parameter;
+      const { id } = parameter;
       /** @type {boolean} */
       let value;
       if (opts.arrayItem) {
@@ -430,12 +459,20 @@ const mxFunction = base => {
       const title = parameter.description || schema.description;
       const nillable = this.nilValues;
       const nillDisabled = !!opts.nillable && nillable.includes(id);
+      const classes = {
+        'form-item': true,
+        required: parameter.required,
+        optional: !parameter.required,
+      };
+      // note, don't mark a checkbox as required. A checkbox also produces `false` value
+      // which should be passed to the transport. The request data processor should take care of
+      // producing the right output.
       return html`
-      <div class="form-item">
+      <div class="${classMap(classes)}">
         <anypoint-checkbox 
+          class="boolean-param"
           name="${parameter.name || schema.name}"
           data-binding="${ifDefined(parameter.binding)}"
-          ?required="${required}"
           .checked="${value}"
           title="${ifDefined(title)}"
           data-domain-id="${id}"
@@ -488,7 +525,7 @@ const mxFunction = base => {
         // this is a case where a scalar is marked as nillable instead of not required
         // (which for some reason is a common practice among RAML developers).
         const scalar = anyOf.find(shape => shape !== nil);
-        return this.parameterSchemaTemplate(parameter, scalar, {
+        return this.parameterSchemaTemplate(parameter, scalar, {}, {
           nillable: true,
         });
       }
@@ -505,7 +542,7 @@ const mxFunction = base => {
       if (nil) {
         opts = { nillable: true };
       }
-      return this.textInputTemplate(parameter, schema, 'text', opts);
+      return this.textInputTemplate(parameter, schema, 'text', {}, opts);
     }
 
     /**
@@ -540,7 +577,7 @@ const mxFunction = base => {
       const label = readLabelValue(parameter, schema);
       const values = /** @type any[] */ (this.readInputValue(parameter, schema, true));
       const options = { arrayItem: true, };
-      const inputs = values.map((value, index) => this.parameterSchemaTemplate(parameter, items, { ...options, value, index }));
+      const inputs = values.map((value, index) => this.parameterSchemaTemplate(parameter, items, {}, { ...options, value, index }));
       return html`
       <div class="array-form-item" data-param-id="${id}" data-param-label="${label}">
         <div class="array-title"><span class="label">${label}</span></div>

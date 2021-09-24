@@ -1,6 +1,6 @@
 import { HTTPRequest, RequestAuthorization } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
 import { ApiParameter, ApiShapeUnion, ApiSecurityRequirement } from '@api-components/amf-helper-mixin';
-import { XhrSimpleRequestTransportElement } from './XhrSimpleRequestTransportElement';
+import { XhrSimpleRequestTransportElement } from './elements/XhrSimpleRequestTransportElement';
 
 export declare interface ApiConsoleRequest extends HTTPRequest {
   /**
@@ -73,4 +73,13 @@ export interface SecuritySelectorListItem {
   types: string[];
   labels: string[];
   security: ApiSecurityRequirement;
+}
+
+export interface ParameterRenderOptions {
+  /**
+   * When set it overrides the parameter's / schema's required property
+   * and renders the input as required.
+   * This also forces the renderer to force example value when default is not present.
+   */
+  required?: boolean;
 }

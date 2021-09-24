@@ -5,40 +5,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
   <title>api-request-editor</title>
-
-  <link media="all" rel="stylesheet" href="../node_modules/codemirror/addon/lint/lint.css" />
-
-  <script src="../node_modules/cryptojslib/components/core.js"></script>
-  <script src="../node_modules/cryptojslib/rollups/sha1.js"></script>
-  <script src="../node_modules/cryptojslib/components/enc-base64-min.js"></script>
-  <script src="../node_modules/cryptojslib/rollups/md5.js"></script>
-  <script src="../node_modules/cryptojslib/rollups/hmac-sha1.js"></script>
-  <script src="../node_modules/jsrsasign/lib/jsrsasign-rsa-min.js"></script>
-  <!--
-  Previously this was included into the component.
-  Since components are ES6 modules this libraries cannot be loaded into
-  the component as they do not export anything and won't set global variable.
-  -->
-  <script src="../node_modules/jsonlint/lib/jsonlint.js"></script>
-  <script src="../node_modules/codemirror/lib/codemirror.js"></script>
-  <script src="../node_modules/codemirror/addon/mode/loadmode.js"></script>
-  <script src="../node_modules/codemirror/mode/meta.js"></script>
-  <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
-  <script src="../node_modules/codemirror/mode/xml/xml.js"></script>
-  <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-  <script src="../node_modules/codemirror/addon/lint/lint.js"></script>
-  <script src="../node_modules/codemirror/addon/lint/json-lint.js"></script>
-  <!--
-  From the inside of a web component it is hard to determine where
-  scripts are actually located. This should be set if the page won't load all possible
-  scripts at run time. The component will download the "mode" from this location.
-  -->
-  <script>
-  /* global CodeMirror */
-  CodeMirror.modeURL = '../node_modules/codemirror/mode/%N/%N.js';
-  </script>
-
-
   <style>
   .main.centered {
     max-width: 1440px !important;
@@ -63,7 +29,7 @@
     --arc-font-subhead-font-size: 16px;
     --arc-font-subhead-font-weight: 400;
     --arc-font-subhead-line-height: 24px;
-    --code-mirror-height: auto;
+    --error-color: red;
   }
 
   body.styled.dark output {
@@ -109,14 +75,6 @@
     --auth-method-oauth2-redirect-info-color: #fff;
     --from-row-action-icon-color: #fff;
     --inline-documentation-color: #fff;
-
-    --code-mirror-background-color: #37474F;
-    --code-mirror-string-color: #C3E88D;
-    --code-mirror-punctuation-color: #EEFFFF;
-    --code-mirror-atom-color: #F07178;
-    --code-mirror-number-color: #F78C6A;
-    --code-mirror-cursor-color: #009688;
-    --code-mirror-gutters-background-color: #37474F;
   }
 
   api-request-editor {
