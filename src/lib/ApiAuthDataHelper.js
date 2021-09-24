@@ -92,8 +92,10 @@ export class ApiAuthDataHelper extends UiDataHelper {
   /**
    * @param {ApiAuthorizationElement} element
    * @param {AuthUiInit} init
+   * @returns {any}
    */
   static setupOauth1(element, init) {
+    // @ts-ignore
     const i = new OAuth1Auth(init);
     i.amf = element.amf;
     i.security = element.security;

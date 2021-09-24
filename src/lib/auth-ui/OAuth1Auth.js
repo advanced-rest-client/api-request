@@ -11,7 +11,7 @@ const apiValue = Symbol("apiValue");
 /** @typedef {import('@api-components/amf-helper-mixin').DomainElement} DomainElement */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
 
-export default class OAuth2Auth extends Oauth1 {
+export default class OAuth1Auth extends Oauth1 {
   /**
    * @returns {ApiParametrizedSecurityScheme}
    */

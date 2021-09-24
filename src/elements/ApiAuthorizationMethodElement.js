@@ -157,8 +157,18 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
    */
   [settingsHandler](e) {
     const { detail } = e;
+    const cp = { ...detail };
+    // compatibility with 2.0
+    if (cp.headers) {
+      cp.header = cp.headers;
+      delete cp.headers;
+    }
+    if (cp.params) {
+      cp.query = cp.params;
+      delete cp.params;
+    }
     const serialized = this.serialize();
-    this.restore({ ...serialized, ...detail });
+    this.restore({ ...serialized, ...cp });
   }
 
   /**

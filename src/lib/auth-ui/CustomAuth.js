@@ -20,12 +20,12 @@ export default class CustomAuth extends ApiUiBase {
    */
   constructor(init) {
     super(init);
-    this.reset();
+    this.clearInit();
 
     this.toggleDescription = this.toggleDescription.bind(this);
   }
 
-  reset() {
+  clearInit() {
     /** @type {string} */
     this.schemeName = undefined;
     /** @type {string} */
@@ -36,9 +36,14 @@ export default class CustomAuth extends ApiUiBase {
     this.descriptionOpened = undefined;
   }
 
+  reset() {
+    this.clearInit();
+    this.clearCache();
+  }
+
   initializeApiModel() {
     const { amf, security } = this;
-    this.reset();
+    this.clearInit();
     const source = 'settings';
     const list = /** @type OperationParameter[] */ (this.parametersValue);
     this.parametersValue = list.filter(item => item.source !== source);

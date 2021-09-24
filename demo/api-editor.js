@@ -3,6 +3,8 @@ import { ApiDemoPage } from '@advanced-rest-client/arc-demo-helper';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
+import '@advanced-rest-client/authorization/oauth2-authorization.js';
+import '@advanced-rest-client/authorization/oauth1-authorization.js';
 import '../xhr-simple-request.js';
 import '../api-request-editor.js';
 
@@ -86,6 +88,7 @@ class ComponentDemo extends ApiDemoPage {
       ['oauth-flows', 'OAS OAuth Flow'],
       ['oas-bearer', 'OAS Bearer'],
       ['secured-api', 'Security demo'],
+      ['21143', '21143'],
     ].map(([file, label]) => html`
       <anypoint-item data-src="${file}-compact.json">${label} - compact model</anypoint-item>
       <anypoint-item data-src="${file}.json">${label}</anypoint-item>
@@ -392,6 +395,8 @@ class ComponentDemo extends ApiDemoPage {
   contentTemplate() {
     return html`
     <xhr-simple-request @api-response="${this._responseReady}"></xhr-simple-request>
+    <oauth1-authorization></oauth1-authorization>
+    <oauth2-authorization></oauth2-authorization>
     <h2 class="centered main">API request editor</h2>
     ${this._demoTemplate()}
     ${this._introductionTemplate()}

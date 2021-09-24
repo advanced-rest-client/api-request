@@ -177,10 +177,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    */
   _bodyContentType: string;
   /**
-   * Computed value of security scheme from selected method.
-   */
-  _securedBy: any[];
-  /**
    * Computed list of headers in the AMF model
    */
   _apiHeaders: any[];
@@ -292,7 +288,10 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
 
   get contentType(): string;
 
-  get securedBy(): any[];
+  /**
+   * The security requirement for the operation or undefined.
+   */
+  get security(): SecuritySelectorListItem[]|undefined;
 
   get apiHeaders(): any[];
 

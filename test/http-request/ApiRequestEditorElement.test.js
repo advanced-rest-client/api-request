@@ -5,58 +5,75 @@ import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 
+/** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
+/** @typedef {import('../../').ApiAuthorizationMethodElement} ApiAuthorizationMethodElement */
 /** @typedef {import('../../').ApiRequestEditorElement} ApiRequestEditorElement */
 
 describe('ApiRequestEditorElement', () => {
+  /** @type AmfLoader */
+  let store;
+  before(async () => {
+    store = new AmfLoader();
+  });
+
   /**
+   * @param {AmfDocument=} model
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function basicFixture() {
-    return (fixture(html`<api-request-editor></api-request-editor>`));
+  async function basicFixture(model) {
+    return (fixture(html`<api-request-editor .amf="${model}"></api-request-editor>`));
   }
 
   /**
+   * @param {AmfDocument=} model
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function allowCustomFixture() {
-    return (fixture(html`<api-request-editor allowCustom></api-request-editor>`));
+  async function allowCustomFixture(model) {
+    return (fixture(html`<api-request-editor .amf="${model}" allowCustom></api-request-editor>`));
   }
 
   /**
+   * @param {AmfDocument} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function modelFixture(amf, selected) {
+  async function modelFixture(model, selected) {
     return (fixture(html`<api-request-editor
-      .amf="${amf}"
+      .amf="${model}"
       .selected="${selected}"></api-request-editor>`));
   }
 
   /**
+   * @param {AmfDocument} model
+   * @param {string} selected
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function urlLabelFixture(amf, selected) {
+  async function urlLabelFixture(model, selected) {
     return (fixture(html`<api-request-editor
-      .amf="${amf}"
+      .amf="${model}"
       .selected="${selected}"
       urlLabel></api-request-editor>`));
   }
 
   /**
+   * @param {AmfDocument=} model
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function customBaseUriSlotFixture() {
+  async function customBaseUriSlotFixture(model) {
     return (fixture(html`
-      <api-request-editor>
+      <api-request-editor .amf="${model}">
         <anypoint-item slot="custom-base-uri" value="http://customServer.com">Custom</anypoint-item>
       </api-request-editor>`));
   }
 
   /**
+   * @param {AmfDocument=} model
    * @returns {Promise<ApiRequestEditorElement>}
    */
-  async function noSelectorFixture() {
+  async function noSelectorFixture(model) {
     return (fixture(html`
-      <api-request-editor noServerSelector>
+      <api-request-editor noServerSelector .amf="${model}">
         <anypoint-item slot="custom-base-uri" value="http://customServer.com">http://customServer.com</anypoint-item>
       </api-request-editor>`));
   }
@@ -297,41 +314,45 @@ describe('ApiRequestEditorElement', () => {
       const driveApi = 'google-drive-api';
       const demoApi = 'demo-api';
 
+      
+
       describe('http method computation', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: httpbinApi, compact });
+          model = await store.getGraph(Boolean(compact), httpbinApi);
         });
 
         it('sets _httpMethod property (get)', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/anything', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/anything', 'get');
+          const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'get');
         });
 
         it('sets _httpMethod property (post)', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/anything', 'post');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/anything', 'post');
+          const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'post');
         });
 
         it('sets _httpMethod property (put)', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/anything', 'put');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/anything', 'put');
+          const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'put');
         });
 
         it('sets _httpMethod property (delete)', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/anything', 'delete');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/anything', 'delete');
+          const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'delete');
         });
       });
 
       describe('_computeApiPayload() and _apiPayload', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: driveApi, compact });
+          model = await store.getGraph(Boolean(compact), driveApi);
         });
 
         it('returns undefined when no model', async () => {
@@ -340,119 +361,115 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('returns undefined when no "expects"', async () => {
-          const element = await basicFixture();
-          element.amf = amf;
+          const element = await basicFixture(model);
           assert.isUndefined(element._computeApiPayload({}));
         });
 
         it('returns payload definition', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files/{fileId}', 'patch');
-          const element = await basicFixture();
-          element.amf = amf;
+          const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
+          const element = await basicFixture(model);
           assert.typeOf(element._computeApiPayload(method), 'array');
         });
 
         it('sets _apiPayload when selection changed', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files/{fileId}', 'patch');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
+          const element = await modelFixture(model, method['@id']);
           assert.typeOf(element.apiPayload, 'array');
         });
       });
 
       describe('_isPayloadRequest', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: driveApi, compact });
+          model = await store.getGraph(Boolean(compact), driveApi);
         });
 
         it('is false for get request', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files/{fileId}', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/files/{fileId}', 'get');
+          const element = await modelFixture(model, method['@id']);
           assert.isFalse(element.isPayloadRequest);
         });
 
         it('returns true for post request', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files/{fileId}', 'patch');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
+          const element = await modelFixture(model, method['@id']);
           assert.isTrue(element.isPayloadRequest);
         });
       });
 
-      describe('_computeSecuredBy() and _securedBy', () => {
-        let amf;
+      describe('Security computations', () => {
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: driveApi, compact });
+          model = await store.getGraph(Boolean(compact), driveApi);
         });
 
-        it('returns undefined when no model', async () => {
-          const element = await basicFixture();
-          element.amf = amf;
-          assert.isUndefined(element._computeSecuredBy());
+        it('does not set variables when no security', async () => {
+          const element = await basicFixture(model);
+          assert.isUndefined(element.security);
         });
 
-        it('returns undefined when no security model', async () => {
-          const element = await basicFixture();
-          element.amf = amf;
-          assert.isUndefined(element._computeSecuredBy({}));
+        it('sets the security value', async () => {
+          const method = store.lookupOperation(model, '/files', 'get');
+          const element = await modelFixture(model, method['@id']);
+          assert.typeOf(element.security, 'array', 'has the security');
+          assert.lengthOf(element.security, 1, 'has the single scheme');
+          const [scheme] = element.security;
+          assert.deepEqual(scheme.types, ['OAuth 2.0'], 'has types definition');
+          assert.deepEqual(scheme.labels, ['oauth_2_0'], 'has labels definition');
+          assert.typeOf(scheme.security, 'object', 'has the security definition');
         });
 
-        it('returns security scheme model', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files', 'get');
-          const element = await modelFixture(amf, method['@id']);
-          const security = element._computeSecuredBy(method);
-          assert.typeOf(security, 'array');
-        });
-
-        it('sets securedBy', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/files', 'get');
-          const element = await modelFixture(amf, method['@id']);
-          assert.typeOf(element.securedBy, 'array');
-          assert.lengthOf(element.securedBy, 1);
+        it('sets the selectedSecurity', async () => {
+          const method = store.lookupOperation(model, '/files', 'get');
+          const element = await modelFixture(model, method['@id']);
+          assert.equal(element.selectedSecurity, 0);
         });
       });
 
       describe('_computeHeaders() and _apiHeaders', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         it('returns undefined when no model', async () => {
-          const element = await basicFixture();
-          element.amf = amf;
+          const element = await basicFixture(model);
           assert.isUndefined(element._computeHeaders());
         });
 
         it('returns undefined when no security model', async () => {
-          const element = await basicFixture();
-          element.amf = amf;
+          const element = await basicFixture(model);
           assert.isUndefined(element._computeHeaders({}));
         });
 
         it('returns headers model', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           const security = element._computeHeaders(method);
           assert.typeOf(security, 'array');
         });
 
         it('sets _apiHeaders', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           assert.typeOf(element.apiHeaders, 'array');
           assert.lengthOf(element.apiHeaders, 1);
         });
       });
 
       describe('#contentType', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         it('sets content type from the body', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/content-type', 'post');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/content-type', 'post');
+          const element = await modelFixture(model, method['@id']);
           await aTimeout(100);
           await nextFrame();
           assert.equal(element.contentType, 'application/json');
@@ -460,35 +477,36 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('ui state', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         it('renders authorization panel when authorization is required', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/messages', 'get');
-          const element = await modelFixture(amf, method['@id']);
-          const node = element.shadowRoot.querySelector('api-authorization');
+          const method = store.lookupOperation(model, '/messages', 'get');
+          const element = await modelFixture(model, method['@id']);
+          const node = element.shadowRoot.querySelector('api-authorization-editor');
           assert.ok(node);
         });
 
         it('renders query/uri editor when model is set', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           const node = element.shadowRoot.querySelector('api-url-params-editor').parentElement;
           assert.isFalse(node.hasAttribute('hidden'));
         });
 
         it('renders headers editor when model is set', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           const node = element.shadowRoot.querySelector('api-headers-editor').parentElement;
           assert.isFalse(node.hasAttribute('hidden'));
         });
 
         it('hides URL editor when noUrlEditor', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           element.noUrlEditor = true;
           await nextFrame();
           const node = element.shadowRoot.querySelector('.url-editor');
@@ -496,8 +514,8 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('computes URL when URL editor is hidden', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           element.noUrlEditor = true;
           await nextFrame();
           assert.equal(element.url, 'http://production.domain.com/people');
@@ -505,16 +523,18 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('execute()', () => {
-        let amf;
-        let element = /** @type ApiRequestEditorElement */ (null);
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
+        /** @type ApiRequestEditorElement */
+        let element;
         beforeEach(async () => {
           clearCache();
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          element = await modelFixture(model, method['@id']);
         });
 
         it('Dispatches `api-request` event', () => {
@@ -562,16 +582,17 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('abort()', () => {
-        let amf;
-        let element = /** @type ApiRequestEditorElement */ (null);
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
-
+        
+        let element = /** @type ApiRequestEditorElement */ (null);
         beforeEach(async () => {
           clearCache();
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          element = await modelFixture(model, method['@id']);
           element._loadingRequest = true;
           element._requestId = 'test-request';
           await nextFrame();
@@ -609,9 +630,10 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('serializeRequest()', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         beforeEach(async () => {
@@ -619,38 +641,38 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('Returns an object', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           const result = element.serializeRequest();
           assert.typeOf(result, 'object');
         });
 
         it('Sets editor url', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           await nextFrame();
           const result = element.serializeRequest();
           assert.equal(result.url, 'http://production.domain.com/people');
         });
 
         it('Sets editor method', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           const result = element.serializeRequest();
           assert.equal(result.method, 'GET');
         });
 
         it('Sets headers from the editor', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/post-headers', 'post');
-          const element = await modelFixture(amf, method['@id']);
-          await aTimeout(0);
+          const method = store.lookupOperation(model, '/post-headers', 'post');
+          const element = await modelFixture(model, method['@id']);
+          await aTimeout(10);
           const result = element.serializeRequest();
           assert.equal(result.headers, 'x-string: my-value\ncontent-type: application/json');
         });
 
         it('sets editor payload', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'post');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'post');
+          const element = await modelFixture(model, method['@id']);
           await aTimeout(0);
           const result = element.serializeRequest();
           assert.ok(result.payload);
@@ -658,20 +680,20 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('sets auth data', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people/{personId}', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people/{personId}', 'get');
+          const element = await modelFixture(model, method['@id']);
           await aTimeout(0);
           const result = element.serializeRequest();
-          assert.typeOf(result.auth, 'array');
-          assert.lengthOf(result.auth, 1);
-          assert.equal(result.auth[0].type, 'custom');
+          assert.typeOf(result.authorization, 'array');
+          assert.lengthOf(result.authorization, 1);
+          assert.equal(result.authorization[0].type, 'custom');
         });
 
         it('does not set editor payload when GET request', async () => {
-          const postMethod = AmfLoader.lookupOperation(amf, '/people', 'post');
-          const element = await modelFixture(amf, postMethod['@id']);
+          const postMethod = store.lookupOperation(model, '/people', 'post');
+          const element = await modelFixture(model, postMethod['@id']);
           await aTimeout(0);
-          const getMethod = AmfLoader.lookupOperation(amf, '/people', 'get');
+          const getMethod = store.lookupOperation(model, '/people', 'get');
           element.selected = getMethod['@id'];
           await aTimeout(0);
           const result = element.serializeRequest();
@@ -679,10 +701,10 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('does not set editor payload when HEAD request', async () => {
-          const postMethod = AmfLoader.lookupOperation(amf, '/people', 'post');
-          const element = await modelFixture(amf, postMethod['@id']);
+          const postMethod = store.lookupOperation(model, '/people', 'post');
+          const element = await modelFixture(model, postMethod['@id']);
           await aTimeout(0);
-          const getMethod = AmfLoader.lookupOperation(amf, '/people', 'head');
+          const getMethod = store.lookupOperation(model, '/people', 'head');
           element.selected = getMethod['@id'];
           await aTimeout(0);
           const result = element.serializeRequest();
@@ -699,14 +721,15 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('_sendHandler()', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         // it('calls authAndExecute() when authorization is required', async () => {
-        //   const method = AmfLoader.lookupOperation(amf, '/messages', 'get');
-        //   const element = await modelFixture(amf, method['@id']);
+        //   const method = store.lookupOperation(model, '/messages', 'get');
+        //   const element = await modelFixture(model, method['@id']);
         //   await aTimeout(5);
         //   const spy = sinon.spy(element, 'authAndExecute');
         //   const button = element.shadowRoot.querySelector('.send-button');
@@ -716,8 +739,8 @@ describe('ApiRequestEditorElement', () => {
         // });
 
         it('calls execute() when authorization is not required', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await modelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await modelFixture(model, method['@id']);
           await aTimeout(5);
           const spy = sinon.spy(element, 'execute');
           const button = element.shadowRoot.querySelector('.send-button');
@@ -727,21 +750,22 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('#urlLabel', () => {
-        let amf;
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: demoApi, compact });
+          model = await store.getGraph(Boolean(compact), demoApi);
         });
 
         it('renders the url label', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await urlLabelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await urlLabelFixture(model, method['@id']);
           const node = element.shadowRoot.querySelector('.url-label');
           assert.ok(node);
         });
 
         it('renders the url value', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/people', 'get');
-          const element = await urlLabelFixture(amf, method['@id']);
+          const method = store.lookupOperation(model, '/people', 'get');
+          const element = await urlLabelFixture(model, method['@id']);
           await nextFrame();
           const node = element.shadowRoot.querySelector('.url-label');
           const text = node.textContent.trim();
@@ -750,14 +774,17 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('slotted servers', () => {
-        let element = /** @type ApiRequestEditorElement */ (null);
-        let amf;
+        /** @type ApiRequestEditorElement */
+        let element;
+        /** @type AmfDocument */
+        let model;
+        before(async () => {
+          model = await store.getGraph(Boolean(compact));
+        });
 
         beforeEach(async () => {
-          element = await customBaseUriSlotFixture();
-          amf = await AmfLoader.load({ compact });
-          element.amf = amf;
-          const op = AmfLoader.lookupOperation(amf, '/people', 'get')
+          element = await customBaseUriSlotFixture(model);
+          const op = store.lookupOperation(model, '/people', 'get')
           element.selected = op['@id'];
           await aTimeout(0);
         });
@@ -768,49 +795,6 @@ describe('ApiRequestEditorElement', () => {
           assert.equal(element.shadowRoot.querySelector('api-url-editor').value, 'http://customServer.com/people');
         });
       })
-    });
-  });
-
-  // AMF 4 breaking changes the model and I have no way (?) of generating partial model.
-  describe.skip('Partial model', () => {
-    /**
-     * @returns {Promise<ApiRequestEditorElement>}
-     */  
-    async function partialFixture(amf, selected, server, protocols, version) {
-      return fixture(html`<api-request-editor
-        .amf="${amf}"
-        .selected="${selected}"
-        .server="${server}"
-        .protocols="${protocols}"
-        .version="${version}"></api-request-editor>`);
-    }
-
-    let amf;
-    let server;
-    let scheme;
-    let version;
-    before(async () => {
-      const summary = await AmfLoader.load({ fileName: 'partial-model/summary' });
-      const endpoint = await AmfLoader.load({ fileName: 'partial-model/endpoint' });
-      server = summary['doc:encodes']['http:server'];
-      scheme = [summary['doc:encodes']['http:scheme']];
-      version = summary['doc:encodes']['schema-org:version'];
-      amf = endpoint;
-    });
-
-    let element = /** @type ApiRequestEditorElement */ (null);
-    beforeEach(async () => {
-      clearCache();
-      element = await partialFixture(amf, '#69', server, scheme, version);
-      await aTimeout(50); // 50 for slower browsers
-    });
-
-    it('url is computed', () => {
-      assert.equal(element.url, 'http://petstore.swagger.io/v2/api/user?stringParameter=');
-    });
-
-    it('queryModel is computed', () => {
-      assert.lengthOf(element._queryModel, 7);
     });
   });
 
@@ -920,11 +904,16 @@ describe('ApiRequestEditorElement', () => {
 
     describe(`server selection - ${label}`, () => {
       describe('custom URI selection', () => {
+        
+        /** @type AmfDocument */
+        let model;
+        before(async () => {
+          model = await store.getGraph(Boolean(compact), multiServerApi);
+        });
+
         let element = /** @type ApiRequestEditorElement */ (null);
-        let amf;
         beforeEach(async () => {
-          amf = await AmfLoader.load({ fileName: multiServerApi, compact });
-          element = await modelFixture(amf);
+          element = await modelFixture(model);
           // This is equivalent to Custom URI being selected, and 'https://www.google.com' being input
           dispatchSelectionEvent(element, 'https://www.google.com', 'custom');
         });
@@ -960,15 +949,15 @@ describe('ApiRequestEditorElement', () => {
       });
 
       describe('from navigation events', () => {
-        let amf;
-        let element = /** @type ApiRequestEditorElement */ (null);
-
+        /** @type AmfDocument */
+        let model;
         before(async () => {
-          amf = await AmfLoader.load({ fileName: multiServerApi, compact });
+          model = await store.getGraph(Boolean(compact), multiServerApi);
         });
-
+        
+        let element = /** @type ApiRequestEditorElement */ (null);
         beforeEach(async () => {
-          element = await modelFixture(amf);
+          element = await modelFixture(model);
         });
 
         it('has default number of servers', async () => {
@@ -976,7 +965,7 @@ describe('ApiRequestEditorElement', () => {
         });
 
         it('computes servers when first navigation', async () => {
-          const method = AmfLoader.lookupOperation(amf, '/default', 'get');
+          const method = store.lookupOperation(model, '/default', 'get');
           changeSelection(element, method['@id']);
           await nextFrame();
           assert.lengthOf(element.servers, 4);
@@ -984,42 +973,42 @@ describe('ApiRequestEditorElement', () => {
 
         it('computes servers after subsequent navigation', async () => {
           // default navigation
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/default', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/default', 'get')['@id']);
           await nextFrame();
           // other endpoint
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/files', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/files', 'get')['@id']);
           await nextFrame();
           assert.lengthOf(element.servers, 1);
         });
 
         it('automatically selects first available server', async () => {
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/default', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/default', 'get')['@id']);
           await nextFrame();
           assert.equal(element.serverValue, 'https://{customerId}.saas-app.com:{port}/v2');
         });
 
         it('auto change selected server', async () => {
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/default', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/default', 'get')['@id']);
           await nextFrame();
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/files', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/files', 'get')['@id']);
           await nextFrame();
           assert.equal(element.serverValue, 'https://files.example.com');
         });
 
         it('keeps server selection when possible', async () => {
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/default', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/default', 'get')['@id']);
           await nextFrame();
 
           dispatchSelectionEvent(element, 'https://{region}.api.cognitive.microsoft.com', 'server');
 
-          changeSelection(element, AmfLoader.lookupOperation(amf, '/copy', 'get')['@id']);
+          changeSelection(element, store.lookupOperation(model, '/copy', 'get')['@id']);
           await nextFrame();
           assert.equal(element.serverValue, 'https://{region}.api.cognitive.microsoft.com');
         });
 
         it('initializes with selected server', async () => {
-          const methodId = AmfLoader.lookupOperation(amf, '/ping', 'get')['@id'];
-          element = await modelFixture(amf, methodId);
+          const methodId = store.lookupOperation(model, '/ping', 'get')['@id'];
+          element = await modelFixture(model, methodId);
           await nextFrame();
           assert.lengthOf(element.servers, 2);
         });
@@ -1092,8 +1081,8 @@ describe('ApiRequestEditorElement', () => {
     it('should clear cache after AMF change', async () => {
       const clearCacheSpy = sinon.spy();
       ApiViewModel.prototype.clearCache = clearCacheSpy
-      const element = await basicFixture();
-      element.amf = await AmfLoader.load();
+      const model = await store.getGraph();
+      await basicFixture(model);
       await nextFrame();
       assert.isTrue(clearCacheSpy.called);
     });
@@ -1101,9 +1090,10 @@ describe('ApiRequestEditorElement', () => {
     it('should not clear cache after AMF change with persistCache', async () => {
       const clearCacheSpy = sinon.spy();
       ApiViewModel.prototype.clearCache = clearCacheSpy
+      const model = await store.getGraph();
       const element = await basicFixture();
       element.persistCache = true;
-      element.amf = await AmfLoader.load();
+      element.amf = model;
       await nextFrame();
       assert.isFalse(clearCacheSpy.called);
     });
@@ -1115,14 +1105,18 @@ describe('ApiRequestEditorElement', () => {
   ].forEach(({label, compact}) => {
     describe(`Populating annotated fields - ${label}`, () => {
       const annotatedParametersApi = 'annotated-parameters';
-      let amf = null;
+      
+      /** @type AmfDocument */
+      let model;
+      before(async () => {
+        model = await store.getGraph(Boolean(compact), annotatedParametersApi);
+      });
+      
       let element = null;
-
       beforeEach(async () => {
         clearCache();
-        amf = await AmfLoader.load({ fileName: annotatedParametersApi, compact });
-        const selected = AmfLoader.lookupOperation(amf, '/test', 'get')['@id'];
-        element = await modelFixture(amf, selected);
+        const selected = store.lookupOperation(model, '/test', 'get')['@id'];
+        element = await modelFixture(model, selected);
       });
 
       it('should populate annotated query parameter field', async () => {
@@ -1155,5 +1149,130 @@ describe('ApiRequestEditorElement', () => {
       });
     });
   });
+
+  describe('Authorization', () => {
+    [true, false].forEach((compact) => {
+      describe(compact ? 'Compact model' : 'Full model', () => {
+        const fileName = 'oas-demo';
+
+        describe(`Single method`, () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, fileName);
+          });
+          
+          /** @type ApiRequestEditorElement */
+          let element;
+          beforeEach(async () => {
+            const operation = store.getOperation(model, '/single', 'get');
+            element = await modelFixture(model, operation.id);
+          });
+
+          it('sets the security value', async () => {
+            assert.typeOf(element.security, 'array', 'has the security');
+            assert.lengthOf(element.security, 1, 'has the single scheme');
+            const [scheme] = element.security;
+            assert.deepEqual(scheme.types, ['http'], 'has types definition');
+            assert.deepEqual(scheme.labels, ['BasicAuth'], 'has labels definition');
+            assert.typeOf(scheme.security, 'object', 'has the security definition');
+          });
   
+          it('sets the selectedSecurity', async () => {
+            assert.equal(element.selectedSecurity, 0);
+          });
+
+          it('has no selector', () => {
+            const node = element.shadowRoot.querySelector('.auth-selector');
+            assert.notOk(node);
+          });
+        });
+
+        describe(`Single method with union`, () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, fileName);
+          });
+          
+          /** @type ApiRequestEditorElement */
+          let element;
+          beforeEach(async () => {
+            const operation = store.getOperation(model, '/and-and-or-union', 'get');
+            element = await modelFixture(model, operation.id);
+          });
+  
+          it('sets the security value', async () => {
+            assert.typeOf(element.security, 'array', 'has the security');
+            assert.lengthOf(element.security, 2, 'has the both schemes');
+            const [scheme1] = element.security;
+            assert.deepEqual(scheme1.types, ['Api Key', 'Api Key'], 'has types definition');
+            assert.deepEqual(scheme1.labels, ['ApiKeyQuery', 'ApiKeyAuth'], 'has labels definition');
+            assert.typeOf(scheme1.security, 'object', 'has the security definition');
+          });
+  
+          it('has method selector', () => {
+            const node = element.shadowRoot.querySelector('.auth-selector');
+            assert.ok(node);
+          });
+  
+          it('renders combined label', () => {
+            const node = element.shadowRoot.querySelector('anypoint-item[data-label="ApiKeyQuery, ApiKeyAuth"]');
+            assert.ok(node);
+          });
+  
+          it('renders label with names and types', () => {
+            const node = element.shadowRoot.querySelector('anypoint-item[data-label="ApiKeyQuery, ApiKeyAuth"]');
+            const parts = node.textContent.trim().split('\n').map((item) => item.trim());
+            assert.equal(parts[0], 'ApiKeyQuery, ApiKeyAuth');
+            assert.equal(parts[1], 'Api Key, Api Key');
+          });
+  
+          it('renders as single editor', () => {
+            const nodes = element.shadowRoot.querySelectorAll('api-authorization-editor');
+            assert.lengthOf(nodes, 1);
+          });
+        });
+
+        describe(`Multiple unions`, () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, fileName);
+          });
+          
+          /** @type ApiRequestEditorElement */
+          let element;
+          beforeEach(async () => {
+            const operation = store.getOperation(model, '/cross-union', 'get');
+            element = await modelFixture(model, operation.id);
+          });
+  
+          it('sets the security value', async () => {
+            assert.typeOf(element.security, 'array', 'has the security');
+            assert.lengthOf(element.security, 3, 'has the both schemes');
+            const [scheme1] = element.security;
+            assert.deepEqual(scheme1.types, ['Api Key', 'Api Key'], 'has types definition');
+            assert.deepEqual(scheme1.labels, ['ApiKeyQuery', 'ApiKeyAuth'], 'has labels definition');
+            assert.typeOf(scheme1.security, 'object', 'has the security definition');
+          });
+  
+          it('has method selector', () => {
+            const node = element.shadowRoot.querySelector('.auth-selector');
+            assert.ok(node);
+          });
+  
+          it('has no scheme label', () => {
+            const node = element.shadowRoot.querySelector('.auth-selector-label');
+            assert.notOk(node);
+          });
+  
+          it('does not render method labels for API Key', () => {
+            const nodes = element.shadowRoot.querySelectorAll('.auth-label');
+            assert.lengthOf(nodes, 0);
+          });
+        });
+      });
+    });
+  });
 });

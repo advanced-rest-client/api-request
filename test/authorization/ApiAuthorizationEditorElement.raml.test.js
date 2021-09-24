@@ -312,6 +312,7 @@ describe('ApiAuthorizationEditorElement', () => {
       it('element is valid with required values', async () => {
         const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('SpecialTokenHeader', 'test');
+        form.updateQueryParameter('debugTokenParam', 'Log');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
         const result = element.validate();
@@ -322,6 +323,7 @@ describe('ApiAuthorizationEditorElement', () => {
       it('produces authorization settings', async () => {
         const form = element.shadowRoot.querySelector('api-authorization-method');
         form.updateHeader('SpecialTokenHeader', 'test');
+        form.updateQueryParameter('debugTokenParam', 'Log');
         form.dispatchEvent(new CustomEvent('change'));
         await nextFrame();
         const result = element.serialize();

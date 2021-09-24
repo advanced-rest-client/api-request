@@ -45,6 +45,11 @@ export declare interface AmfParameterMixin {
   parametersValue: OperationParameter[];
   nilValues: string[];
 
+  /**
+   * Clears previously set values in the cache storage.
+   */
+  clearCache(): void;
+
   connectedCallback(): void;
 
   addArrayValueHandler(e: Event): void;
