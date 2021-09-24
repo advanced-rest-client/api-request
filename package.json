@@ -34,6 +34,7 @@
     "@advanced-rest-client/arc-types": "^0.2.47",
     "@advanced-rest-client/arc-url": "^0.2.1",
     "@advanced-rest-client/authorization": "^0.2.0",
+    "@advanced-rest-client/body-editor": "^0.2.5",
     "@advanced-rest-client/events-target-mixin": "^3.2.3",
     "@advanced-rest-client/highlight": "^1.1.1",
     "@advanced-rest-client/http-method-selector": "^3.0.5",
@@ -44,6 +45,7 @@
     "@anypoint-web-components/anypoint-input": "^0.2.27",
     "@anypoint-web-components/anypoint-item": "^1.1.0",
     "@anypoint-web-components/anypoint-listbox": "^1.1.7",
+    "@anypoint-web-components/anypoint-radio-button": "^0.1.6",
     "@api-components/amf-helper-mixin": "^4.5.4",
     "@api-components/api-body-editor": "^4.0.5",
     "@api-components/api-forms": "^0.2.1",
@@ -59,7 +61,6 @@
   },
   "devDependencies": {
     "@advanced-rest-client/arc-demo-helper": "^3.0.2",
-    "@anypoint-web-components/anypoint-radio-button": "^0.1.6",
     "@api-components/api-model-generator": "^0.2.9",
     "@api-components/api-navigation": "^4.2.5",
     "@open-wc/eslint-config": "^4.0.1",

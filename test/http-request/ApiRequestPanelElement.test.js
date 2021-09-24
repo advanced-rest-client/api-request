@@ -1,67 +1,93 @@
 import { fixture, assert, html } from '@open-wc/testing';
 import sinon from 'sinon';
+import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-panel.js';
+import { loadMonaco } from '../MonacoSetup.js';
 
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('../../').ApiRequestPanelElement} ApiRequestPanelElement */
 /** @typedef {import('../../').ApiRequestEditorElement} ApiRequestEditorElement */
 /** @typedef {import('../../src/types').ApiConsoleResponse} ApiConsoleResponse */
 
 describe('ApiRequestPanelElement', () => {
+  /** @type AmfLoader */
+  let store;
+  before(async () => {
+    await loadMonaco();
+    store = new AmfLoader();
+  });
+
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function basicFixture() {
-    return fixture(html`<api-request-panel></api-request-panel>`);
+  async function basicFixture(model, selected) {
+    return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}"></api-request-panel>`);
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function authPopupFixture() {
-    return fixture(html`<api-request-panel
+  async function authPopupFixture(model, selected) {
+    return fixture(html`<api-request-panel .amf="${model}"  .selected="${selected}"
       authPopupLocation="test/"></api-request-panel>`);
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function proxyFixture() {
+  async function proxyFixture(model, selected) {
     return fixture(
-      html`<api-request-panel proxy="https://proxy.domain.com/"></api-request-panel>`
+      html`<api-request-panel .amf="${model}" .selected="${selected}" proxy="https://proxy.domain.com/"></api-request-panel>`
     );
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function proxyEncFixture() {
+  async function proxyEncFixture(model, selected) {
     return fixture(html`<api-request-panel
+      .amf="${model}"
+      .selected="${selected}"
       proxy="https://proxy.domain.com/"
       proxyEncodeUrl></api-request-panel>`);
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function redirectUriFixture() {
-    return fixture(html`<api-request-panel
+  async function redirectUriFixture(model, selected) {
+    return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}"
       redirectUri="https://auth.domain.com/token"></api-request-panel>`);
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function addHeadersFixture() {
+  async function addHeadersFixture(model, selected) {
     const headers = [{"name": "x-test", "value": "header-value"}];
-    return fixture(html`<api-request-panel .appendHeaders="${headers}"></api-request-panel>`);
+    return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}" .appendHeaders="${headers}"></api-request-panel>`);
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function navigationFixture() {
+  async function navigationFixture(model, selected) {
     return fixture(
-      html`<api-request-panel handleNavigationEvents></api-request-panel>`
+      html`<api-request-panel .amf="${model}" .selected="${selected}" handleNavigationEvents></api-request-panel>`
     );
   }
 
@@ -70,22 +96,29 @@ describe('ApiRequestPanelElement', () => {
     editor.url = request.url || 'https://domain.com';
     editor._httpMethod = request.method || 'get';
     editor._headers = request.headers || '';
-    editor._payload = request.payload;
+    // editor._payload = request.payload;
   }
 
   describe('Initialization', () => {
+    /** @type AmfDocument */
+    let model;
+    before(async () => {
+      model = await store.getGraph(true);
+    });
+
     it('can be constructed with document.createElement', () => {
       const button = document.createElement('api-request-panel');
       assert.ok(button);
     });
 
     it('_hasResponse is false', async () => {
-      const element = await basicFixture();
+      const element = await basicFixture(model);
       assert.isFalse(element._hasResponse);
     });
 
     it('api-request is dispatched', async () => {
-      const element = await basicFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await basicFixture(model, method['@id']);
       appendRequestData(element);
       const spy = sinon.spy();
       element.addEventListener('api-request', spy);
@@ -123,8 +156,15 @@ describe('ApiRequestPanelElement', () => {
   });
 
   describe('Proxy settings', () => {
+    /** @type AmfDocument */
+    let model;
+    before(async () => {
+      model = await store.getGraph(true);
+    });
+
     it('Changes URL in the api-request event', async () => {
-      const element = await proxyFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await proxyFixture(model, method['@id']);
       appendRequestData(element);
       const editor = element.shadowRoot.querySelector('api-request-editor');
 
@@ -138,7 +178,8 @@ describe('ApiRequestPanelElement', () => {
     });
 
     it('Encodes original URL', async () => {
-      const element = await proxyEncFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await proxyEncFixture(model, method['@id']);
       appendRequestData(element);
       const spy = sinon.spy();
       element.addEventListener('api-request', spy);
@@ -152,8 +193,15 @@ describe('ApiRequestPanelElement', () => {
   });
 
   describe('Headers settings', () => {
+    /** @type AmfDocument */
+    let model;
+    before(async () => {
+      model = await store.getGraph(true);
+    });
+
     it('Adds headers to the request', async () => {
-      const element = await addHeadersFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await addHeadersFixture(model, method['@id']);
       appendRequestData(element);
       const spy = sinon.spy();
       element.addEventListener('api-request', spy);
@@ -163,7 +211,8 @@ describe('ApiRequestPanelElement', () => {
     });
 
     it('Should add string headers to api-request event', async () => {
-      const element = await basicFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await basicFixture(model, method['@id']);
 
       const headers = new Headers();
       headers.append('content-type', 'application/json');
@@ -178,7 +227,8 @@ describe('ApiRequestPanelElement', () => {
     });
 
     it('Replaces headers in the request', async () => {
-      const element = await addHeadersFixture();
+      const method = store.lookupOperation(model, '/people', 'get');
+      const element = await addHeadersFixture(model, method['@id']);
       appendRequestData(element, {
         headers: 'x-test: other-value',
       });

@@ -12,11 +12,12 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { CSSResult, TemplateResult, LitElement } from 'lit-element';
+import { TemplateResult, LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import {
   AmfHelperMixin,
   ApiOperation,
+  ApiPayload,
 } from '@api-components/amf-helper-mixin';
 import { ApiUrlDataModel } from '@api-components/api-url';
 import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
@@ -33,7 +34,11 @@ export const authorizationSelectorTemplate: unique symbol;
 export const authorizationSelectorItemTemplate: unique symbol;
 
 export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
-  get styles(): CSSResult[];
+  /** 
+   * The currently selected media type for the payloads.
+   * @attribute
+   */
+  mimeType: string;
 
   /**
    * An `@id` of selected AMF shape. When changed it computes
@@ -155,11 +160,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * Headers for the request.
    */
   _headers: string;
-  /**
-   * Body for the request. The type of the body depends on
-   * defined in the API media type.
-   */
-  _payload: string;
   /**
    * Final request URL including settings like `baseUri`, AMF
    * model settings and user provided parameters.
@@ -284,14 +284,21 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
 
   get headers(): string;
 
-  get payload(): any;
-
   get contentType(): string;
 
   /**
    * The security requirement for the operation or undefined.
    */
   get security(): SecuritySelectorListItem[]|undefined;
+  /**
+   * @returns The currently rendered payload, if any.
+   */
+  get payload(): ApiPayload|undefined;
+
+  /**
+   * @returns The list of all possible payloads for this operation.
+   */
+  get payloads(): ApiPayload[]|undefined;
 
   get apiHeaders(): any[];
 
@@ -350,11 +357,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * By default the event is cancelable until `cancelable` property is set to false.
    */
   _dispatch(type: string, detail?: any, cancelable?: boolean): CustomEvent;
-
-  /**
-   * Clears the request properties.
-   */
-  clearRequest(): void;
 
   reset(): void;
 
@@ -461,7 +463,7 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * `domain`. See `advanced-rest-client/auth-methods` for model descriptions.
    *
    */
-  serializeRequest(): ApiConsoleRequest;
+  serialize(): ApiConsoleRequest;
 
   /**
    * Handler for the `api-response` custom event.
@@ -606,8 +608,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
   _paramsEditorTemplate(): TemplateResult;
 
   _headersEditorTemplate(): TemplateResult;
-
-  _bodyEditorTemplate(): TemplateResult | string;
 
   [authorizationTemplate](): TemplateResult | string;
   /**

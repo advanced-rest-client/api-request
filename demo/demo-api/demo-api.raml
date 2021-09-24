@@ -37,10 +37,12 @@ annotationTypes:
         required: true
 uses:
   ExampleType: resourceTypes/example-types.raml
+  DemoTypes: library/demo-types.raml
 types:
   Image: !include resourceTypes/image.raml
   Resource: !include resourceTypes/resource.raml
   AppPerson: !include resourceTypes/app-person.raml
+  DemoPerson: !include types/DemoPerson.raml
   Product: !include resourceTypes/product.raml
   ErrorResource:
     description: A response that is errored
@@ -735,3 +737,461 @@ documentation:
         error:
           type: boolean
           default: false
+/parameters:
+  get:
+    displayName: All parameter types
+    headers: 
+      Accept:
+        default: application/json
+        description: Selectes the response's media type, when supported.
+        enum: 
+          - application/json
+          - application/xml
+          - text/csv
+        required: false
+      x-required:
+        required: true
+      x-object-header:
+        type: object
+        properties: 
+          key: string
+          value:
+            type: any
+            description: Any value
+      If-Modified-Since:
+        type: datetime
+        example: Sun, 28 Feb 2016 16:41:41 GMT
+        format: rfc2616 # this time it's required, otherwise, the example format is invalid
+    queryParameters: 
+      unionable:
+        type: string | number
+        description: One of the two
+        example: 25
+        default: no
+      complexUnionable:
+        type: Feature | Product
+        description: Super confusing for a query param
+      mixedUnionable:
+        type: Feature | string
+        description: At least one should work
+      combo:
+        type: string
+        default: Some value
+        description: A combo of all string properties
+        displayName: Combo (string)
+        enum: 
+          - value 1
+          - value 2
+          - value 3
+          - value 4
+          - value 5
+          - value 6
+          - value 7
+          - value 8
+          - value 9
+          - value 10
+        examples:
+          Example 1: value 1
+          Example 2: value 2
+        maxLength: 100
+        minLength: 1
+        pattern: .*
+        required: true
+      comboNum:
+        type: number
+        default: 20
+        description: A combo with a number type
+        displayName: Combo (number)
+        enum: 
+          - 5
+          - 10
+          - 20
+          - 40
+          - 50
+          - 75
+          - 100
+        examples:
+          Minimum: 5
+          Maximum: 100
+        minimum: 5
+        maximum: 100
+        multipleOf: 5
+        format: int64
+      birthday:
+        type: date-only
+        example: 2015-05-23
+      lunchtime:
+        type: time-only
+        example: 12:30:00
+      fireworks:
+        type: datetime-only
+        example: 2015-07-04T21:00:00
+      created:
+        type: datetime
+        example: 2016-02-28T16:41:41.090Z
+        format: rfc3339
+      userPicture:
+        type: file
+        fileTypes: ['image/jpeg', 'image/png']
+        maxLength: 307200
+      customFile:
+        type: file
+        fileTypes: ['*/*'] # any file type allowed
+        maxLength: 1048576
+      aBoolean:
+        type: boolean
+        description: This is a boolean value without a default value.
+        displayName: Boolean
+      aBooleanWithDefault:
+        type: boolean
+        default: true
+        displayName: Boolean with default
+        description: This is a boolean value with default value.
+      nillable:
+        type: nil
+        description: This can be null
+      nillableUnion:
+        type: string | nil
+/query-params:
+  /bool:
+    get:
+      queryParameters: 
+        aBoolean:
+          type: boolean
+          description: This is a boolean value without a default value.
+          displayName: Boolean
+        aBooleanWithDefault:
+          type: boolean
+          default: true
+          displayName: Boolean with default
+          description: This is a boolean value with default value.
+        nillableBoolean:
+          type: boolean | nil
+          displayName: Boolean with nil
+          description: This is a boolean value with a nil union value.
+        stringBoolean:
+          type: boolean | string
+          displayName: Boolean with string
+          description: This is a boolean value with a string union value.
+  /string:
+    get:
+      queryParameters: 
+        string:
+          type: string
+          description: Simple string
+        enum:
+          type: string
+          enum: [development, staging, qa, production]
+          description: Enum string
+        minMaxLnegth:
+          type: string
+          minLength: 5
+          maxLength: 15
+          description: Min 5 max 15
+        patternLettersOnly:
+          type: string
+          pattern: '[a-zA-Z]*'
+          description: Letters only pattern
+        patternNumbersOnly:
+          type: string
+          pattern: '[0-9]*'
+          description: Number only pattern
+        displayName:
+          type: string
+          displayName: String 6
+          description: With display name
+        notRequired:
+          type: string
+          required: false
+          description: Optional value
+        withDefault:
+          type: string
+          default: This is a default
+          description: Default value
+        withDefaultNotRequired:
+          type: string
+          default: This is a default
+          required: false
+          description: Default value and not required
+        stringUnionNumber:
+          type: string | number
+          description: Either string or number
+        withExamples:
+          type: string
+          examples:
+            Word 1: Option 1
+            Word 2: Option 2
+            Word 3: 123456
+          description: String with examples.
+        anArray:
+          type: string[]
+          description: Array of strings.
+  /dates:
+    get:
+      queryParameters: 
+        dateOnly:
+          type: date-only
+          description: Date only, like "2015-05-23"
+        timeOnly:
+          type: time-only
+          description: Time only, like "12:30:00"
+        dateTimeOnly:
+          type: datetime-only
+          description: Date and time only, like "2015-07-04T21:00:00"
+        rfc3339:
+          type: datetime
+          format: rfc3339
+          description: Date and time, rfc3339 format, like "2016-02-28T16:41:41.090Z"
+        rfc2616:
+          type: datetime
+          format: rfc2616 
+          description: Date and time, rfc2616 format, like "Sun, 28 Feb 2016 16:41:41 GMT"
+        dateTimeNoFormat:
+          type: datetime
+          description: Date and time, assumed rfc3339 format, like "2016-02-28T16:41:41.090Z"
+        dateOnlyDefaultValue:
+          type: date-only
+          default: 2015-05-23
+          description: Date only, with a default value.
+        timeOnlyDefaultValue:
+          type: time-only
+          default: 12:30:00
+          description: Time only, with a default value.
+        rfc3339DefaultValue:
+          type: datetime
+          format: rfc3339
+          default: 2016-02-28T16:41:41.090Z
+          description: Date and time, rfc3339 format, default value
+        rfc2616DefaultValue:
+          type: datetime
+          format: rfc2616 
+          default: Sun, 28 Feb 2016 16:41:41 GMT
+          description: Date and time, rfc2616 format, default value
+        dateTimeDefaultValue:
+          type: datetime
+          default: 2016-02-28T16:41:41.090Z
+          description: Date and time, with a default value.
+        dateTimeUnion:
+          type: datetime | string
+          description: Date and time union with string.
+        dateTimeNil:
+          type: datetime | nil
+          description: Required but nillable.
+        dateArray:
+          type: datetime[]
+          description: A list of datetime
+  /numbers:
+    get:
+      queryParameters: 
+        simple: number
+        intFormat:
+          type: number
+          format: int
+          description: int format number
+        int8Format:
+          type: number
+          format: int8
+          description: int8 format number
+        int16Format:
+          type: number
+          format: int16
+          description: int16 format number
+        int32Format:
+          type: number
+          format: int32
+          description: int32 format number
+        int64Format:
+          type: number
+          format: int64
+          description: int64 format number
+        longFormat:
+          type: number
+          format: long
+          description: long format number
+        floatFormat:
+          type: number
+          format: float
+          description: float format number
+        doubleFormat:
+          type: number
+          format: double
+          description: double format number
+        floatWithMultiple:
+          type: number
+          format: float
+          multipleOf: 1.1
+          description: float format number with multiple of.
+        integerFormat:
+          type: integer
+          description: An integer
+        integerMinMax:
+          type: integer
+          minimum: 0
+          maximum: 100
+          multipleOf: 5
+          description: Min, max, and multiple of.
+        integerUnionString:
+          type: integer | string
+          description: Union with string
+        integerUnionNil:
+          type: integer | nil
+          description: Required but nillable
+        notRequired:
+          type: integer
+          required: false
+          description: Required but nillable
+        integerDefault:
+          type: integer
+          default: 12
+          description: Integer with default "12"
+        floatDefault:
+          type: number
+          format: float
+          multipleOf: 1.1
+          default: 2.2
+          description: float with default if "2.2"
+        integerArray:
+          type: integer[]
+          description: A list of integers
+/any-body:
+  post:
+    body: 
+      application/json:
+        type: any
+        description: Whatever you want to put there, just do it.
+        example: "An example of Any body" 
+        displayName: This is ANY
+        default: "(empty)"
+/a-file-body:
+  post:
+    body: 
+      image/*:
+        type: file
+        fileTypes: ['image/jpeg', 'image/png']
+        maxLength: 307200
+        displayName: The image
+        description: Allows to upload any image.
+/a-scalar-body:
+  post:
+    body: 
+      text/plain:
+        type: string
+        description: Generally some fine description
+        default: "To be updated soon"
+        minLength: 3
+        maxLength: 1024
+/an-union-body:
+  post:
+    body: 
+      application/json:
+        type: AppPerson|Product
+        description: Either product or a person.
+/raml-examples:
+  post:
+    body: 
+      application/json:
+        type: object
+        examples: !include examples/person.raml
+/date-formats:
+  post:
+    body: 
+      application/json:
+        properties: 
+          birthday:
+            type: date-only # no implications about time or offset
+            # example: 2015-05-23
+          lunchtime:
+            type: time-only # no implications about date or offset
+            # example: 12:30:00
+          fireworks:
+            type: datetime-only
+            # example: 2015-07-04T21:00:00
+          created:
+            type: datetime
+            # example: 2016-02-28T16:41:41.090Z
+            format: rfc3339
+          If-Modified-Since:
+            type: datetime
+            # example: Sun, 28 Feb 2016 16:41:41 GMT
+            format: rfc2616 
+            # rfc3339 or rfc2616
+/body-types:
+  /json:
+    post:
+      body: 
+        application/json:
+          type: AppPerson
+  /xml:
+    post:
+      body:
+        application/xml:
+          type: AppPerson
+  /form:
+    post:
+      body:
+        application/x-www-form-urlencoded:
+          type: AppPerson
+  /multi-parts:
+    post:
+      body:
+        multipart/form-data:
+          type: AppPerson
+/generated-example:
+  post:
+    body:
+      application/json:
+        type: DemoPerson
+      application/xml:
+        type: DemoPerson
+      application/x-www-form-urlencoded:
+        type: DemoPerson
+  put:
+    body:
+      application/json:
+        type: DemoPerson[]
+      application/xml:
+        type: DemoPerson[]
+      application/x-www-form-urlencoded:
+        type: DemoPerson[]
+/demo-types:
+  post:
+    body: 
+      application/json:
+        type: DemoTypes.Pet
+    responses: 
+      200:
+        body: 
+          application/json:
+            type: DemoTypes.Dog | DemoTypes.Cat
+/raml-and-union:
+  post:
+    body: 
+      application/json:
+        type: [DemoTypes.Mamal, DemoTypes.Pet]
+/raml-and-or-union:
+  post:
+    body: 
+      application/json:
+        type: [DemoTypes.Mamal, DemoTypes.Pet | DemoTypes.Cat]
+/body-with-enums:
+  post:
+    body: 
+      application/json:
+        type: object
+        properties: 
+          anEnum:
+            type: string
+            default: Some value
+            description: A combo of all string properties
+            displayName: Combo (string)
+            enum: 
+              - value 1
+              - value 2
+              - value 3
+              - value 4
+              - value 5
+              - value 6
+              - value 7
+              - value 8
+              - value 9
+              - value 10

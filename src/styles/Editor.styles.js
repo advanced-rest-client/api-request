@@ -113,4 +113,9 @@ authorization-panel {
 .auth-selector {
   margin: 12px 0;
 }
+
+.payload-mime-selector {
+  display: flex;
+  align-items: center;
+}
 `;

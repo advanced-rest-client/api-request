@@ -25,3 +25,28 @@ To maximize the compatibility with 0.2.0 use the following configuration:
 
 The editor has a new boolean property `globalCache`. Once set it instruct the caching mechanism to cache user input in memory. The cached values are kept in memory even when API spec change.
 Use the `src/lib/InputCache.js` class to manipulate the cache programmatically when needed.
+
+### Request editor
+
+#### Refactor
+
+- `serializeRequest()` -> `serialize()`
+
+### Body editor
+
+The body editor has been re-created from scratch. The new editor uses monaco editor to render the body input.
+This requires loading monaco environment before the editor is rendered and activated.
+
+Use the `MonacoLoader` class from the `@advanced-rest-client/monaco-support` package to load the editor with the required dependencies.
+
+```javascript
+import { MonacoLoader } from '@advanced-rest-client/monaco-support';
+
+// the base path from the current location to the editor location.
+const base = `../node_modules/monaco-editor/`;
+MonacoLoader.createEnvironment(base); // creates an environment to load the dependencies
+await MonacoLoader.loadMonaco(base); // initializes the monaco editor.
+await MonacoLoader.monacoReady(); // waits until all libraries are loaded.
+```
+
+Note, Monaco does not support encapsulation. Once loaded a global `Monaco` variable is created.

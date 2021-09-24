@@ -1,0 +1,44 @@
+#%RAML 1.0 Library
+
+types:
+  AppPeson: !include ../resourceTypes/app-person.raml
+  BaseResource:
+    description: |
+      API resource.
+    type: object
+    properties:
+      etag:
+        type: string
+        description: |
+          ETag of this resource for caching purposes.
+          __This property will be ignored when creating an object.__
+  Pet:
+    type: BaseResource
+    properties: 
+      type:
+        type: string
+        description: The object type for child classes.
+      name:
+        type: string
+        description: The name of the pet.
+      sound:
+        type: string
+        description: The sound it makes.
+    discriminatorValue: type
+  Dog:
+    type: Pet
+    properties: 
+      type:
+        default: Dog
+      sound:
+        default: Woof
+      friendly: boolean
+  Cat:
+    type: Pet
+    properties: 
+      type:
+        default: Cat
+  Mamal:
+    type: object
+    properties: 
+      birthDate: date-only

@@ -1,5 +1,6 @@
 import { html } from 'lit-html';
 import { ApiDemoPage } from '@advanced-rest-client/arc-demo-helper';
+import { MonacoLoader } from '@advanced-rest-client/monaco-support';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
@@ -46,6 +47,14 @@ class ComponentDemo extends ApiDemoPage {
     this._responseReady = this._responseReady.bind(this);
     this._apiRequestHandler = this._apiRequestHandler.bind(this);
     this.redirectUri = `${window.location.origin}/node_modules/@advanced-rest-client/oauth-authorization/oauth-popup.html`;
+    this.loadMonaco();
+  }
+
+  async loadMonaco() {
+    const base = `../node_modules/monaco-editor/`;
+    MonacoLoader.createEnvironment(base);
+    await MonacoLoader.loadMonaco(base);
+    await MonacoLoader.monacoReady();
   }
 
   _demoStateHandler(e) {

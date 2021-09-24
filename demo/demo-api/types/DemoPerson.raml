@@ -1,0 +1,67 @@
+#%RAML 1.0 DataType
+
+displayName: Person
+description: |
+  A person but without examples defined inline.
+
+type: object
+
+properties:
+  id:
+    xml:
+      attribute: true
+    description: A unique identifier for a person. It is a 32 bit string containing alphanumeric characters.
+    type: string
+    example: ad3fd6d4-af89-11eb-8529-0242ac130003
+  name:
+    required: true
+    example: John Smith
+    description: Person full name. The input will be rejected if this property is not set while creating new object.
+    type: string
+    pattern: "[0-9a-zA-Z ]+"
+    xml:
+      attribute: true
+      name: fullname
+  birthday:
+    type: date-only
+    description: The person's date of birth, represented as YYYY-MM-DD.
+    examples:
+      Example 1: 1983-10-20
+      Example 2: 1994-08-29
+  gender?:
+    type: string
+    description: |
+      The person's gender. Possible values includes, but are not limited to, the following values:
+      * "male" - Male gender.
+      * "female" - Female gender.
+      * "other" - Other.
+    example: male
+  url:
+    type: string
+    description: The URL of this person's profile.
+  image: 
+    type: !include ../resourceTypes/image.raml
+    xml:
+      wrapped: true
+  tagline:
+    type: string
+    description: The brief description (tagline) of this person.
+  language:
+    type: string
+    description: The user's preferred language for rendering.
+    example: "Polish"
+  tags:
+    description: Tags added to the person.
+    type: array
+    items: 
+      properties:
+        name: 
+          type: string
+          description: The name of the tag
+          example: Manager
+        id:
+          type: string
+          description: Tag's identifier.
+          example: ad3fda8a-af89-11eb-8529-0242ac130003
+      xml:
+        wrapped: false

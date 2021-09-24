@@ -27,10 +27,17 @@ import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.j
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
-// import '@api-components/api-body-editor/api-body-editor.js';
+import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-button.js';
+import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-group.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@api-components/api-server-selector/api-server-selector.js';
+import '@advanced-rest-client/body-editor/body-formdata-editor.js';
+import '@advanced-rest-client/body-editor/body-multipart-editor.js';
+import '@advanced-rest-client/body-editor/body-raw-editor.js';
+import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
+import { cachePayloadValue, getPayloadValue, readCachePayloadValue } from "../lib/PayloadUtils.js";
+import { ensureContentType } from "../lib/Utils.js";
 import '../../api-authorization-editor.js'
 import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 
@@ -38,10 +45,15 @@ import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
 /** @typedef {import('@advanced-rest-client/arc-types').FormTypes.FormItem} FormItem */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.ArcBaseRequest} ArcBaseRequest */
+/** @typedef {import('@advanced-rest-client/arc-types').ApiTypes.ApiType} ApiType */
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
+/** @typedef {import('@advanced-rest-client/body-editor').BodyRawEditorElement} BodyRawEditorElement */
+/** @typedef {import('@advanced-rest-client/body-editor').BodyFormdataEditorElement} BodyFormdataEditorElement */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiPayload} ApiPayload */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
+/** @typedef {import('@anypoint-web-components/anypoint-radio-button/index').AnypointRadioGroupElement} AnypointRadioGroupElement */
 /** @typedef {import('../elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
 /** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('../types').PopulationInfo} PopulationInfo */
@@ -53,9 +65,17 @@ export const operationValue = Symbol('currentModel');
 export const processSecurity = Symbol('processSecurity');
 export const securityList = Symbol('securityList');
 export const authSelectorHandler = Symbol('authSelectorHandler');
+export const mediaTypeSelectHandler = Symbol('mediaTypeSelectHandler');
+export const modelBodyEditorChangeHandler = Symbol('modelBodyEditorChangeHandler');
+export const rawBodyChangeHandler = Symbol('rawBodyChangeHandler');
 export const authorizationTemplate = Symbol('authorizationTemplate');
 export const authorizationSelectorTemplate = Symbol('authorizationSelectorTemplate');
 export const authorizationSelectorItemTemplate = Symbol('authorizationSelectorItemTemplate');
+export const mediaTypeSelectorTemplate = Symbol('mediaTypeSelectorTemplate');
+export const bodyTemplate = Symbol('bodyTemplate');
+export const formDataEditorTemplate = Symbol('formDataEditorTemplate');
+export const multipartEditorTemplate = Symbol('multipartEditorTemplate');
+export const rawEditorTemplate = Symbol('rawEditorTemplate');
 
 export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
   get styles() {
@@ -67,6 +87,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   static get properties() {
     return {
+      /** 
+       * The currently selected media type for the payloads.
+       */
+      mimeType: { type: String, reflect: true, },
       /**
        * An `@id` of selected AMF shape. When changed it computes
        * method model for the selection.
@@ -164,11 +188,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
        * Headers for the request.
        */
       _headers: { type: String },
-      /**
-       * Body for the request. The type of the body depends on
-       * defined in the API media type.
-       */
-      _payload: { type: String },
       /**
        * Final request URL including settings like `baseUri`, AMF
        * model settings and user provided parameters.
@@ -310,10 +329,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   get headers() {
     return this._headers;
-  }
-
-  get payload() {
-    return this._payload;
   }
 
   get contentType() {
@@ -475,6 +490,45 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   }
 
   /**
+   * @returns {ApiPayload|undefined} The currently rendered payload, if any.
+   */
+  get payload() {
+    const { payloads } = this;
+    if (!payloads) {
+      return undefined;
+    }
+    const { mimeType } = this;
+    /** @type ApiPayload */
+    let payload;
+    if (mimeType) {
+      payload = payloads.find(i => i.mediaType === mimeType);
+    }
+    if (!payload) {
+      [payload] = payloads;
+    }
+    return payload;
+  }
+
+  /**
+   * @returns {ApiPayload[]|undefined} The list of all possible payloads for this operation.
+   */
+  get payloads() {
+    const operation = this[operationValue];
+    if (!operation) {
+      return undefined;
+    }
+    const { request } = operation;
+    if (!request) {
+      return undefined;
+    }
+    const { payloads } = request;
+    if (!Array.isArray(payloads) || !payloads.length) {
+      return undefined;
+    }
+    return payloads;
+  }
+
+  /**
    * @constructor
    */
   constructor() {
@@ -531,6 +585,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.applyAuthorization = undefined;
     /** @type boolean */
     this.globalCache = undefined;
+    /** @type string */
+    this.mimeType = undefined;
   }
 
   _attachListeners(node) {
@@ -608,24 +664,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     return e;
   }
 
-  /**
-   * Clears the request properties.
-   */
-  clearRequest() {
-    this.url = '';
-    this._headers = '';
-    this._headerContentType = '';
-    this._bodyContentType = '';
-    this._payload = '';
-    this.dispatchEvent(new CustomEvent('requestclearstate'));
-    TelemetryEvents.event(this, {
-      category: EventCategory,
-      action: 'Clear request',
-    });
-  }
-
   reset() {
     this[securityList] = undefined;
+    this.mimeType = undefined;
   }
 
   _selectedChanged() {
@@ -658,6 +699,36 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const { security } = operation;
     this[securityList] = SecurityProcessor.readSecurityList(security);
     this.selectedSecurity = 0;
+  }
+
+  /**
+   * A handler for the change event dispatched by the `raw` editor.
+   * @param {Event} e
+   */
+  [rawBodyChangeHandler](e) {
+    const editor = /** @type BodyRawEditorElement */ (e.target);
+    const { value, dataset } = editor;
+    const { payloadId } = dataset;
+    if (!payloadId) {
+      return;
+    }
+    cachePayloadValue(payloadId, value);
+  }
+
+  /**
+   * A handler for the change event dispatched by the 
+   * `urlEncode` editor.
+   * Updated the local value, model, and notifies the change.
+   * @param {Event} e
+   */
+  [modelBodyEditorChangeHandler](e) {
+    const editor = /** @type BodyFormdataEditorElement */ (e.target);
+    const { value, model, dataset } = editor;
+    const { payloadId } = dataset;
+    if (!payloadId) {
+      return;
+    }
+    cachePayloadValue(payloadId, value, model);
   }
 
   /**
@@ -789,7 +860,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    */
   execute() {
     this._loadingRequest = true;
-    const request = this.serializeRequest();
+    const request = this.serialize();
     const uuid = v4();
     this._requestId = uuid;
     request.id = uuid;
@@ -851,30 +922,46 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    *
    * @return {ApiConsoleRequest}
    */
-  serializeRequest() {
-    const method = (this.httpMethod || 'get').toUpperCase();
-    const result = /** @type ApiConsoleRequest */ ({
+  serialize() {
+    const op = this[operationValue];
+    if (!op) {
+      throw new Error(`No API is operation defined on the editor`);
+    }
+    const method = (op.method || 'get').toUpperCase();
+    const request = /** @type ApiConsoleRequest */ ({
       method,
       url: this.url,
       headers: this._ensureContentTypeInHeaders(this.headers) || '',
     });
 
-    if (['GET', 'HEAD'].indexOf(result.method) === -1) {
-      const payload = this._payload
-      if (payload instanceof FormData) {
-        result.headers = /** @type string */ (HeadersParser.replace(result.headers, 'content-type', null));
+    if (!['GET', 'HEAD'].includes(method)) {
+      /** @type any */
+      let body;
+      const { payload } = this;
+      if (payload) {
+        const info = readCachePayloadValue(payload.id);
+        if (info && info.value) {
+          body = info.value;
+        }
       }
-      result.payload = this._payload;
+      if (body instanceof FormData) {
+        request.headers = /** @type string */ (HeadersParser.replace(request.headers, 'content-type', null));
+      } else if (payload) {
+        request.headers = ensureContentType(request.headers, payload.mediaType);
+      }
+      if (typeof body !== 'undefined') {
+        request.payload = body;
+      }
     }
     const authElement = this.shadowRoot.querySelector('api-authorization-editor');
     if (authElement) {
       const auth = authElement.serialize();
-      result.authorization = auth;
+      request.authorization = auth;
       if (this.applyAuthorization) {
-        SecurityProcessor.applyAuthorization(result, auth);
+        SecurityProcessor.applyAuthorization(request, auth);
       }
     }
-    return result;
+    return request;
   }
 
   /**
@@ -1060,10 +1147,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this._headerContentType = HeadersParser.contentType(value);
   }
 
-  _payloadHandler(e) {
-    this._payload = e.detail.value;
-  }
-
   _bodyContentTypeHandler(e) {
     this._bodyContentType = e.detail.value;
     this._headers = HeadersParser.replace(this._headers, 'content-type', e.detail.value);
@@ -1132,6 +1215,16 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   }
 
   /**
+   * @param {Event} e
+   */
+  [mediaTypeSelectHandler](e) {
+    const select = /** @type AnypointRadioGroupElement */ (e.target);
+    const { selected } = select;
+    const mime = String(selected);
+    this.mimeType = mime;
+  }
+
+  /**
    * Given a headers string, if it does not contain a Content-Type header,
    * set it manually and return the computed headers string.
    * @param {String} headersString 
@@ -1140,8 +1233,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _ensureContentTypeInHeaders(headersString) {
     const headersArray = HeadersParser.toJSON(headersString);
     const hasContentTypeHeader = headersArray.find((value) => value.name.toLowerCase() === 'content-type');
-    if (!hasContentTypeHeader && this.contentType) {
-      headersArray.push({ name: 'content-type', value: this.contentType, enabled: true });
+    if (!hasContentTypeHeader && this.mimeType) {
+      headersArray.push({ name: 'content-type', value: this.mimeType, enabled: true });
       return HeadersParser.toString(headersArray);
     }
     return HeadersParser.toString(headersString);
@@ -1156,7 +1249,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       ${this._urlLabelTemplate()}
       ${this._paramsEditorTemplate()}
       ${this._headersEditorTemplate()}
-      ${this._bodyEditorTemplate()}
+      ${this[mediaTypeSelectorTemplate]()}
+      ${this[bodyTemplate]()}
       ${this[authorizationTemplate]()}
       ${this._formActionsTemplate()}
     </div>`;
@@ -1268,44 +1362,43 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     </div>`;
   }
 
-  _bodyEditorTemplate() {
-    if (!this._isPayloadRequest || !this._apiPayload) {
-      return '';
-    }
-    const {
-      _apiPayload,
-      eventsTarget,
-      amf,
-      allowCustom,
-      readOnly,
-      disabled,
-      outlined,
-      compatibility,
-      contentType,
-      allowDisableParams,
-      allowHideOptional,
-    } = this;
+  // _bodyEditorTemplate() {
+  //   if (!this._isPayloadRequest || !this._apiPayload) {
+  //     return '';
+  //   }
+  //   const {
+  //     _apiPayload,
+  //     eventsTarget,
+  //     amf,
+  //     allowCustom,
+  //     readOnly,
+  //     disabled,
+  //     outlined,
+  //     compatibility,
+  //     contentType,
+  //     allowDisableParams,
+  //     allowHideOptional,
+  //   } = this;
 
-    return html`<div class="editor-section">
-      <div role="heading" aria-level="2" class="section-title">Body</div>
-      <api-body-editor
-        @value-changed="${this._payloadHandler}"
-        @content-type-changed="${this._bodyContentTypeHandler}"
-        .eventsTarget="${eventsTarget}"
-        .amf="${amf}"
-        .amfBody="${_apiPayload}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
-        ?outlined="${outlined}"
-        ?compatibility="${compatibility}"
-        .contentType="${contentType}"
-        ?allowCustom="${allowCustom}"
-        ?allowDisableParams="${allowDisableParams}"
-        ?allowHideOptional="${allowHideOptional}"
-        lineNumbers
-      ></api-body-editor>
-    </div>`;
-  }
+  //   return html`<div class="editor-section">
+  //     <div role="heading" aria-level="2" class="section-title">Body</div>
+  //     <api-body-editor
+  //       @content-type-changed="${this._bodyContentTypeHandler}"
+  //       .eventsTarget="${eventsTarget}"
+  //       .amf="${amf}"
+  //       .amfBody="${_apiPayload}"
+  //       .readOnly="${readOnly}"
+  //       .disabled="${disabled}"
+  //       ?outlined="${outlined}"
+  //       ?compatibility="${compatibility}"
+  //       .contentType="${contentType}"
+  //       ?allowCustom="${allowCustom}"
+  //       ?allowDisableParams="${allowDisableParams}"
+  //       ?allowHideOptional="${allowHideOptional}"
+  //       lineNumbers
+  //     ></api-body-editor>
+  //   </div>`;
+  // }
 
   [authorizationTemplate]() {
     const { security } = this;
@@ -1452,5 +1545,112 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-server-selector>`;
+  }
+
+  /**
+   * @return {TemplateResult|string} The template for the payload's mime type selector.
+   */
+  [mediaTypeSelectorTemplate]() {
+    const { payloads, mimeType } = this;
+    if (!payloads || payloads.length === 1) {
+      return '';
+    }
+    const mimes = payloads.map(p => p.mediaType);
+    let index = mimes.indexOf(mimeType);
+    if (index === -1) {
+      index = 0;
+    }
+
+    return html`
+    <div class="payload-mime-selector">
+      <label>Payload media type</label>
+      <anypoint-radio-group 
+        @selected="${this[mediaTypeSelectHandler]}" 
+        .selected="${index}"
+        attrForSelected="data-value" 
+      >
+        ${mimes.map((item) => html`<anypoint-radio-button name="mediaTypeValue" data-value="${item}">${item}</anypoint-radio-button>`)}
+      </anypoint-radio-group>
+    </div>
+    `;
+  }
+
+  /**
+   * @returns {TemplateResult|string} The template for the body editor. 
+   */
+  [bodyTemplate]() {
+    const { payload } = this;
+    if (!payload) {
+      return '';
+    }
+    const mimeType = payload.mediaType;
+    const info = getPayloadValue(payload);
+    if (mimeType === 'application/x-www-form-urlencoded') {
+      return this[formDataEditorTemplate](info, payload.id);
+    }
+    if (mimeType === 'multipart/form-data') {
+      return this[multipartEditorTemplate](info, payload.id);
+    }
+    return this[rawEditorTemplate](info, payload.id, mimeType);
+  }
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @returns {TemplateResult} The template for the editor that specializes in the URL encoded form data
+   */
+  [formDataEditorTemplate](info, id) {
+    const editorModel = /** @type ApiType[] */ (info.model);
+    const effectiveValue = Array.isArray(editorModel) && editorModel.length ? undefined : info.value;
+    return html`
+    <body-formdata-editor 
+      autoEncode
+      .value="${ifProperty(effectiveValue)}"
+      .model="${ifProperty(editorModel)}"
+      data-payload-id="${id}"
+      @change="${this[modelBodyEditorChangeHandler]}"
+    ></body-formdata-editor>
+    `;
+  }
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @returns {TemplateResult} The template for the editor that specializes in the multipart form data
+   */
+  [multipartEditorTemplate](info, id) {
+    const editorModel = /** @type ApiType[] */ (info.model);
+    const effectiveValue = Array.isArray(editorModel) && editorModel.length ? undefined : info.value;
+    return html`
+    <body-multipart-editor 
+      .value="${ifProperty(effectiveValue)}"
+      .model="${ifProperty(editorModel)}"
+      ignoreContentType
+      data-payload-id="${id}"
+      @change="${this[modelBodyEditorChangeHandler]}"
+    ></body-multipart-editor>
+    `;
+  }
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @param {string} mimeType
+   * @returns {TemplateResult} The template for the editor that specializes in any text data
+   */
+  [rawEditorTemplate](info, id, mimeType) {
+    let schemas;
+    if (Array.isArray(info.schemas) && info.schemas.length) {
+      schemas = info.schemas;
+    }
+    return html`
+    <body-raw-editor 
+      .value="${info.value}" 
+      .contentType="${mimeType}"
+      .schemas="${ifProperty(schemas)}"
+      data-payload-id="${id}"
+      @change="${this[rawBodyChangeHandler]}"
+    ></body-raw-editor>
+    `;
   }
 }

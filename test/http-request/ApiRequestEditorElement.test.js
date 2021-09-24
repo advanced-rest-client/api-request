@@ -4,6 +4,7 @@ import * as sinon from 'sinon';
 import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
+import { loadMonaco } from '../MonacoSetup.js';
 
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
 /** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
@@ -14,6 +15,7 @@ describe('ApiRequestEditorElement', () => {
   /** @type AmfLoader */
   let store;
   before(async () => {
+    await loadMonaco();
     store = new AmfLoader();
   });
 
@@ -230,31 +232,6 @@ describe('ApiRequestEditorElement', () => {
     it('Event has detail', () => {
       const e = element._dispatch(eName, eDetail);
       assert.equal(e.detail, eDetail);
-    });
-  });
-
-  describe('clearRequest()', () => {
-    let element = /** @type ApiRequestEditorElement */ (null);
-    beforeEach(async () => {
-      element = await basicFixture();
-      element.url = 'https://api.com';
-      element._headers = 'x-test: true';
-      element._payload = 'test-payload';
-    });
-
-    it('Clears the URL', () => {
-      element.clearRequest();
-      assert.equal(element.url, '');
-    });
-
-    it('Clears headers', () => {
-      element.clearRequest();
-      assert.equal(element.headers, '');
-    });
-
-    it('Clears payload', () => {
-      element.clearRequest();
-      assert.equal(element.payload, '');
     });
   });
 
@@ -554,8 +531,8 @@ describe('ApiRequestEditorElement', () => {
           assert.typeOf(element.requestId, 'string');
         });
 
-        it('Calls serializeRequest()', () => {
-          const spy = sinon.spy(element, 'serializeRequest');
+        it('Calls serialize()', () => {
+          const spy = sinon.spy(element, 'serialize');
           element.execute();
           assert.isTrue(spy.called);
         });
@@ -575,7 +552,7 @@ describe('ApiRequestEditorElement', () => {
         it('_dispatch() is called with serialized request', () => {
           const spy = sinon.spy(element, '_dispatch');
           element.execute();
-          const compare = element.serializeRequest();
+          const compare = element.serialize();
           compare.id = element.requestId;
           assert.deepEqual(spy.args[0][1], compare);
         });
@@ -629,7 +606,7 @@ describe('ApiRequestEditorElement', () => {
         });
       });
 
-      describe('serializeRequest()', () => {
+      describe('serialize()', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
@@ -640,33 +617,33 @@ describe('ApiRequestEditorElement', () => {
           clearCache();
         });
 
-        it('Returns an object', async () => {
+        it('returns an object', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.typeOf(result, 'object');
         });
 
-        it('Sets editor url', async () => {
+        it('sets editor url', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
           await nextFrame();
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.equal(result.url, 'http://production.domain.com/people');
         });
 
-        it('Sets editor method', async () => {
+        it('sets editor method', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.equal(result.method, 'GET');
         });
 
-        it('Sets headers from the editor', async () => {
+        it('sets headers from the editor', async () => {
           const method = store.lookupOperation(model, '/post-headers', 'post');
           const element = await modelFixture(model, method['@id']);
           await aTimeout(10);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.equal(result.headers, 'x-string: my-value\ncontent-type: application/json');
         });
 
@@ -674,16 +651,18 @@ describe('ApiRequestEditorElement', () => {
           const method = store.lookupOperation(model, '/people', 'post');
           const element = await modelFixture(model, method['@id']);
           await aTimeout(0);
-          const result = element.serializeRequest();
-          assert.ok(result.payload);
-          assert.equal(result.payload, element.payload);
+          const result = element.serialize();
+          assert.typeOf(result.payload, 'string', 'has the payload');
+          const body = JSON.parse(String(result.payload));
+          // just any value, it's not important here.
+          assert.equal(body.etag, '', 'has payload values');
         });
 
         it('sets auth data', async () => {
           const method = store.lookupOperation(model, '/people/{personId}', 'get');
           const element = await modelFixture(model, method['@id']);
           await aTimeout(0);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.typeOf(result.authorization, 'array');
           assert.lengthOf(result.authorization, 1);
           assert.equal(result.authorization[0].type, 'custom');
@@ -696,7 +675,7 @@ describe('ApiRequestEditorElement', () => {
           const getMethod = store.lookupOperation(model, '/people', 'get');
           element.selected = getMethod['@id'];
           await aTimeout(0);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.isUndefined(result.payload);
         });
 
@@ -707,15 +686,15 @@ describe('ApiRequestEditorElement', () => {
           const getMethod = store.lookupOperation(model, '/people', 'head');
           element.selected = getMethod['@id'];
           await aTimeout(0);
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.isUndefined(result.payload);
         });
 
         it('sets Content-Type header if not present but set in component', async () => {
-          const element = await basicFixture();
-          element._headerContentType = 'application/json';
+          const method = store.lookupOperation(model, '/people', 'post');
+          const element = await modelFixture(model, method['@id']);
           element._headers = '';
-          const result = element.serializeRequest();
+          const result = element.serialize();
           assert.equal(result.headers, 'content-type: application/json');
         });
       });
@@ -1013,31 +992,6 @@ describe('ApiRequestEditorElement', () => {
           assert.lengthOf(element.servers, 2);
         });
       });
-    });
-  });
-
-  describe('serializeRequest()', () => {
-    let element = /** @type ApiRequestEditorElement */ (null);
-    beforeEach(async () => {
-      element = await basicFixture();
-      element._httpMethod = 'POST';
-      element.url = 'some-url';
-    });
-
-    it('should remove multipart content type if form data payload', () => {
-      element._headers = 'content-type: multipart/form-data';
-      element._payload = new FormData()
-      const request = element.serializeRequest()
-
-      assert.equal(request.headers, '');
-    });
-
-    it('should not modify headers if content type not defined and form data payload', () => {
-      element._headers = '';
-      element._payload = new FormData()
-      const request = element.serializeRequest()
-
-      assert.equal(request.headers, '');
     });
   });
 
