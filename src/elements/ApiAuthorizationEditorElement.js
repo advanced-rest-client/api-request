@@ -106,6 +106,10 @@ export default class ApiAuthorizationEditorElement extends LitElement {
        * Enabled compatibility with the Anypoint platform.
        */
       compatibility: { type: Boolean, reflect: true },
+      /** 
+       * Enabled Material Design outlined theme
+       */
+      outlined: { type: Boolean, reflect: true },
       /**
        * By default the element stores user input in a map that is associated with the specific
        * instance of this element. This way the element can be used multiple times in the same document.
@@ -146,6 +150,8 @@ export default class ApiAuthorizationEditorElement extends LitElement {
     this.credentialsSource = undefined;
     /** @type boolean */
     this.compatibility = undefined;
+    /** @type boolean */
+    this.outlined = undefined;
     /** @type {boolean} */
     this.globalCache = undefined;
     /** @type {SecurityMethods} */
@@ -372,12 +378,13 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [basicAuthTemplate](security) {
-    const { compatibility, amf, globalCache } = this;
+    const { compatibility, outlined, amf, globalCache } = this;
     return html`
     ${this[methodTitleTemplate](security)}
     <api-authorization-method
       .amf="${amf}"
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       type="basic"
       @change="${this[changeHandler]}"
@@ -394,6 +401,7 @@ export default class ApiAuthorizationEditorElement extends LitElement {
   [digestAuthTemplate](security, renderTitle) {
     const {
       compatibility,
+      outlined,
       httpMethod,
       requestUrl,
       requestBody,
@@ -404,6 +412,7 @@ export default class ApiAuthorizationEditorElement extends LitElement {
     ${renderTitle ? this[methodTitleTemplate](security) : ''}
     <api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       .amf="${amf}"
       .httpMethod="${httpMethod}"
@@ -422,11 +431,12 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [passThroughAuthTemplate](security, renderTitle) {
-    const { compatibility, amf, globalCache, } = this;
+    const { compatibility, outlined, amf, globalCache, } = this;
     return html`
     ${renderTitle ? this[methodTitleTemplate](security) : ''}
     <api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       .amf="${amf}"
       .security="${security}"
@@ -442,9 +452,10 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [ramlCustomAuthTemplate](security) {
-    const { compatibility, amf, globalCache, } = this;
+    const { compatibility, outlined, amf, globalCache, } = this;
     return html`<api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       .amf="${amf}"
       .security="${security}"
@@ -461,11 +472,12 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [bearerAuthTemplate](security, renderTitle) {
-    const { compatibility, amf, globalCache, } = this;
+    const { compatibility, outlined, amf, globalCache, } = this;
     return html`
     ${renderTitle ? this[methodTitleTemplate](security) : ''}
     <api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       type="bearer"
       .amf="${amf}"
@@ -482,11 +494,12 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [oa1AuthTemplate](security, renderTitle) {
-    const { compatibility, oauth2RedirectUri, amf, globalCache, } = this;
+    const { compatibility, outlined, oauth2RedirectUri, amf, globalCache, } = this;
     return html`
     ${renderTitle ? this[methodTitleTemplate](security) : ''}
     <api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       type="oauth 1"
       .redirectUri="${oauth2RedirectUri}"
@@ -505,6 +518,7 @@ export default class ApiAuthorizationEditorElement extends LitElement {
   [oa2AuthTemplate](security) {
     const {
       compatibility,
+      outlined,
       oauth2RedirectUri,
       credentialsSource,
       oauth2AuthorizationUri,
@@ -516,6 +530,7 @@ export default class ApiAuthorizationEditorElement extends LitElement {
     ${this[methodTitleTemplate](security)}
     <api-authorization-method
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       ?globalCache="${globalCache}"
       type="oauth 2"
       .redirectUri="${oauth2RedirectUri}"
@@ -535,12 +550,13 @@ export default class ApiAuthorizationEditorElement extends LitElement {
    * @return {TemplateResult}
    */
   [apiKeyTemplate](security) {
-    const { compatibility, amf, globalCache, } = this;
+    const { compatibility, outlined, amf, globalCache, } = this;
     return html`
     ${this[methodTitleTemplate](security)}
     <api-authorization-method
       ?globalCache="${globalCache}"
       ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
       type="api key"
       .amf="${amf}"
       .security="${security}"

@@ -79,6 +79,11 @@ export default class ApiAuthorizationEditorElement extends LitElement {
   * @attribute
   */
   compatibility: boolean;
+  /** 
+   * Enabled Material Design outlined theme
+   * @attribute
+   */
+  outlined: boolean;
   /**
   * By default the element stores user input in a map that is associated with the specific
   * instance of this element. This way the element can be used multiple times in the same document.

@@ -5,4 +5,5 @@ export { ApiRequestEditorElement } from './src/elements/ApiRequestEditorElement.
 export { default as ApiAuthorizationEditorElement } from './src/elements/ApiAuthorizationEditorElement.js';
 export { default as ApiAuthorizationMethodElement } from './src/elements/ApiAuthorizationMethodElement.js';
 export * from './src/events/EventTypes.js';
+export * from './src/events/RequestEvents.js';
 export * as InputCache from './src/lib/InputCache.js';

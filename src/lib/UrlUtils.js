@@ -4,21 +4,12 @@
 
 /**
  * Computes the URL value for the current serves, selected server, and endpoint's path.
- * @param {ApiEndPoint} endpoint
- * @param {ApiServer[]} servers
- * @param {string} serverId
+ * @param {ApiEndPoint} endpoint The current endpoint
+ * @param {ApiServer=} server The selected server definition. Optional.
  * @returns {string} The URL template value.
  */
- export function computeEndpointUrlValue(endpoint, servers, serverId) {
+ export function computeEndpointUrlValue(endpoint, server) {
   let result = '';
-  let server;
-  if (Array.isArray(servers) && servers.length) {
-    if (serverId) {
-      server = servers.find((item) => item.id === serverId);
-    } else {
-      [server] = servers;
-    }
-  }
   if (server) {
     result += server.url;
     if (result.endsWith('/')) {
@@ -82,6 +73,11 @@ export function applyUrlVariables(url, variables, encode) {
       return;
     }
     value = String(value);
+    if (value === '') {
+      // this is to leave the URL template value in the URL so the validators
+      // can report an error.
+      return;
+    }
     if (encode) {
       if (variable[0] === '+' || variable[0] === '#') {
         value = encodeURI(value);

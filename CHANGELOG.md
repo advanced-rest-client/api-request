@@ -32,6 +32,11 @@ Use the `src/lib/InputCache.js` class to manipulate the cache programmatically w
 
 - `serializeRequest()` -> `serialize()`
 
+#### Setting URL values (baseUri, protocols, server)
+
+With version `0.2.x` it was possible to set `server`, `baseUri`, and `protocols` properties so the component is able to compute the endpoint URL without having the `server` value read from the AMF graph model. This turned out to be a feature that is not used so it is removed in `0.3.0`. Use `baseUri` to override any value defined in the servers.
+Note, when `baseUri` is set it takes precedence over any other URI configuration (like a selected server).
+
 ### Body editor
 
 The body editor has been re-created from scratch. The new editor uses monaco editor to render the body input.
@@ -50,3 +55,33 @@ await MonacoLoader.monacoReady(); // waits until all libraries are loaded.
 ```
 
 Note, Monaco does not support encapsulation. Once loaded a global `Monaco` variable is created.
+
+### Events
+
+With this version the following events are deprecated:
+
+- ~~api-request~~
+- ~~abort-api-request~~
+- ~~api-response~~
+
+All DOM event types should be lowercase [a-z] names. This version dispatches both new and old events. The deprecated events will be removed in the future.
+
+Use the following evens instead:
+
+- `apirequest`
+- `apiabort`
+- `apiresponse`
+
+Also, use the `src/events/EventTypes.js` and `src/events/RequestEvents.js` definitions to dispatch or handle the events:
+
+```javascript
+import { EventTypes, RequestEvents } from '@api-components/api-request';
+
+// handle a request event
+window.addEventListener(EventTypes.Request.apiRequest, (e) => {
+  console.log(e.detail);
+});
+
+// dispatch the request event
+RequestEvents.apiRequest(window, { /* the request definition */ });
+```

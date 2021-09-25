@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable arrow-body-style */
 // eslint-disable-next-line no-unused-vars
@@ -61,6 +62,12 @@ const mxFunction = base => {
     }
 
     /**
+     * A function to be overwritten by child classes to execute an action when a parameter has changed.
+     * @param {string} key The key of the property that changed.
+     */
+    paramChanged(key) {}
+
+    /**
      * Clears previously set values in the cache storage.
      */
     clearCache() {
@@ -85,6 +92,7 @@ const mxFunction = base => {
       const items = /** @type any[] */ (InputCache.get(this.target, id, this.globalCache));
       items.push(undefined);
       this.requestUpdate();
+      this.paramChanged(id);
     }
 
     /**
@@ -135,6 +143,7 @@ const mxFunction = base => {
       const typed = ApiSchemaValues.parseUserInput(value, param.schema);
       InputCache.set(this.target, domainId, typed, this.globalCache, isArray === 'true', index ? Number(index) : undefined);
       this.notifyChange();
+      this.paramChanged(domainId);
     }
 
     /**
@@ -153,6 +162,7 @@ const mxFunction = base => {
       }
       InputCache.set(this.target, domainId, checked, this.globalCache, isArray === 'true', index ? Number(index) : undefined);
       this.notifyChange();
+      this.paramChanged(domainId);
     }
 
     /**
@@ -172,6 +182,7 @@ const mxFunction = base => {
       InputCache.remove(this.target, domainId, this.globalCache, index ? Number(index) : undefined);
       this.requestUpdate();
       this.notifyChange();
+      this.paramChanged(domainId);
     }
 
     /**
@@ -193,6 +204,7 @@ const mxFunction = base => {
       const typed = ApiSchemaValues.parseUserInput(value, param.schema);
       InputCache.set(this.target, domainId, typed, this.globalCache, isArray === 'true', index ? Number(index) : undefined);
       this.notifyChange();
+      this.paramChanged(domainId);
     }
 
     /**
@@ -217,6 +229,7 @@ const mxFunction = base => {
         this.requestUpdate();
       }
       this.notifyChange();
+      this.paramChanged(domainId);
     }
 
     /**
@@ -352,6 +365,8 @@ const mxFunction = base => {
           title="${ifDefined(title)}"
           @change="${this.paramChangeHandler}"
           ?disabled="${nillDisabled}"
+          ?compatibility="${this.compatibility || this.anypoint}"
+          ?outlined="${this.outlined}"
         >
           <label slot="label">${label}</label>
         </anypoint-input>
@@ -367,11 +382,11 @@ const mxFunction = base => {
      * @returns {TemplateResult} The template for the param remove button. 
      */
     deleteParamTemplate(paramId, arrayIndex) {
-      const { anypoint } = this;
+      const { compatibility, anypoint } = this;
       const title = 'Removes this parameter value.';
       return html`
       <anypoint-icon-button 
-        ?compatibility="${anypoint}" 
+        ?compatibility="${compatibility || anypoint}" 
         title="${title}" 
         data-domain-id="${paramId}"
         data-index="${ifDefined(arrayIndex)}"
@@ -390,7 +405,7 @@ const mxFunction = base => {
      * @returns {TemplateResult|string} The template for the enum input.
      */
     enumTemplate(parameter, schema, userOpts={}, opts={}) {
-      const { anypoint } = this;
+      const { compatibility, anypoint } = this;
       let required;
       if (typeof userOpts.required === 'boolean') {
         required = userOpts.required;
@@ -416,7 +431,8 @@ const mxFunction = base => {
           class="param-selector"
           name="${parameter.name || schema.name}"
           data-binding="${ifDefined(binding)}"
-          ?compatibility="${anypoint}"
+          ?outlined="${this.outlined}"
+          ?compatibility="${compatibility || anypoint}"
           ?required="${required}"
           title="${ifDefined(title)}"
           fitPositionTarget
@@ -428,11 +444,11 @@ const mxFunction = base => {
           <label slot="label">${label}</label>
           <anypoint-listbox
             slot="dropdown-content"
-            ?compatibility="${anypoint}"
+            ?compatibility="${compatibility || anypoint}"
             .selected="${selected}"
             @selected="${this.enumSelectionHandler}"
           >
-            ${enumValues.map((value) => html`<anypoint-item data-type="${value.dataType}" data-value="${value.value}">${value.value}</anypoint-item>`)}
+            ${enumValues.map((value) => html`<anypoint-item ?compatibility="${compatibility || anypoint}" data-type="${value.dataType}" data-value="${value.value}">${value.value}</anypoint-item>`)}
           </anypoint-listbox>
         </anypoint-dropdown-menu>
         ${opts.nillable ? this.nillInputTemplate(parameter) : ''}

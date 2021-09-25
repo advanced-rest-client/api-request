@@ -1,9 +1,12 @@
 {
   "cSpell.words": [
+    "apirequest",
+    "apiresponse",
     "apiserverchanged",
     "Applian",
     "cryptojslib",
     "customevent",
+    "Formdata",
     "httpbin",
     "jsrsasign",
     "microservice",

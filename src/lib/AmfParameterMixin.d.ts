@@ -46,6 +46,12 @@ export declare interface AmfParameterMixin {
   nilValues: string[];
 
   /**
+   * A function to be overwritten by child classes to execute an action when a parameter has changed.
+   * @param key The key of the property that changed.
+   */
+  paramChanged(key: string): void;
+
+  /**
    * Clears previously set values in the cache storage.
    */
   clearCache(): void;

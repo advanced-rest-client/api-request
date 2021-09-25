@@ -22,6 +22,10 @@ export default css`
   flex-direction: row;
 }
 
+:host([compatibility]) .form-item {
+  margin: 20px 0 28px 0;
+}
+
 .array-form-item {
   padding-left: 8px;
   border-left: 1px var(--http-request-array-section-border-color, rgba(0, 0, 0, 0.14)) solid;
@@ -37,6 +41,10 @@ export default css`
 .section-title {
   margin: 20px 8px 0px 8px;
   display: block;
+}
+
+:host([compatibility]) .section-title {
+  margin: 20px 8px 24px 8px;
 }
 
 arc-marked {

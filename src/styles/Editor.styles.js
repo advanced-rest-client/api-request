@@ -31,10 +31,6 @@ export default css`
   margin-left: 12px;
 }
 
-paper-spinner {
-  margin-right: 8px;
-}
-
 .action-bar {
   display: flex;
   flex-direction: row;
@@ -59,7 +55,7 @@ api-url-editor {
 
 .section-title {
   margin: var(--arc-font-subhead-margin, 0.83em 8px);
-  letter-spacing: var(--arc-font-subhead-letter-spacing, 0.1rem);
+  letter-spacing: var(--arc-font-subhead-letter-spacing, initial);
   font-size: var(--arc-font-subhead-font-size, 20px);
   font-weight: var(--arc-font-subhead-font-weight, 200);
   line-height: var(--arc-font-subhead-line-height);
@@ -69,19 +65,11 @@ api-url-editor {
   margin: 8px 0;
 }
 
-api-body-editor,
-api-headers-editor,
-api-url-params-editor,
-authorization-panel {
-  margin: 0;
-  padding: 0;
-}
-
 :host([compatibility]) .section-title {
   font-size: var(--anypoint-subhead-font-size, var(--arc-font-subhead-font-size, 18px));
   font-weight: var(--anypoint-subhead-font-weight, var(--arc-font-subhead-font-weight, 400));
   letter-spacing: var(--anypoint-subhead-letter-spacing, var(--arc-font-subhead-letter-spacing, initial));
-  margin: var(--anypoint-subhead-margin, var(--arc-font-subhead-margin, 0.83em 8px));
+  margin: var(--anypoint-subhead-margin, var(--arc-font-subhead-margin, 1em 8px));
   line-height: var(--anypoint-subhead-line-height, var(--arc-font-subhead-line-height));
 }
 
@@ -126,6 +114,10 @@ authorization-panel {
   flex-direction: row;
 }
 
+:host([compatibility]) .form-item {
+  margin: 20px 0 28px 0;
+}
+
 .array-form-item {
   padding-left: 8px;
   border-left: 1px var(--api-request-editor-array-section-border-color, rgba(0, 0, 0, 0.14)) solid;
@@ -134,5 +126,9 @@ authorization-panel {
 .api-server-selector, .param-selector, .form-input {
   flex: 1 1 0%;
   margin: 0px;
+}
+
+.hide-optional .optional {
+  display: none;
 }
 `;

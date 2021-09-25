@@ -34,6 +34,17 @@ export declare interface ApiConsoleResponse {
   loadingTime: number;
 }
 
+export declare interface AbortRequestEventDetail {
+  /**
+   * The URL of the request
+   */
+  url: string,
+  /**
+   * The id of the request.
+   */
+  id: string;
+}
+
 export declare interface ApiConsoleHTTPResponse {
   status: number;
   statusText?: string;
@@ -54,11 +65,36 @@ export declare interface PopulationInfo {
 }
 
 export interface OperationParameter {
+  /**
+   * Works with the `allowDisableParams` configuration. By default 
+   * a parameter is always enabled regardless of this value.
+   * When the `allowDisableParams` is set it uses this value to ignore some parameters (even the required ones).
+   */
+  enabled?: boolean;
+  /**
+   * The parameter definition transformed from the AMF graph model.
+   * This is set for path, query, and header parameters.
+   */
   parameter: ApiParameter;
+  /**
+   * The schema associated with the parameter. Determines the shape of the user input control.
+   */
   schema?: ApiShapeUnion;
+  /**
+   * Link to `parameter.id`.
+   */
   paramId: string;
+  /**
+   * Link to `schema.id`.
+   */
   schemaId?: string;
+  /**
+   * The value of the binding. Determines where the control should be rendered (parameters or headers).
+   */
   binding: string;
+  /**
+   * A property set to determine from where the object came from. Used internally in the code.
+   */
   source: string;
 }
 
@@ -82,4 +118,8 @@ export interface ParameterRenderOptions {
    * This also forces the renderer to force example value when default is not present.
    */
   required?: boolean;
+  /**
+   * Renders the toggle button to ignore the control.
+   */
+  allowDisable?: boolean;
 }
