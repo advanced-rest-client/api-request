@@ -1,3 +1,5 @@
+/* eslint-disable no-continue */
+/* eslint-disable no-plusplus */
 /* eslint-disable class-methods-use-this */
 /**
 @license
@@ -36,7 +38,7 @@ import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
 import { ensureContentType, generateHeaders } from "../lib/Utils.js";
 import { cachePayloadValue, getPayloadValue, readCachePayloadValue } from "../lib/PayloadUtils.js";
-import { applyUrlParameters, applyUrlVariables, computeEndpointUrlValue } from '../lib/UrlUtils.js';
+import { applyUrlParameters, applyUrlVariables, computeEndpointUrlValue, applyQueryParamStringToObject } from '../lib/UrlUtils.js';
 import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 import { AmfParameterMixin } from '../lib/AmfParameterMixin.js';
 import { AmfInputParser } from '../lib/AmfInputParser.js';
@@ -45,16 +47,12 @@ import { RequestEvents } from '../events/RequestEvents.js';
 import '../../api-authorization-editor.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
-/** @typedef {import('@advanced-rest-client/arc-types').FormTypes.AmfFormItem} AmfFormItem */
-/** @typedef {import('@advanced-rest-client/arc-types').FormTypes.FormItem} FormItem */
-/** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.ArcBaseRequest} ArcBaseRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ApiTypes.ApiType} ApiType */
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
 /** @typedef {import('@advanced-rest-client/body-editor').BodyRawEditorElement} BodyRawEditorElement */
 /** @typedef {import('@advanced-rest-client/body-editor').BodyFormdataEditorElement} BodyFormdataEditorElement */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiEndPoint} ApiEndPoint */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
-/** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityRequirement} ApiSecurityRequirement */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiPayload} ApiPayload */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParameter} ApiParameter */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
@@ -62,6 +60,7 @@ import '../../api-authorization-editor.js';
 /** @typedef {import('@api-components/amf-helper-mixin').ApiScalarShape} ApiScalarShape */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 /** @typedef {import('@anypoint-web-components/anypoint-radio-button/index').AnypointRadioGroupElement} AnypointRadioGroupElement */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 /** @typedef {import('../elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
 /** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('../types').PopulationInfo} PopulationInfo */
@@ -77,6 +76,7 @@ export const serializerValue = Symbol('serializerValue');
 export const loadingRequestValue = Symbol('loadingRequestValue');
 export const requestIdValue = Symbol('requestIdValue');
 export const baseUriValue = Symbol('baseUriValue');
+export const urlInvalidValue = Symbol('urlInvalidValue');
 export const serverLocalValue = Symbol('serverLocalValue');
 export const processOperation = Symbol('processOperation');
 export const processEndpoint = Symbol('processEndpoint');
@@ -91,6 +91,9 @@ export const computeMethodAmfModel = Symbol('computeMethodAmfModel');
 export const computeUrlValue = Symbol('computeUrlValue');
 export const collectReportParameters = Symbol('collectReportParameters');
 export const processSelection = Symbol('processSelection');
+export const getOrderedPathParams = Symbol('getOrderedPathParams');
+export const validateUrl = Symbol('validateUrl');
+export const readUrlValidity = Symbol('readUrlValidity');
 export const authSelectorHandler = Symbol('authSelectorHandler');
 export const mediaTypeSelectHandler = Symbol('mediaTypeSelectHandler');
 export const modelBodyEditorChangeHandler = Symbol('modelBodyEditorChangeHandler');
@@ -121,6 +124,12 @@ export const formActionsTemplate = Symbol('formActionsTemplate');
 export const abortButtonTemplate = Symbol('abortButtonTemplate');
 export const sendButtonTemplate = Symbol('sendButtonTemplate');
 export const addCustomButtonTemplate = Symbol('addCustomButtonTemplate');
+export const urlEditorTemplate = Symbol('urlEditorTemplate');
+export const urlEditorChangeHandler = Symbol('urlEditorChangeHandler');
+export const computeUrlRegexp = Symbol('computeUrlRegexp');
+export const urlSearchRegexpValue = Symbol('urlSearchRegexpValue');
+export const applyUriValues = Symbol('applyUriValues');
+export const applyQueryParamsValues = Symbol('applyQueryParamsValues');
 
 export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(EventsTargetMixin(LitElement))) {
   get styles() {
@@ -144,6 +153,10 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
        * When set it renders a label with the computed URL.
        */
       urlLabel: { type: Boolean },
+      /**
+       * When set it renders the URL input above the URL parameters.
+       */
+      urlEditor: { type: Boolean },
       /**
        * A base URI for the API. To be set if RAML spec is missing `baseUri`
        * declaration and this produces invalid URL input. This information
@@ -389,6 +402,30 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   }
 
   /**
+   * @returns {string|undefined} API defined base URI (current server + the endpoint)
+   */
+  get apiBaseUri() {
+    const endpoint = /** @type ApiEndPoint */ (this[endpointValue]);
+    const server = /** @type ApiServer */ (this[serverLocalValue]);
+    if (!server || !endpoint) {
+      return undefined;
+    }
+    const { path='' } = endpoint;
+    let { url='' } = server;
+    if (url.endsWith('/')) {
+      url = url.substr(0, url.length - 1);
+    }
+    return `${url}${path}`;
+  }
+
+  /**
+   * @returns {boolean} True when the URL input is invalid.
+   */
+  get urlInvalid() {
+    return this[urlInvalidValue];
+  }
+
+  /**
    * @constructor
    */
   constructor() {
@@ -396,14 +433,22 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this[responseHandler] = this[responseHandler].bind(this);
     this[authRedirectChangedHandler] = this[authRedirectChangedHandler].bind(this);
     this[populateAnnotatedFieldsHandler] = this[populateAnnotatedFieldsHandler].bind(this);
-
-    this.urlLabel = false;
-    this.outlined = false;
-    this.compatibility = false;
-    this.noServerSelector = false;
-    this.allowCustom = false;
-    this.allowHideOptional = false;
-    this.allowCustomBaseUri = false;
+    /** @type boolean */
+    this.urlLabel = undefined;
+    /** @type boolean */
+    this.urlEditor = undefined;
+    /** @type boolean */
+    this.outlined = undefined;
+    /** @type boolean */
+    this.compatibility = undefined;
+    /** @type boolean */
+    this.noServerSelector = undefined;
+    /** @type boolean */
+    this.allowCustom = undefined;
+    /** @type boolean */
+    this.allowHideOptional = undefined;
+    /** @type boolean */
+    this.allowCustomBaseUri = undefined;
     /** @type Oauth2Credentials[] */
     this.credentialsSource = undefined;
     this.selectedSecurity = 0;
@@ -461,7 +506,9 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   }
 
   // for the AmfParameterMixin
-  notifyChange() {  }
+  notifyChange() {
+    this.dispatchEvent(new Event('change'));
+  }
 
   /**
    * @param {EventTarget} node
@@ -507,6 +554,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    */
   paramChanged(key) {
     this[computeUrlValue]();
+    this[validateUrl]();
     const param = this.parametersValue.find(p => p.paramId === key);
     if (param && param.binding === 'header' && (param.parameter.name || '').toLocaleLowerCase() === 'content-type') {
       const value = InputCache.get(this, param.paramId, this.globalCache);
@@ -548,7 +596,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   /**
    * Checks if the current server has variables and update the parameters array
    */
-  async [updateServerParameters]() {
+  [updateServerParameters]() {
     const { server } = this;
     const source = 'server';
     // clears previously set request parameters related to server configuration.
@@ -576,7 +624,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   /**
    * Checks if the current endpoint has variables and requests them when needed.
    */
-  async [updateEndpointParameters]() {
+  [updateEndpointParameters]() {
     const source = 'endpoint';
     // clears previously set request parameters related to server configuration.
     this.parametersValue = this.parametersValue.filter(item => item.source !== source);
@@ -620,23 +668,30 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     }
     const operation = this[serializerValue].operation(model);
     this[operationValue] = operation;
+    this[processServers]();
     this[processEndpoint]();
     this[processOperation]();
     this[processSecurity]();
-    this[processServers]();
   }
 
   /**
    * Searches for the current operation endpoint and sets variables from the endpoint definition.
    */
   [processEndpoint]() {
-    const operation = this[operationValue];
-    const wa = this._computeWebApi(this.amf);
-    const model = this._computeMethodEndpoint(wa, operation.id);
-    const factory = new AmfSerializer(this.amf);
+    const { amf, selected } = this;
+    if (!selected) {
+      this[endpointValue] = undefined;
+      this[updateEndpointParameters]();
+      this[computeUrlRegexp]();
+      return;
+    }
+    const wa = this._computeWebApi(amf);
+    const model = this._computeMethodEndpoint(wa, this.selected);
+    const factory = new AmfSerializer(amf);
     const endpoint = factory.endPoint(model);
     this[endpointValue] = endpoint;
     this[updateEndpointParameters]();
+    this[computeUrlRegexp]();
   }
 
   /**
@@ -726,10 +781,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.selectedSecurity = Number(selected);
     this.requestUpdate();
   }
-
-  //
-  // Servers section (computing the list of servers, state change handles, etc.)
-  //
 
   /**
    * Computes the list of servers to be rendered by this operation.
@@ -996,6 +1047,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       this[serverLocalValue] = servers.find(server => server.url === serverValue);
     }
     this.readUrlData();
+    this[computeUrlRegexp]();
   }
 
   /**
@@ -1018,6 +1070,24 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.serverValue = value;
     this[updateServer]();
     this.readUrlData();
+  }
+
+  /**
+   * Computes a regexp for the base URI defined in the server to process URL input change
+   * and set the `[urlSearchRegexpValue]` value.
+   * This should be computed only when a server and en endpoint change.
+   */
+  [computeUrlRegexp]() {
+    let value = this.apiBaseUri;
+    if (!value) {
+      this[urlSearchRegexpValue] = undefined;
+    } else {
+      value = value.replace('?', '\\?');
+      value = value.replace(/(\.|\/)/g, '\\$1');
+      value = value.replace(/{[\w\\+]+}/g, '([a-zA-Z0-9\\$\\-_\\.~\\+!\'\\(\\)\\*\\{\\}]+)');
+      value += '.*';
+      this[urlSearchRegexpValue] = new RegExp(value);
+    }
   }
 
   /**
@@ -1082,12 +1152,156 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.requestUpdate();
   }
 
+  /**
+   * Updates path/query model from user input.
+   *
+   * @param {Event} e The change event
+   */
+  [urlEditorChangeHandler](e) {
+    const { value } = /** @type {HTMLInputElement} */ (e.target);
+    let matches;
+    const uriRegexp = this[urlSearchRegexpValue];
+    // parameters must be in order from server to the endpoint
+    const pathParams = this[getOrderedPathParams]();
+    let changed = false;
+    if (pathParams.length && uriRegexp) {
+      matches = value.match(uriRegexp);
+      if (matches) {
+        matches.shift();
+        changed = this[applyUriValues](matches, pathParams);
+      }
+    }
+    const matchesNew = value.match(/[^&?]*?=[^&?]*/g);
+    if (matchesNew) {
+      const params = /** @type Record<string, string|string[]> */ ({});
+      matchesNew.forEach((item) => applyQueryParamStringToObject(item, params));
+      const qpChanged = this[applyQueryParamsValues](params);
+      if (!changed) {
+        changed = qpChanged;
+      }
+    }
+    this.url = value;
+    this[validateUrl]();
+    this.notifyChange();
+    this.requestUpdate();
+  }
+
+  /**
+   * Sets the value of `[urlInvalidValue]` and therefore `urlInvalid` properties.
+   */
+  [validateUrl]() {
+    this[urlInvalidValue] = !this[readUrlValidity]();
+    this.requestUpdate();
+  }
+
+  /**
+   * Validates the current URL value.
+   * @returns {boolean} True when the current URL is a valid URL.
+   */
+  [readUrlValidity]() {
+    const { url } = this;
+    if (!url) {
+      return false;
+    }
+    if (typeof url !== 'string') {
+      return false;
+    }
+    if (url.indexOf('{') !== -1 && url.indexOf('}') !== -1) {
+      return false;
+    }
+    const inputElement = /** @type AnypointInput */ (this.shadowRoot.querySelector('.url-input'));
+    if (inputElement) {
+      return inputElement.validate();
+    }
+    return true;
+  }
+
+  /**
+   * Reads the ordered list of path parameters from the server and the endpoint.
+   * @returns {OperationParameter[]}
+   */
+  [getOrderedPathParams]() {
+    const result = /** @type OperationParameter[] */ [];
+    const { apiBaseUri } = this;
+    if (!apiBaseUri) {
+      return result;
+    }
+    const matches = apiBaseUri.match(/{[\w\\+]+}/g);
+    if (!matches) {
+      return result;
+    }
+    const all = this.parametersValue;
+    matches.forEach((tpl) => {
+      const name = tpl.substr(1, tpl.length - 2);
+      const param = all.find(p => p.binding === 'path' && p.parameter.name === name);
+      if (param) {
+        result.push(param);
+      }
+    });
+    return result;
+  }
+
+  /**
+   * Applies values from the `values` array to the uri parameters which names are in the `names` array.
+   * Both lists are ordered list of parameters.
+   *
+   * @param {string[]} values Values for the parameters
+   * @param {OperationParameter[]} params List of path parameters.
+   * @returns {boolean} True when any parameter was changed.
+   */
+  [applyUriValues](values, params) {
+    let changed = false;
+    for (let i = 0, len = params.length; i < len; i++) {
+      const value = values[i];
+      if (value && value[0] === '{') {
+        // This is still a variable
+        continue;
+      }
+      const param = params[i];
+      if (InputCache.get(this, param.paramId, this.globalCache) !== value) {
+        InputCache.set(this, param.paramId, value, this.globalCache);
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Applies query parameters values to the render list.
+   *
+   * @param {Record<string, string|string[]>} map
+   * @returns {boolean} True when any parameter was changed.
+   */
+  [applyQueryParamsValues](map) {
+    if (!map) {
+      return false;
+    }
+    const keys = Object.keys(map);
+    let changed = false;
+    keys.forEach((key) => {
+      const value = map[key];
+      if (value && value[0] === '{') {
+        // This is still a variable
+        return;
+      }
+      const param = this.parametersValue.find(p => p.binding === 'query' && p.parameter.name === key);
+      if (param) {
+        if (InputCache.get(this, param.paramId, this.globalCache) !== value) {
+          InputCache.set(this, param.paramId, value, this.globalCache);
+          changed = true;
+        }
+      }
+    });
+    return changed;
+  }
+
   render() {
     const { styles } = this;
     return html`<style>${styles}</style>
     <div class="content">
       ${this[serverSelectorTemplate]()}
       ${this[urlLabelTemplate]()}
+      ${this[urlEditorTemplate]()}
       ${this[parametersTemplate]()}
       ${this[headersTemplate]()}
       ${this[mediaTypeSelectorTemplate]()}
@@ -1465,6 +1679,35 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
         title="Toggles optional parameters"
         data-target="${target}"
       >Show optional parameters</anypoint-switch>
+    </div>
+    `;
+  }
+
+  /**
+   * @returns {TemplateResult|string} A template for the URL editor.
+   */
+  [urlEditorTemplate]() {
+    const { urlEditor, url, urlInvalid } = this;
+    if (!urlEditor) {
+      return '';
+    }
+    return html`
+    <div class="url-input-wrapper">
+      <anypoint-input 
+        name="url" 
+        type="url" 
+        class="url-input"
+        ?invalid="${urlInvalid}"
+        required
+        invalidMessage="The URL is invalid"
+        .value="${url}"
+        ?compatibility="${this.compatibility}"
+        ?outlined="${this.outlined}"
+        @change="${this[urlEditorChangeHandler]}"
+        @blur="${this[validateUrl]}"
+      >
+        <label slot="label">Request URL</label>
+      </anypoint-input>
     </div>
     `;
   }

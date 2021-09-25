@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 /**
 @license
 Copyright 2021 The Advanced REST client authors <arc@mulesoft.com>
@@ -14,290 +13,236 @@ the License.
 */
 import { TemplateResult, LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
-import {
-  AmfHelperMixin,
-  ApiOperation,
-  ApiPayload,
-} from '@api-components/amf-helper-mixin';
-import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
-import { Oauth2Credentials, } from '@advanced-rest-client/authorization';
-import { ApiConsoleRequest, PopulationInfo, SecuritySelectorListItem } from '../types';
+import { AmfHelperMixin, AmfSerializer } from '@api-components/amf-helper-mixin';
+import { Oauth2Credentials } from '@advanced-rest-client/authorization';
+import { ApiEndPoint, ApiOperation, ApiPayload, ApiParameter, ApiServer, Operation, AmfDocument } from '@api-components/amf-helper-mixin';
+import { ServerType } from '@api-components/api-server-selector';
+import { AmfParameterMixin } from '../lib/AmfParameterMixin';
+import { SecuritySelectorListItem, ApiConsoleRequest, OperationParameter } from '../types';
 
 export const EventCategory: string;
+
+export const domainIdValue: unique symbol;
 export const operationValue: unique symbol;
-export const securityList: unique symbol;
+export const endpointValue: unique symbol;
+export const serializerValue: unique symbol;
+export const loadingRequestValue: unique symbol;
+export const requestIdValue: unique symbol;
+export const baseUriValue: unique symbol;
+export const urlInvalidValue: unique symbol;
+export const serverLocalValue: unique symbol;
+export const processOperation: unique symbol;
+export const processEndpoint: unique symbol;
 export const processSecurity: unique symbol;
+export const processServers: unique symbol;
+export const appendToParams: unique symbol;
+export const securityList: unique symbol;
+export const updateServer: unique symbol;
+export const updateServerParameters: unique symbol;
+export const updateEndpointParameters: unique symbol;
+export const computeMethodAmfModel: unique symbol;
+export const computeUrlValue: unique symbol;
+export const collectReportParameters: unique symbol;
+export const processSelection: unique symbol;
+export const getOrderedPathParams: unique symbol;
+export const validateUrl: unique symbol;
+export const readUrlValidity: unique symbol;
 export const authSelectorHandler: unique symbol;
+export const mediaTypeSelectHandler: unique symbol;
+export const modelBodyEditorChangeHandler: unique symbol;
+export const rawBodyChangeHandler: unique symbol;
+export const serverCountHandler: unique symbol;
+export const serverHandler: unique symbol;
+export const populateAnnotatedFieldsHandler: unique symbol;
+export const authRedirectChangedHandler: unique symbol;
+export const responseHandler: unique symbol;
+export const sendHandler: unique symbol;
+export const abortHandler: unique symbol;
+export const optionalToggleHandler: unique symbol;
+export const addCustomHandler: unique symbol;
 export const authorizationTemplate: unique symbol;
 export const authorizationSelectorTemplate: unique symbol;
 export const authorizationSelectorItemTemplate: unique symbol;
+export const mediaTypeSelectorTemplate: unique symbol;
+export const bodyTemplate: unique symbol;
+export const formDataEditorTemplate: unique symbol;
+export const multipartEditorTemplate: unique symbol;
+export const rawEditorTemplate: unique symbol;
+export const headersTemplate: unique symbol;
+export const parametersTemplate: unique symbol;
+export const serverSelectorTemplate: unique symbol;
+export const toggleOptionalTemplate: unique symbol;
+export const urlLabelTemplate: unique symbol;
+export const formActionsTemplate: unique symbol;
+export const abortButtonTemplate: unique symbol;
+export const sendButtonTemplate: unique symbol;
+export const addCustomButtonTemplate: unique symbol;
+export const urlEditorTemplate: unique symbol;
+export const urlEditorChangeHandler: unique symbol;
+export const computeUrlRegexp: unique symbol;
+export const urlSearchRegexpValue: unique symbol;
+export const applyUriValues: unique symbol;
+export const applyQueryParamsValues: unique symbol;
 
 /**
- * @fires api-request
  * @fires apirequest
+ * @fires apiabort
+ * @fires api-request
+ * @fires abort-api-request
  */
-export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
+export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(EventsTargetMixin(LitElement))) {
   /** 
    * The currently selected media type for the payloads.
    * @attribute
    */
   mimeType: string;
-
   /**
-   * An `@id` of selected AMF shape. When changed it computes
-   * method model for the selection.
-   * 
-   * @attribute
-   */
+  * An `@id` of selected AMF shape. When changed it computes
+  * method model for the selection.
+  * @attribute
+  */
   selected: string;
+  [domainIdValue]: string;
   /**
-   * When set it renders a label with the computed URL.
-   * @attribute
-   */
+  * When set it renders a label with the computed URL.
+  * @attribute
+  */
   urlLabel: boolean;
   /**
-   * A base URI for the API. To be set if RAML spec is missing `baseUri`
-   * declaration and this produces invalid URL input. This information
-   * is passed to the URL editor that prefixes the URL with `baseUri` value
-   * if passed URL is a relative URL.
-   * @attribute
-   */
-  baseUri: string;
+  * When set it renders the URL input above the URL parameters.
+  * @attribute
+  */
+  urlEditor: boolean;
   /**
-   * If set it computes `hasOptional` property and shows checkbox in the
-   * form to show / hide optional properties.
-   * @attribute
-   */
+  * A base URI for the API. To be set if RAML spec is missing `baseUri`
+  * declaration and this produces invalid URL input. This information
+  * is passed to the URL editor that prefixes the URL with `baseUri` value
+  * if passed URL is a relative URL.
+  * @attribute
+  */
+  baseUri: string;
+  [baseUriValue]: string;
+  /**
+  * If set it computes `hasOptional` property and shows checkbox in the
+  * form to show / hide optional properties.
+  * @attribute
+  */
   allowHideOptional: boolean;
   /**
-   * When set, renders "add custom" item button.
-   * If the element is to be used without AMF model this should always
-   * be enabled. Otherwise users won't be able to add a parameter.
-   * @attribute
-   */
+  * When set, renders "add custom" item button.
+  * If the element is to be used without AMF model this should always
+  * be enabled. Otherwise users won't be able to add a parameter.
+  * @attribute
+  */
   allowCustom: boolean;
   /**
-   * API server definition from the AMF model.
-   *
-   * This value to be set when partial AMF model for an endpoint is passed
-   * instead of web api to be passed to the `api-url-data-model` element.
-   *
-   * Do not set with full AMF web API model.
-   */
-  server: any;
-  /**
-   * Supported protocol versions.
-   *
-   * E.g.
-   *
-   * ```json
-   * ["http", "https"]
-   * ```
-   *
-   * This value to be set when partial AMF model for an endpoint is passed
-   * instead of web api to be passed to the `api-url-data-model` element.
-   *
-   * Do not set with full AMF web API model.
-   */
-  protocols: string[];
-  /**
-   * API version name.
-   *
-   * This value to be set when partial AMF model for an endpoint is passed
-   * instead of web api to be passed to the `api-url-data-model` element.
-   *
-   * Do not set with full AMF web API model.
-   * @attribute
-   */
-  version: string;
-  /**
-   * Enables compatibility with Anypoint styling
-   * @attribute
-   */
+  * Enables compatibility with Anypoint styling
+  * @attribute
+  */
   compatibility: boolean;
   /**
-   * Enables Material Design outlined style
-   * @attribute
-   */
+  * Enables Material Design outlined style
+  * @attribute
+  */
   outlined: boolean;
   /**
-   * When set the editor is in read only mode.
-   * @attribute
-   */
-  readOnly: boolean;
-  /**
-   * When set all controls are disabled in the form
-   * @attribute
-   */
-  disabled: boolean;
-  /**
-   * OAuth2 redirect URI.
-   * This value **must** be set in order for OAuth 1/2 to work properly.
-   * @attribute
-   */
+  * OAuth2 redirect URI.
+  * This value **must** be set in order for OAuth 1/2 to work properly.
+  * @attribute
+  */
   redirectUri: string;
   /**
-   * List of credentials source
-   * @attribute
-   */
-  credentialsSource: Oauth2Credentials[];
-  /**
-   * Computed from AMF model for the method HTTP method name.
-   */
-  _httpMethod: string;
-  /**
-   * Headers for the request.
-   */
-  _headers: string;
-  /**
-   * Final request URL including settings like `baseUri`, AMF
-   * model settings and user provided parameters.
-   * This value is always computed by the `api-url-editor` even if it's
-   * hidden from the view.
-   * @attribute
-   */
+  * Final request URL including settings like `baseUri`, AMF
+  * model settings and user provided parameters.
+  * @attribute
+  */
   url: string;
   /**
-   * Current content type as defined by headers.
-   */
-  _headerContentType: string;
-  /**
-   * Current content type as defined by body editor.
-   */
-  _bodyContentType: string;
-  /**
-   * Computed list of headers in the AMF model
-   */
-  _apiHeaders: any[];
-  /**
-   * Defined by the API payload data.
-   */
-  _apiPayload: any[];
-  /**
-   * Computed value if the method can carry a payload.
-   */
-  _isPayloadRequest: boolean;
-  /**
-   * Flag set when the request is being made.
-   */
-  _loadingRequest: boolean;
-  /**
-   * Generated request ID when the request is sent. This value is reported
-   * in send and abort events
-   */
-  _requestId: string;
-  /**
-   * Request query parameters view model
-   */
-  _queryModel: AmfFormItem[];
-  /**
-   * Request path parameters view model
-   */
-  _pathModel: AmfFormItem[];
-
-  _endpointUri: string;
-  _apiBaseUri: string;
-  /**
-   * @attribute
-   */
-  serversCount: number;
-  /**
-   * Holds the value of the currently selected server
-   * Data type: URI
-   * @attribute
-   */
+  * Holds the value of the currently selected server
+  * Data type: URI
+  * @attribute
+  */
   serverValue: string;
   /**
-   * Holds the type of the currently selected server
-   * Values: `server` | `uri` | `custom`
-   * @attribute
-   */
-  serverType: string;
+  * Holds the type of the currently selected server
+  * Values: `server` | `uri` | `custom`
+  * @attribute
+  */
+  serverType: ServerType;
   /**
-   * Optional property to set
-   * If true, the server selector is not rendered
-   * @attribute
-   */
+  * Optional property to set
+  * If true, the server selector is not rendered
+  * @attribute
+  */
   noServerSelector: boolean;
   /**
-   * Optional property to set
-   * If true, the server selector custom base URI option is rendered
-   * @attribute
-   */
+  * Optional property to set
+  * If true, the server selector custom base URI option is rendered
+  * @attribute
+  */
   allowCustomBaseUri: boolean;
   /**
-   * When enabled, does not clear cache on AMF change
-   * @attribute
-   */
-  persistCache: boolean;
+  * List of credentials source
+  */
+  credentialsSource: Oauth2Credentials[];
   /** 
-   * The index of the selected security definition to apply.
-   * @attribute
-   */
+  * The index of the selected security definition to apply.
+  * @attribute
+  */
   selectedSecurity: number;
   /** 
-   * When set it applies the authorization values to the request dispatched
-   * with the API request event.
-   * If possible, it applies the authorization values to query parameter or headers
-   * depending on the configuration.
-   * 
-   * When the values arr applied to the request the authorization config is kept in the
-   * request object, but its `enabled` state is always `false`, meaning other potential
-   * processors should ignore this values.
-   * 
-   * If this property is not set then the application hosting this component should
-   * process the authorization data and apply them to the request.
-   * @attribute
-   */
+  * When set it applies the authorization values to the request dispatched
+  * with the API request event.
+  * If possible, it applies the authorization values to query parameter or headers
+  * depending on the configuration.
+  * 
+  * When the values arr applied to the request the authorization config is kept in the
+  * request object, but its `enabled` state is always `false`, meaning other potential
+  * processors should ignore this values.
+  * 
+  * If this property is not set then the application hosting this component should
+  * process the authorization data and apply them to the request.
+  * @attribute
+  */
   applyAuthorization: boolean;
   /**
-   * By default the element stores user input in a map that is associated with the specific
-   * instance of this element. This way the element can be used multiple times in the same document.
-   * However, this way parameter values generated by the generators or entered by the user won't
-   * get populated in different operations.
-   *
-   * By setting this value the element prefers a global cache for values. Once the user enter
-   * a value it is registered in the global cache and restored when the same parameter is used again.
-   *
-   * Do not use this option when the element is embedded multiple times in the page. It will result
-   * in generating request data from the cache and not what's in the form inputs and these may not be in sync.
-   *
-   * These values are stored in memory only. Listen to the `change` event to learn that something changed.
-   * @attribute
-   */
+  * By default the element stores user input in a map that is associated with the specific
+  * instance of this element. This way the element can be used multiple times in the same document.
+  * However, this way parameter values generated by the generators or entered by the user won't
+  * get populated in different operations.
+  *
+  * By setting this value the element prefers a global cache for values. Once the user enter
+  * a value it is registered in the global cache and restored when the same parameter is used again.
+  *
+  * Do not use this option when the element is embedded multiple times in the page. It will result
+  * in generating request data from the cache and not what's in the form inputs and these may not be in sync.
+  *
+  * These values are stored in memory only. Listen to the `change` event to learn that something changed.
+  * @attribute
+  */
   globalCache: boolean;
 
-  servers: any[];
-
+  /**
+   * @returns The HTTP method name.
+   */
   get httpMethod(): string;
 
-  get headers(): string;
-
-  get contentType(): string;
-
   /**
-   * The security requirement for the operation or undefined.
+   * True when the request is being loaded.
    */
-  get security(): SecuritySelectorListItem[]|undefined;
-  /**
-   * @returns The currently rendered payload, if any.
-   */
-  get payload(): ApiPayload|undefined;
-
-  /**
-   * @returns The list of all possible payloads for this operation.
-   */
-  get payloads(): ApiPayload[]|undefined;
-
-  get apiHeaders(): any[];
-
-  get apiPayload(): any[];
-
-  get isPayloadRequest(): boolean;
-
   get loadingRequest(): boolean;
+  [loadingRequestValue]: boolean;
 
+  /**
+   * The current request id.
+   */
   get requestId(): string;
+  [requestIdValue]: string;
+
+  /**
+   * Currently used server definition.
+   */
+  get server(): ApiServer;
 
   /**
    * This is the final computed value for the baseUri to propagate downwards
@@ -307,32 +252,64 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
   get effectiveBaseUri(): string;
 
   /**
-   * @returns True when there are not enough servers to render the selector
+   * True when there are not enough servers to render the selector
    */
-  get _serverSelectorHidden(): boolean;
+  get serverSelectorHidden(): boolean;
+
+  /**
+   * The security requirement for the operation or undefined.
+   */
+  get security(): SecuritySelectorListItem[]|undefined;
+
+  /**
+   * The currently rendered payload, if any.
+   */
+  get payload(): ApiPayload|undefined;
+
+  /**
+   * The list of all possible payloads for this operation.
+   */
+  get payloads(): ApiPayload[]|undefined;
+
+  /**
+   * API defined base URI (current server + the endpoint)
+   */
+  get apiBaseUri(): string|undefined;
+
+  /**
+   * @returns True when the URL input is invalid.
+   */
+  get urlInvalid(): boolean;
   /** 
    * Set when the selection change, this is a JS object created form the 
    * supportedOperation definition of the AMF graph.
    */
   [operationValue]: ApiOperation;
+  [endpointValue]: ApiEndPoint;
   /** 
    * The list of security list items to render.
    * An operation may have multiple security definition in an or/and fashion.
    * This allows to render the selector to pick the current security.
    */
   [securityList]: SecuritySelectorListItem[];
-
+  [serializerValue]: AmfSerializer;
+  /** 
+   * The list of parameter groups that are opened when `allowHideOptional` is set.
+   */
+  openedOptional: string[];
+  
   constructor();
 
+  // for the AmfParameterMixin
+  notifyChange(): void;
   _attachListeners(node: EventTarget): void;
-
   _detachListeners(node: EventTarget): void;
 
   /**
    * Overrides `AmfHelperMixin.__amfChanged`.
    * It updates selection and clears cache in the model generator, per APIC-229
    */
-  __amfChanged(amf: any): void;
+  __amfChanged(amf: AmfDocument): void;
 
   /**
    * Reads the URL data from the ApiUrlDataModel library and sets local variables.
@@ -340,56 +317,85 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
   readUrlData(): void;
 
   /**
-   * Dispatches bubbling and composed custom event.
-   * By default the event is cancelable until `cancelable` property is set to false.
+   * A function to be overwritten by child classes to execute an action when a parameter has changed.
    */
-  _dispatch(type: string, detail?: any, cancelable?: boolean): CustomEvent;
+  paramChanged(key: string): void;
+
+  /**
+   * Computes the URL value for the current serves, selected server, and endpoint's path.
+   */
+  [computeUrlValue](): void;
+
+  /**
+   * Creates a list of parameters that are used to generate the inputs report for `AmfInputParser.reportRequestInputs`
+   */
+  [collectReportParameters](): ApiParameter[];
+
+  /**
+   * Checks if the current server has variables and update the parameters array
+   */
+  [updateServerParameters](): void;
+
+  /**
+   * Checks if the current endpoint has variables and requests them when needed.
+   */
+  [updateEndpointParameters](): void;
 
   reset(): void;
 
-  _selectedChanged(): void;
+  [processSelection](): void;
+
+  /**
+   * Searches for the current operation endpoint and sets variables from the endpoint definition.
+   */
+  [processEndpoint](): void;
+
+  /**
+   * Collects operations input parameters into a single object.
+   */
+  [processOperation](): void;
 
   /**
    * Processes security information for the UI.
    */
   [processSecurity](): void;
 
+  /**
+   * Appends a list of parameters to the list of rendered parameters
+   */
+  [appendToParams](list: ApiParameter[], source: string): void;
+
+  /**
+   * A handler for the change event dispatched by the `raw` editor.
+   */
+  [rawBodyChangeHandler](e: Event): void;
+
+  /**
+   * A handler for the change event dispatched by the 
+   * `urlEncode` editor.
+   * Updated the local value, model, and notifies the change.
+   */
+  [modelBodyEditorChangeHandler](e: Event): void;
   [authSelectorHandler](e: Event): void;
 
-  _computeMethodAmfModel(model: any, selected: string): any[] | undefined;
+  /**
+   * Computes the list of servers to be rendered by this operation.
+   * This should be called after the `[processEndpoint]()` function, when the 
+   * endpoint model is set.
+   */
+  [processServers](): void;
 
   /**
-   * Computes model definition for headers.
-   *
-   * @param model Method model
-   * @returns List of headers or undefined.
+   * @returns AMF graph model for an operation
    */
-  _computeHeaders(model: any): any[] | undefined;
-
-  /**
-   * Computes value for `apiPayload` property from AMF model for current
-   * method.
-   *
-   * @param model Operation model.
-   * @return Method payload.
-   */
-  _computeApiPayload(model: any): any[] | undefined;
-
-  /**
-   * Computes value for `isPayloadRequest`.
-   * Only `GET` and `HEAD` methods are known as ones that can't carry a
-   * payload. For any other HTTP method this always returns true.
-   *
-   * @param method HTTP method value
-   */
-  _computeIsPayloadRequest(method: string): boolean;
+  [computeMethodAmfModel](model: AmfDocument, selected: string): Operation|undefined;
 
   /**
    * Handles send button click.
    * Depending on authorization validity it either sends the
    * request or forces authorization and sends the request.
    */
-  _sendHandler(): void;
+  [sendHandler](): void;
 
   /**
    * To be called when the user want to execute the request but
@@ -425,7 +431,7 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
   /**
    * Event handler for abort click.
    */
-  _abortRequest(): void;
+  [abortHandler](): void;
 
   /**
    * Returns an object with the request properties.
@@ -448,7 +454,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * It vary and depends on selected auth method.
    * For example in case of the NTLM it will be: `username`, `password` and
    * `domain`. See `advanced-rest-client/auth-methods` for model descriptions.
-   *
    */
   serialize(): ApiConsoleRequest;
 
@@ -456,171 +461,181 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * Handler for the `api-response` custom event.
    * Clears the loading state.
    */
-  _responseHandler(e: CustomEvent): void;
+  [responseHandler](e: CustomEvent): void;
 
   /**
    * Handler for the `oauth2-redirect-uri-changed` custom event. Changes
    * the `redirectUri` property.
    */
-  _authRedirectChangedHandler(e: CustomEvent): void;
+  [authRedirectChangedHandler](e: CustomEvent): void;
 
   /**
    * Handle event for populating annotated fields in the editor.
-   * @param {CustomEvent} e 
    */
-  _populateAnnotatedFieldsHandler(e: CustomEvent): void;
-
-  /**
-   * Given an array of PopulationInfo objects, look for query parameters
-   * annotated with the matching information, and update their values
-   * in the component's view model.
-   */
-  _updateAnnotatedQueryParameters(populationInfoArray: PopulationInfo[]): void;
-
-  /**
-   * Given an array of PopulationInfo objects, look for headers
-   * annotated with the matching information, and update their values
-   * in the component's view model.
-   */
-  _updateAnnotatedHeaders(populationInfoArray: PopulationInfo[]): void;
-
-  /**
-   * Generic function for updating the nodes whose custom property information matches
-   * with the `populationInfoArray` objects provided. To update, it calls the `updateCallbackFn`
-   * which is one of the function's arguments.
-   * @param populationInfoArray 
-   * @param parameterNodes AMF parameter nodes
-   * @param updateCallbackFn Function to call to update a node's editor value
-   */
-  _updateAnnotatedFields(populationInfoArray: PopulationInfo[], parameterNodes: Object[], updateCallbackFn: Function): void;
-
-  /**
-   * Returns all of the custom domain properties for an AMF node
-   * @param shape AMF node
-   * @return Array of all custom domain property nodes
-   */
-  _computeCustomProperties(shape: Object): Object[]
-
-  /**
-   * Function to determine whether a shape has a custom domain property whose name
-   * and value match with the provided information.
-   * @param shape AMF node
-   * @param propertyName Custom domain property name to search for
-   * @param propertyValue Custom domain property value to match with
-   */
-  _computeHasCustomPropertyValue(shape: Object, propertyName: string, propertyValue: string): boolean;
-
-  /**
-   * Given a query parameter AMF node, update the parameter's representation
-   * in this component's view model with the given value.
-   * @param {Object} queryParamNode AMF node for query parameter
-   * @param {*} value The new value for the query parameter field
-   */
-  _updateQueryModelParameter(queryParamNode: Object, value: any): void;
-
-  /**
-   * Given a header AMF node, update the header's representation in
-   * this component's `_headers` property. To do this, first transform
-   * the `_headers` string to a JSON, then change the value, then
-   * set the new string for the `_headers` property.
-   * @param headerNode AMF node for header
-   * @param value The new value for the header field
-   */
-  _updateHeader(headerNode: Object, value: any): void;
-
-  _urlHandler(e: Event): void;
-
-  _pathModelHandler(e: Event): void;
-
-  _queryModelHandler(e: Event): void;
-
-  _headersHandler(e: Event): void;
-
-  _payloadHandler(e: Event): void;
-
-  _contentTypeHandler(e: Event): void;
-
-  _authChanged(e: Event): void;
+  [populateAnnotatedFieldsHandler](e: CustomEvent): void;
 
   /**
    * Computes a current server value for selection made in the server selector.
    */
-  _updateServer(): void;
-
-  /**
-   * @param value Server's base URI
-   * @return An element associated with the base URI or undefined if not found.
-   */
-  _findServerByValue(value: string): any | undefined;
-
-  /**
-   * @param server Server definition.
-   * @returns Value for server's base URI
-   */
-  _getServerUri(server: any): string | undefined;
-
-  /**
-   * Updates the list of servers for current operation so a server for current
-   * selection can be computed.
-   */
-  _updateServers(): void;
+  [updateServer](): void;
 
   /**
    * Handler for the change dispatched from the server selector.
    */
-  _serverCountHandler(e: CustomEvent): void;
+  [serverCountHandler](e: CustomEvent): void;
 
   /**
    * Handler for the change dispatched from the server selector.
    */
-  _serverHandler(e: CustomEvent): void;
+  [serverHandler](e: CustomEvent): void;
 
   /**
-   * Given a headers string, if it does not contain a Content-Type header,
-   * set it manually and return the computed headers string.
+   * Computes a regexp for the base URI defined in the server to process URL input change
+   * and set the `[urlSearchRegexpValue]` value.
+   * This should be computed only when a server and en endpoint change.
    */
-  _ensureContentTypeInHeaders(headersString: string): string
+  [computeUrlRegexp](): void;
+  [mediaTypeSelectHandler](e: Event): void;
+
+  /**
+   * Toggles optional parameter groups.
+   */
+  [optionalToggleHandler](e: Event): void;
+
+  /**
+   * When enabled it adds a new custom parameter to the request section defined in the source button.
+   */
+  [addCustomHandler](e: Event): void;
+
+  /**
+   * Updates path/query model from user input.
+   *
+   * @param e The change event
+   */
+  [urlEditorChangeHandler](e: Event): void;
+
+  /**
+   * Sets the value of `[urlInvalidValue]` and therefore `urlInvalid` properties.
+   */
+  [validateUrl](): void;
+
+  /**
+   * Validates the current URL value.
+   * @returns True when the current URL is a valid URL.
+   */
+  [readUrlValidity](): boolean;
+
+  /**
+   * Reads the ordered list of path parameters from the server and the endpoint.
+   */
+  [getOrderedPathParams](): OperationParameter[];
+
+  /**
+   * Applies values from the `values` array to the uri parameters which names are in the `names` array.
+   * Both lists are ordered list of parameters.
+   *
+   * @param values Values for the parameters
+   * @param params List of path parameters.
+   * @returns True when any parameter was changed.
+   */
+  [applyUriValues](values: string[], params: OperationParameter[]): boolean;
+
+  /**
+   * Applies query parameters values to the render list.
+   *
+   * @returns True when any parameter was changed.
+   */
+  [applyQueryParamsValues](map: Record<string, string|string[]>): boolean;
 
   render(): TemplateResult;
 
-  _oauthHandlersTemplate(): TemplateResult;
-
-  _urlEditorTemplate(): TemplateResult;
-
   /**
-   * @return Template for the request URL label.
+   * @return {} Template for the request URL label.
    */
-  _urlLabelTemplate(): TemplateResult | string;
+  [urlLabelTemplate](): TemplateResult|string;
 
-  _paramsEditorTemplate(): TemplateResult;
-
-  _headersEditorTemplate(): TemplateResult;
-
-  [authorizationTemplate](): TemplateResult | string;
   /**
-   * @returns The template for the security drop down selector.
+   * @returns {TemplateResult} The template for the security drop down selector.
    */
   [authorizationSelectorTemplate](security: SecuritySelectorListItem[], selected: number): TemplateResult;
 
   /**
-   * @returns The template for the security drop down selector list item.
+   * @returns {TemplateResult} The template for the security drop down selector list item.
    */
   [authorizationSelectorItemTemplate](info: SecuritySelectorListItem): TemplateResult;
 
-  _formActionsTemplate(): TemplateResult;
+  [formActionsTemplate](): TemplateResult;
 
   /**
    * Creates a template for the "abort" button.
+   *
+   * @return {TemplateResult}
    */
-  _abortButtonTemplate(): TemplateResult;
+  [abortButtonTemplate](): TemplateResult;
 
   /**
    * Creates a template for the "send" or "auth and send" button.
+   *
+   * @return {TemplateResult}
    */
-  _sendButtonTemplate(): TemplateResult;
+  [sendButtonTemplate](): TemplateResult;
 
   /**
-   * @return A template for the server selector
+   * @return {TemplateResult} A template for the server selector
    */
-  _serverSelectorTemplate(): TemplateResult;
+  [serverSelectorTemplate](): TemplateResult;
+
+  [parametersTemplate](): TemplateResult;
+
+  [headersTemplate](): TemplateResult|string;
+
+  /**
+   * @param {string} type
+   * @returns {TemplateResult} The template for the add custom parameter button
+   */
+  [addCustomButtonTemplate](type): TemplateResult;
+
+  /**
+   * @return {TemplateResult|string} The template for the payload's mime type selector.
+   */
+  [mediaTypeSelectorTemplate](): TemplateResult|string;
+
+  /**
+   * @returns {TemplateResult|string} The template for the body editor. 
+   */
+  [bodyTemplate](): TemplateResult|string;
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @returns {TemplateResult} The template for the editor that specializes in the URL encoded form data
+   */
+  [formDataEditorTemplate](info, id): TemplateResult;
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @returns {TemplateResult} The template for the editor that specializes in the multipart form data
+   */
+  [multipartEditorTemplate](info, id): TemplateResult;
+
+  /**
+   * @param {any} info
+   * @param {string} id
+   * @param {string} mimeType
+   * @returns {TemplateResult} The template for the editor that specializes in any text data
+   */
+  [rawEditorTemplate](info, id, mimeType): TemplateResult;
+
+  /**
+   * @param {string} target The name of the target parameter group.
+   * @param {OperationParameter[]} params The list of parameters. When all are required or empty it won't render then button.
+   * @returns {TemplateResult|string} Template for the switch button to toggle visibility of the optional items.
+   */
+  [toggleOptionalTemplate](target, params): TemplateResult|string;
+
+  /**
+   * @returns {TemplateResult|string} A template for the URL editor.
+   */
+  [urlEditorTemplate](): TemplateResult|string;
 }

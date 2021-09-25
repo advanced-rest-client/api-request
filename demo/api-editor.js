@@ -19,6 +19,7 @@ class ComponentDemo extends ApiDemoPage {
       'allowHideOptional',
       'responseBody',
       'urlLabel',
+      'urlEditor',
       'renderCustomServer',
       'allowCustomBaseUri',
       'noServerSelector',
@@ -28,6 +29,7 @@ class ComponentDemo extends ApiDemoPage {
     this.allowCustom = true;
     this.allowHideOptional = true;
     this.urlLabel = false;
+    this.urlEditor = true;
     this.renderCustomServer = false;
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
@@ -110,6 +112,10 @@ class ComponentDemo extends ApiDemoPage {
     console.log(e.detail);
   }
 
+  requestChangeHandler() {
+    console.log('requestChangeHandler');
+  }
+
   dispatchAnnotations() {
     const detail = { 
       values: [
@@ -133,6 +139,7 @@ class ComponentDemo extends ApiDemoPage {
       selectedAmfId,
       responseBody,
       urlLabel,
+      urlEditor,
       noServerSelector,
       allowCustomBaseUri,
       applyAuthorization,
@@ -161,12 +168,14 @@ class ComponentDemo extends ApiDemoPage {
             ?outlined="${outlined}"
             ?compatibility="${compatibility}"
             ?urlLabel="${urlLabel}"
+            ?urlEditor="${urlEditor}"
             ?applyAuthorization="${applyAuthorization}"
             globalCache
             .redirectUri="${redirectUri}"
             ?noServerSelector="${noServerSelector}"
             ?allowCustomBaseUri="${allowCustomBaseUri}"
             @api-request="${this._apiRequestHandler}"
+            @change="${this.requestChangeHandler}"
           >
             ${this._addCustomServers()}
           </api-request-editor>
@@ -198,6 +207,14 @@ class ComponentDemo extends ApiDemoPage {
           name="urlLabel"
           @change="${this._toggleMainOption}"
           >URL label</anypoint-checkbox
+        >
+        <anypoint-checkbox
+          aria-describedby="mainOptionsLabel"
+          slot="options"
+          name="urlEditor"
+          @change="${this._toggleMainOption}"
+          .checked="${urlEditor}"
+          >URL editor</anypoint-checkbox
         >
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"

@@ -83,7 +83,7 @@ api-url-editor {
 }
 
 .url-label {
-  margin: 0 8px;
+  /* margin: 0 8px; */
   padding: 12px 8px;
   border-radius: 3px;
 
@@ -138,5 +138,14 @@ api-url-editor {
 
 .custom-item .custom-value {
   margin-left: 4px;
+}
+
+.url-input-wrapper {
+  display: flex;
+}
+
+.url-input {
+  flex: 1;
+  margin: 0;
 }
 `;

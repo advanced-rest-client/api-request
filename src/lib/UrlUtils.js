@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiEndPoint} ApiEndPoint */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
@@ -148,4 +149,27 @@ export function applyUrlParameters(url, params, encode) {
   result += (result.indexOf('?') === -1) ? '?' : '&';
   result += query;
   return result;
+}
+
+/**
+ * Applies query parameter values to an object.
+ * Repeated parameters will have array value instead of string value.
+ *
+ * @param {string} param Query parameter value as string. Eg `name=value`
+ * @param {Record<string, string|string[]>} obj Target for values
+ */
+export function applyQueryParamStringToObject(param, obj) {
+  if (!param || !obj || typeof param !== 'string') {
+    return;
+  }
+  const parts = param.split('=');
+  const name = parts[0];
+  if (name in obj) {
+    if (!Array.isArray(obj[name])) {
+      obj[name] = [/** @type string */(obj[name])];
+    }
+    /** @type string[] */(obj[name]).push(parts[1]);
+  } else {
+    obj[name] = parts[1];
+  }
 }
