@@ -14,6 +14,7 @@ the License.
 */
 import { LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
+import { EventTypes } from '../events/EventTypes.js';
 import '../../xhr-simple-request-transport.js';
 
 /** @typedef {import('./XhrSimpleRequestTransportElement').XhrSimpleRequestTransportElement} XhrSimpleRequestTransportElement */
@@ -164,16 +165,16 @@ export class XhrSimpleRequestElement extends EventsTargetMixin(LitElement) {
    * @param {EventTarget} node 
    */
   _attachListeners(node) {
-    node.addEventListener('api-request', this._requestHandler);
-    node.addEventListener('abort-api-request', this._abortHandler);
+    node.addEventListener(EventTypes.Request.apiRequest, this._requestHandler);
+    node.addEventListener(EventTypes.Request.abortApiRequest, this._abortHandler);
   }
 
   /**
    * @param {EventTarget} node 
    */
   _detachListeners(node) {
-    node.removeEventListener('api-request', this._requestHandler);
-    node.removeEventListener('abort-api-request', this._abortHandler);
+    node.removeEventListener(EventTypes.Request.apiRequest, this._requestHandler);
+    node.removeEventListener(EventTypes.Request.abortApiRequest, this._abortHandler);
   }
 
   /**

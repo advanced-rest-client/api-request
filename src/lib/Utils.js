@@ -51,7 +51,7 @@ export function ensureContentType(headers, mime) {
  * @returns {string} The name to use in the input.
  */
 export function readLabelValue(parameter, schema) {
-  let label = schema.displayName || parameter.name ||  schema.name;
+  let label = parameter.paramName || schema.displayName || parameter.name ||  schema.name;
   const { required } = parameter;
   if (required) {
     label += '*';

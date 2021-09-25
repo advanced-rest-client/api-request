@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "apiredirecturichange",
     "apirequest",
     "apiresponse",
     "apiserverchanged",
@@ -11,7 +12,9 @@
     "jsrsasign",
     "microservice",
     "pathmodelchange",
+    "populateannotatedfields",
     "querymodelchange",
+    "redirecturichange",
     "requestclearstate",
     "securitysettingsinfochanged",
     "serverscountchanged"

@@ -8,6 +8,10 @@ interface Request {
   abortApiRequestLegacy: string;
   apiResponse: string;
   apiResponseLegacy: string;
+  redirectUriChange: string;
+  redirectUriChangeLegacy: string;
+  populateAnnotatedFields: string;
+  populateAnnotatedFieldsLegacy: string;
 }
 
 interface IEventTypes {

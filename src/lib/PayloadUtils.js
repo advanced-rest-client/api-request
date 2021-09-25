@@ -23,7 +23,7 @@ export function getPayloadValue(payload) {
   if (cache.has(payload.id)) {
     return cache.get(payload.id);
   }
-  const { id, mediaType, schema } = payload;
+  const { id, mediaType='text/plain', schema } = payload;
   const schemaFactory = new ApiMonacoSchemaGenerator();
   const monacoSchemes = schemaFactory.generate(schema, id);
   let { examples } = payload;

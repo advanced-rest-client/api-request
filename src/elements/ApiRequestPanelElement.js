@@ -12,31 +12,49 @@ License for the specific language governing permissions and limitations under
 the License.
 */
 import { html, LitElement } from 'lit-element';
-import { HeadersParser } from '@advanced-rest-client/arc-headers';
+import { ArcHeaders } from '@advanced-rest-client/arc-headers';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import elementStyles from '../styles/Panel.styles.js';
+import { EventTypes } from '../events/EventTypes.js';
 import '../../api-request-editor.js';
 import '../../api-response-view.js';
-
-// import '@advanced-rest-client/response-view/response-view.js';
 
 /* eslint-disable no-plusplus */
 /* eslint-disable class-methods-use-this */
 
 /** @typedef {import('lit-html').TemplateResult} TemplateResult */
-/** @typedef {import('../types').ApiConsoleResponse} ApiConsoleResponse */
-/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.Response} ArcResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.ErrorResponse} ErrorResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.TransportRequest} TransportRequest */
+/** @typedef {import('@advanced-rest-client/arc-types').ApiTypes.ApiType} ApiType */
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
+/** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
+/** @typedef {import('@api-components/api-server-selector').ServerType} ServerType */
+/** @typedef {import('../types').ApiConsoleResponse} ApiConsoleResponse */
+/** @typedef {import('../events/RequestEvents').ApiRequestEvent} ApiRequestEvent */
+/** @typedef {import('../events/RequestEvents').ApiResponseEvent} ApiResponseEvent */
 
-export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
+export const selectedValue = Symbol('selectedValue');
+export const selectedChanged = Symbol('selectedChanged');
+export const appendProxy = Symbol('appendProxy');
+export const propagateResponse = Symbol('propagateResponse');
+export const responseHandler = Symbol('responseHandler');
+export const requestHandler = Symbol('requestHandler');
+export const appendConsoleHeaders = Symbol('appendConsoleHeaders');
+export const navigationHandler = Symbol('navigationHandler');
+export const requestTemplate = Symbol('requestTemplate');
+export const responseTemplate = Symbol('requestTemplate');
+
+export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   get styles() {
     return elementStyles;
   }
 
-  get _hasResponse() {
+  /**
+   * True when the panel render the response.
+   * @returns {boolean}
+   */
+  get hasResponse() {
     return !!this.response;
   }
 
@@ -58,14 +76,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        */
       handleNavigationEvents: { type: Boolean },
       /**
-       * Hides the URL editor from the view.
-       * The editor is still in the DOM and the `urlInvalid` property still will be set.
+       * When set it renders the URL input above the URL parameters.
        */
-      noUrlEditor: { type: Boolean },
+      urlEditor: { type: Boolean },
       /**
        * When set it renders a label with the computed URL.
-       * This intended to be used with `noUrlEditor` set to true.
-       * This way it replaces the editor with a simple label.
        */
       urlLabel: { type: Boolean },
       /**
@@ -88,14 +103,6 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        * Enables Material Design outlined style
        */
       outlined: { type: Boolean },
-      /**
-       * When set the editor is in read only mode.
-       */
-      readOnly: { type: Boolean },
-      /**
-       * When set all controls are disabled in the form
-       */
-      disabled: { type: Boolean },
       /**
        * Created by the transport ARC `request` object
        */
@@ -134,11 +141,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        * `https://proxy.com/?url=http%3A%2F%2Fdomain.com%2Fpath%2F%3Fquery%3Dsome%2Bvalue`
        */
       proxyEncodeUrl: { type: Boolean },
-      /**
-       * Location of the `node_modules` folder.
-       * It should be a path from server's root path including node_modules.
-       */
-      authPopupLocation: { type: String },
+      
       /**
        * ID of latest request.
        * It is received from the `api-request-editor` when `api-request`
@@ -155,49 +158,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        */
       allowHideOptional: { type: Boolean },
       /**
-       * If set, enable / disable param checkbox is rendered next to each
-       * form item.
-       */
-      allowDisableParams: { type: Boolean },
-      /**
        * When set, renders "add custom" item button.
        * If the element is to be used without AMF model this should always
        * be enabled. Otherwise users won't be able to add a parameter.
        */
       allowCustom: { type: Boolean },
-      /**
-       * API server definition from the AMF model.
-       *
-       * This value to be set when partial AMF model for an endpoint is passed
-       * instead of web api to be passed to the `api-url-data-model` element.
-       *
-       * Do not set with full AMF web API model.
-       */
-      server: { type: Object },
-      /**
-       * Supported protocol versions.
-       *
-       * E.g.
-       *
-       * ```json
-       * ["http", "https"]
-       * ```
-       *
-       * This value to be set when partial AMF model for an endpoint is passed
-       * instead of web api to be passed to the `api-url-data-model` element.
-       *
-       * Do not set with full AMF web API model.
-       */
-      protocols: { type: Array },
-      /**
-       * API version name.
-       *
-       * This value to be set when partial AMF model for an endpoint is passed
-       * instead of web api to be passed to the `api-url-data-model` element.
-       *
-       * Do not set with full AMF web API model.
-       */
-      version: { type: String },
       /**
        * Holds the value of the currently selected server
        * Data type: URI
@@ -222,128 +187,128 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
        * List of credentials source
        */
       credentialsSource: { type: Array },
-      /**
-       * When enabled, does not clear cache on AMF change
+      /** 
+       * When set it applies the authorization values to the request dispatched
+       * with the API request event.
+       * If possible, it applies the authorization values to query parameter or headers
+       * depending on the configuration.
+       * 
+       * When the values arr applied to the request the authorization config is kept in the
+       * request object, but its `enabled` state is always `false`, meaning other potential
+       * processors should ignore this values.
+       * 
+       * If this property is not set then the application hosting this component should
+       * process the authorization data and apply them to the request.
        */
-      persistCache: { type: Boolean }
+      applyAuthorization: { type: Boolean },
+       /**
+        * By default the element stores user input in a map that is associated with the specific
+        * instance of this element. This way the element can be used multiple times in the same document.
+        * However, this way parameter values generated by the generators or entered by the user won't
+        * get populated in different operations.
+        *
+        * By setting this value the element prefers a global cache for values. Once the user enter
+        * a value it is registered in the global cache and restored when the same parameter is used again.
+        *
+        * Do not use this option when the element is embedded multiple times in the page. It will result
+        * in generating request data from the cache and not what's in the form inputs and these may not be in sync.
+        *
+        * These values are stored in memory only. Listen to the `change` event to learn that something changed.
+        */
+      globalCache: { type: Boolean, reflect: true },
     };
   }
 
   get selected() {
-    return this._selected;
+    return this[selectedValue];
   }
 
   set selected(value) {
-    const old = this._selected;
+    const old = this[selectedValue];
     /* istanbul ignore if */
     if (old === value) {
       return;
     }
-    this._selected = value;
+    this[selectedValue] = value;
     this.requestUpdate('selected', old);
-    this._selectedChanged(value);
+    this[selectedChanged](value);
   }
 
-  get authPopupLocation() {
-    return this._authPopupLocation;
-  }
-
-  set authPopupLocation(value) {
-    const old = this._authPopupLocation;
-    /* istanbul ignore if */
-    if (old === value) {
-      return;
-    }
-    this._authPopupLocation = value;
-    this._updateRedirectUri(value);
-  }
-
-  /**
-   * @constructor
-   */
   constructor() {
     super();
-    this._apiResponseHandler = this._apiResponseHandler.bind(this);
-    this._apiRequestHandler = this._apiRequestHandler.bind(this);
-    this._handleNavigationChange = this._handleNavigationChange.bind(this);
-
+    this[responseHandler] = this[responseHandler].bind(this);
+    this[requestHandler] = this[requestHandler].bind(this);
+    this[navigationHandler] = this[navigationHandler].bind(this);
+    /** @type ApiType[] */
     this.appendHeaders = null;
+    /** @type string */
     this.proxy = undefined;
+    /** @type boolean */
     this.proxyEncodeUrl = false;
+    /** @type boolean */
     this.handleNavigationEvents = false;
+    /** @type AmfDocument */
     this.amf = undefined;
-    this.noUrlEditor = false;
+    /** @type boolean */
+    this.urlEditor = undefined;
+    /** @type boolean */
     this.urlLabel = undefined;
+    /** @type string */
     this.baseUri = undefined;
     this.eventsTarget = undefined;
+    /** @type boolean */
     this.allowHideOptional = false;
-    this.allowDisableParams = false;
+    /** @type boolean */
     this.allowCustom = false;
-    this.server = undefined;
-    this.protocols = undefined;
-    this.version = undefined;
-    this.readOnly = false;
-    this.disabled = false;
+    /** @type boolean */
     this.compatibility = false;
+    /** @type boolean */
     this.outlined = false;
+    /** @type string */
     this.serverValue = undefined;
+    /** @type ServerType */
     this.serverType = undefined;
+    /** @type string */
+    this.redirectUri = undefined;
+    /** @type boolean */
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
-    this.persistCache = false;
+    /** @type boolean */
+    this.globalCache = undefined;
+    /** @type boolean */
+    this.applyAuthorization = undefined;
     /** @type Oauth2Credentials[] */
     this.credentialsSource = undefined;
-
-    /**  
-     * @type {TransportRequest}
-     */
+    /** @type {TransportRequest} */
     this.request = undefined;
-    /**  
-     * @type {ArcResponse|ErrorResponse}
-     */
+    /** @type {ArcResponse|ErrorResponse} */
     this.response = undefined;
   }
 
-  connectedCallback() {
-    if (super.connectedCallback) {
-      super.connectedCallback();
-    }
-    if (!this.redirectUri) {
-      this._updateRedirectUri(this.authPopupLocation);
-    }
-  }
-
+  /**
+   * @param {EventTarget} node
+   */
   _attachListeners(node) {
-    this.addEventListener('api-request', this._apiRequestHandler);
-    node.addEventListener('api-response', this._apiResponseHandler);
+    this.addEventListener(EventTypes.Request.apiRequest, this[requestHandler]);
+    node.addEventListener(EventTypes.Request.apiResponse, this[responseHandler]);
+    node.addEventListener(EventTypes.Request.apiResponseLegacy, this[responseHandler]);
     node.addEventListener(
       'api-navigation-selection-changed',
-      this._handleNavigationChange
-    );
-  }
-
-  _detachListeners(node) {
-    this.removeEventListener('api-request', this._apiRequestHandler);
-    node.removeEventListener('api-response', this._apiResponseHandler);
-    node.removeEventListener(
-      'api-navigation-selection-changed',
-      this._handleNavigationChange
+      this[navigationHandler]
     );
   }
 
   /**
-   * Sets OAuth 2 redirect URL for the authorization panel
-   *
-   * @param {String=} [location='node_modules/'] Bower components location
+   * @param {EventTarget} node
    */
-  _updateRedirectUri(location = 'node_modules/') {
-    const a = document.createElement('a');
-    let l = String(location);
-    if (l && l[l.length - 1] !== '/') {
-      l += '/';
-    }
-    a.href = `${l}@advanced-rest-client/oauth-authorization/oauth-popup.html`;
-    this.redirectUri = a.href;
+  _detachListeners(node) {
+    this.removeEventListener(EventTypes.Request.apiRequest, this[requestHandler]);
+    node.removeEventListener(EventTypes.Request.apiResponse, this[responseHandler]);
+    node.removeEventListener(EventTypes.Request.apiResponseLegacy, this[responseHandler]);
+    node.removeEventListener(
+      'api-navigation-selection-changed',
+      this[navigationHandler]
+    );
   }
 
   /**
@@ -351,36 +316,36 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * This handler will only check if there is authorization required
    * and if the user is authorized.
    *
-   * @param {CustomEvent} e `api-request` event
+   * @param {ApiRequestEvent} e `api-request` event
    */
-  _apiRequestHandler(e) {
+  [requestHandler](e) {
     this.lastRequestId = e.detail.id;
-    this._appendConsoleHeaders(e);
-    this._appendProxy(e);
+    this[appendConsoleHeaders](e);
+    this[appendProxy](e);
   }
 
   /**
    * Appends headers defined in the `appendHeaders` array.
-   * @param {CustomEvent} e The `api-request` event.
+   * @param {ApiRequestEvent} e The `api-request` event.
    */
-  _appendConsoleHeaders(e) {
+  [appendConsoleHeaders](e) {
     const headersToAdd = this.appendHeaders;
     if (!headersToAdd) {
       return;
     }
-    let eventHeaders = e.detail.headers || '';
-    for (let i = 0, len = headersToAdd.length; i < len; i++) {
-      const header = headersToAdd[i];
-      eventHeaders = HeadersParser.replace(eventHeaders, header.name, header.value);
-    }
-    e.detail.headers = eventHeaders;
+    const parser = new ArcHeaders(e.detail.headers || '');
+    headersToAdd.forEach((header) => {
+      const { name, value } = header;
+      parser.set(name, value);
+    });
+    e.detail.headers = parser.toString();
   }
 
   /**
    * Sets the proxy URL if the `proxy` property is set.
-   * @param {CustomEvent} e The `api-request` event.
+   * @param {ApiRequestEvent} e The `api-request` event.
    */
-  _appendProxy(e) {
+  [appendProxy](e) {
     const { proxy } = this;
     if (!proxy) {
       return;
@@ -396,14 +361,14 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * Handler for the `api-response` custom event. Sets values on the response
    * panel when response is ready.
    *
-   * @param {CustomEvent} e
+   * @param {ApiResponseEvent} e
    */
-  _apiResponseHandler(e) {
+  [responseHandler](e) {
     const response = /** @type ApiConsoleResponse */ (e.detail);
     if (this.lastRequestId !== response.id) {
       return;
     }
-    this._propagateResponse(response);
+    this[propagateResponse](response);
   }
 
   /**
@@ -417,7 +382,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    *
    * @param {ApiConsoleResponse} data Event's detail object
    */
-  _propagateResponse(data) {
+  [propagateResponse](data) {
     if (data.isError) {
       this.response = /** @type ErrorResponse */ ({
         error: data.error,
@@ -452,7 +417,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * Clears response panel when selected id changed.
    * @param {String} id
    */
-  _selectedChanged(id) {
+  [selectedChanged](id) {
     if (!id) {
       return;
     }
@@ -478,7 +443,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    *
    * @param {CustomEvent} e
    */
-  _handleNavigationChange(e) {
+  [navigationHandler](e) {
     if (this.handleNavigationEvents) {
       const { selected: id, type } = e.detail;
       this.selected = type === 'method' ? id : undefined;
@@ -486,29 +451,23 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   }
 
   render() {
-    return html`<style>${this.styles}</style>${this._requestTemplate()}${this._responseTemplate()}`;
+    return html`<style>${this.styles}</style>${this[requestTemplate]()}${this[responseTemplate]()}`;
   }
 
   /**
    * @return {TemplateResult} A template for the request panel
    */
-  _requestTemplate() {
+  [requestTemplate]() {
     const {
       redirectUri,
       selected,
       amf,
-      noUrlEditor,
+      urlEditor,
       urlLabel,
       baseUri,
       eventsTarget,
       allowHideOptional,
-      allowDisableParams,
       allowCustom,
-      server,
-      protocols,
-      version,
-      readOnly,
-      disabled,
       compatibility,
       outlined,
       serverValue,
@@ -516,7 +475,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       noServerSelector,
       allowCustomBaseUri,
       credentialsSource,
-      persistCache,
+      globalCache,
+      applyAuthorization,
     } = this;
 
     return html`
@@ -524,18 +484,12 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       .redirectUri="${redirectUri}"
       .selected="${selected}"
       .amf="${amf}"
-      ?noUrlEditor="${noUrlEditor}"
+      ?urlEditor="${urlEditor}"
       ?urlLabel="${urlLabel}"
       .baseUri="${baseUri}"
       .eventsTarget="${eventsTarget}"
       ?allowHideOptional="${allowHideOptional}"
-      ?allowDisableParams="${allowDisableParams}"
       ?allowCustom="${allowCustom}"
-      .server="${server}"
-      .protocols="${protocols}"
-      .version="${version}"
-      ?readOnly="${readOnly}"
-      ?disabled="${disabled}"
       ?outlined="${outlined}"
       ?compatibility="${compatibility}"
       .serverValue="${serverValue}"
@@ -543,7 +497,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       ?noServerSelector="${noServerSelector}"
       ?allowCustomBaseUri="${allowCustomBaseUri}"
       .credentialsSource="${credentialsSource}"
-      ?persistCache="${persistCache}"
+      ?globalCache="${globalCache}"
+      ?applyAuthorization="${applyAuthorization}"
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-request-editor>`;
@@ -552,9 +507,9 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   /**
    * @return {TemplateResult|string} A template for the response view
    */
-  _responseTemplate() {
-    const { _hasResponse } = this;
-    if (!_hasResponse) {
+  [responseTemplate]() {
+    const { hasResponse } = this;
+    if (!hasResponse) {
       return '';
     }
     return html`<api-response-view

@@ -1,5 +1,6 @@
 import { html } from 'lit-html';
 import { ApiDemoPage } from '@advanced-rest-client/arc-demo-helper';
+import { MonacoLoader } from '@advanced-rest-client/monaco-support';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@api-components/api-navigation/api-navigation.js';
@@ -14,20 +15,19 @@ class ComponentDemo extends ApiDemoPage {
 
     this.initObservableProperties([
       'outlined',
-      'readOnly',
-      'disabled',
       'narrow',
       'selectedAmfId',
       'allowCustom',
       'allowHideOptional',
       'allowDisableParams',
       'noDocs',
-      'noUrlEditor',
+      'urlEditor',
       'renderCustomServer',
       'allowCustomBaseUri',
       'noServerSelector',
       'urlLabel',
       'selectedServerValue',
+      'applyAuthorization',
     ]);
     this.componentName = 'api-request-panel';
     this.allowCustom = false;
@@ -36,15 +36,21 @@ class ComponentDemo extends ApiDemoPage {
     this.renderCustomServer = false;
     this.noServerSelector = false;
     this.allowCustomBaseUri = false;
+    this.applyAuthorization = true;
     this.urlLabel = false;
-    this.readOnly = false;
-    this.disabled = false;
-    this.noUrlEditor = false;
+    this.urlEditor = true;
 
     this.demoStates = ['Filled', 'Outlined', 'Anypoint'];
     /* eslint-disable-next-line no-restricted-globals */
     this.redirectUri = `${location.origin}/node_modules/@advanced-rest-client/oauth-authorization/oauth-popup.html`;
-    this._serverChangeHandler = this._serverChangeHandler.bind(this);
+    this.loadMonaco();
+  }
+
+  async loadMonaco() {
+    const base = `../node_modules/monaco-editor/`;
+    MonacoLoader.createEnvironment(base);
+    await MonacoLoader.loadMonaco(base);
+    await MonacoLoader.monacoReady();
   }
 
   _demoStateHandler(e) {
@@ -84,6 +90,14 @@ class ComponentDemo extends ApiDemoPage {
       ['SE-12224', 'Scope is not an array issues (SE-12224)'],
       ['APIC-168', 'Custom scheme support (APIC-168)'],
       ['async-api', 'AsyncAPI'],
+      ['APIC-289', 'OAS param names'],
+      ['api-keys', 'API key'],
+      ['oas-demo', 'OAS Demo API'],
+      ['oauth-flows', 'OAS OAuth Flow'],
+      ['oas-bearer', 'OAS Bearer'],
+      ['secured-api', 'Security demo'],
+      ['21143', '21143'],
+      ['annotated-parameters', 'annotated-parameters'],
     ].map(
       ([file, label]) => html`
         <anypoint-item data-src="${file}-compact.json"
@@ -99,10 +113,10 @@ class ComponentDemo extends ApiDemoPage {
     }
     return html`<anypoint-item
         slot="custom-base-uri"
-        value="http://customServer.com"
+        data-value="http://customServer.com"
         >http://customServer.com</anypoint-item
       >
-      <anypoint-item slot="custom-base-uri" value="http://customServer.com2"
+      <anypoint-item slot="custom-base-uri" data-value="http://customServer.com2"
         >http://customServer.com2</anypoint-item
       >`;
   }
@@ -125,8 +139,6 @@ class ComponentDemo extends ApiDemoPage {
       darkThemeActive,
       outlined,
       compatibility,
-      readOnly,
-      disabled,
       amf,
       redirectUri,
       allowCustom,
@@ -135,9 +147,10 @@ class ComponentDemo extends ApiDemoPage {
       selectedAmfId,
       noServerSelector,
       allowCustomBaseUri,
-      noUrlEditor,
+      urlEditor,
       urlLabel,
       selectedServerValue,
+      applyAuthorization,
     } = this;
     return html` <section class="documentation-section">
       <h3>Interactive demo</h3>
@@ -156,37 +169,22 @@ class ComponentDemo extends ApiDemoPage {
             .selected="${selectedAmfId}"
             ?allowCustom="${allowCustom}"
             ?allowHideOptional="${allowHideOptional}"
-            ?allowDisableParams="${allowDisableParams}"
             ?outlined="${outlined}"
             ?compatibility="${compatibility}"
-            ?readOnly="${readOnly}"
-            ?disabled="${disabled}"
-            ?noUrlEditor="${noUrlEditor}"
+            ?urlEditor="${urlEditor}"
             ?urlLabel="${urlLabel}"
             ?noServerSelector="${noServerSelector}"
             ?allowCustomBaseUri="${allowCustomBaseUri}"
             .redirectUri="${redirectUri}"
             .serverValue="${selectedServerValue}"
+            ?applyAuthorization="${applyAuthorization}"
+            globalCache
             @apiserverchanged="${this._serverChangeHandler}"
           >
             ${this._addCustomServers()}
           </api-request-panel>
         </div>
         <label slot="options" id="mainOptionsLabel">Options</label>
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
-          name="readOnly"
-          @change="${this._toggleMainOption}"
-          >Read only</anypoint-checkbox
-        >
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
-          name="disabled"
-          @change="${this._toggleMainOption}"
-          >Disabled</anypoint-checkbox
-        >
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"
@@ -211,13 +209,13 @@ class ComponentDemo extends ApiDemoPage {
           @change="${this._toggleMainOption}"
           >Allow disable params</anypoint-checkbox
         >
-        
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"
-          name="noUrlEditor"
+          name="urlEditor"
+          .checked="${urlEditor}"
           @change="${this._toggleMainOption}"
-          >No URL editor</anypoint-checkbox
+          >URL editor</anypoint-checkbox
         >
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
@@ -231,7 +229,7 @@ class ComponentDemo extends ApiDemoPage {
           slot="options"
           name="renderCustomServer"
           @change="${this._toggleMainOption}"
-          >Slot custom servers</anypoint-checkbox
+          >Custom servers</anypoint-checkbox
         >
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
@@ -247,6 +245,16 @@ class ComponentDemo extends ApiDemoPage {
           @change="${this._toggleMainOption}"
           >No Server Selector</anypoint-checkbox
         >
+        <anypoint-checkbox
+          aria-describedby="mainOptionsLabel"
+          slot="options"
+          name="applyAuthorization"
+          .checked="${applyAuthorization}"
+          @change="${this._toggleMainOption}"
+          title="Applies authorization configuration to the request when dispatching the event"
+        >
+          Apply authorization
+        </anypoint-checkbox>
       </arc-interactive-demo>
     </section>`;
   }

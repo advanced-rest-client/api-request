@@ -44,6 +44,7 @@ import { AmfParameterMixin } from '../lib/AmfParameterMixin.js';
 import { AmfInputParser } from '../lib/AmfInputParser.js';
 import * as InputCache from '../lib/InputCache.js';
 import { RequestEvents } from '../events/RequestEvents.js';
+import { EventTypes } from '../events/EventTypes.js';
 import '../../api-authorization-editor.js';
 
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
@@ -505,6 +506,11 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.openedOptional = [];
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    InputCache.registerLocal(this);
+  }
+
   // for the AmfParameterMixin
   notifyChange() {
     this.dispatchEvent(new Event('change'));
@@ -514,18 +520,24 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * @param {EventTarget} node
    */
   _attachListeners(node) {
-    node.addEventListener('api-response', this[responseHandler]);
-    node.addEventListener('oauth2-redirect-uri-changed', this[authRedirectChangedHandler]);
-    node.addEventListener('populate-annotated-fields', this[populateAnnotatedFieldsHandler]);
+    node.addEventListener(EventTypes.Request.apiResponse, this[responseHandler]);
+    node.addEventListener(EventTypes.Request.apiResponseLegacy, this[responseHandler]);
+    node.addEventListener(EventTypes.Request.redirectUriChange, this[authRedirectChangedHandler]);
+    node.addEventListener(EventTypes.Request.redirectUriChangeLegacy, this[authRedirectChangedHandler]);
+    node.addEventListener(EventTypes.Request.populateAnnotatedFields, this[populateAnnotatedFieldsHandler]);
+    node.addEventListener(EventTypes.Request.populateAnnotatedFieldsLegacy, this[populateAnnotatedFieldsHandler]);
   }
 
   /**
    * @param {EventTarget} node
    */
   _detachListeners(node) {
-    node.removeEventListener('api-response', this[responseHandler]);
-    node.removeEventListener('oauth2-redirect-uri-changed', this[authRedirectChangedHandler]);
-    node.removeEventListener('populate-annotated-fields', this[populateAnnotatedFieldsHandler]);
+    node.removeEventListener(EventTypes.Request.apiResponse, this[responseHandler]);
+    node.removeEventListener(EventTypes.Request.apiResponseLegacy, this[responseHandler]);
+    node.removeEventListener(EventTypes.Request.redirectUriChange, this[authRedirectChangedHandler]);
+    node.removeEventListener(EventTypes.Request.redirectUriChangeLegacy, this[authRedirectChangedHandler]);
+    node.removeEventListener(EventTypes.Request.populateAnnotatedFields, this[populateAnnotatedFieldsHandler]);
+    node.removeEventListener(EventTypes.Request.populateAnnotatedFieldsLegacy, this[populateAnnotatedFieldsHandler]);
   }
 
   /**
@@ -571,7 +583,9 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     if (effectiveBaseUri) {
       result = effectiveBaseUri;
     } else {
-      result = computeEndpointUrlValue(this[endpointValue], server);
+      const wa = this._computeWebApi(this.amf);
+      const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
+      result = computeEndpointUrlValue(this[endpointValue], server, schemes);
     }
     const params = this[collectReportParameters]()
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
@@ -601,7 +615,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const source = 'server';
     // clears previously set request parameters related to server configuration.
     this.parametersValue = this.parametersValue.filter(item => item.source !== source);
-    if (!server) {
+    if (!server || ['custom', 'uri'].includes(this.serverType)) {
+      // we don't need to compute server variables for a custom URLs.
       return;
     }
     if (Array.isArray(server.variables) && server.variables.length) {
@@ -629,7 +644,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     // clears previously set request parameters related to server configuration.
     this.parametersValue = this.parametersValue.filter(item => item.source !== source);
     const endpoint = this[endpointValue];
-    if (!endpoint) {
+    if (!endpoint || ['custom', 'uri'].includes(this.serverType)) {
+      // we don't need to compute endpoint variables for a custom URLs.
       return;
     }
     if (Array.isArray(endpoint.parameters) && endpoint.parameters.length) {
@@ -865,11 +881,11 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * handled by `xhr-simple-request` component.
    */
   execute() {
-    this[loadingRequestValue] = true;
     const request = this.serialize();
     const uuid = v4();
     this[requestIdValue] = uuid;
     request.id = uuid;
+    this[loadingRequestValue] = true;
     RequestEvents.apiRequest(this, request);
     RequestEvents.apiRequestLegacy(this, request);
     TelemetryEvents.event(this, {
@@ -1058,6 +1074,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const { value } = e.detail;
     this.serversCount = value;
     this[updateServer]();
+    this.requestUpdate();
   }
 
   /**
@@ -1069,6 +1086,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.serverType = type;
     this.serverValue = value;
     this[updateServer]();
+    this[updateEndpointParameters]();
     this.readUrlData();
   }
 
@@ -1331,7 +1349,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const rendered = security[selectedSecurity];
     return html`
     <section class="authorization params-section">
-      <div class="section-title"><span class="label">Authorization</span></div>
+      <div class="section-title"><span class="label">Credentials</span></div>
       ${security.length > 1 ? this[authorizationSelectorTemplate](security, selectedSecurity) : ''}
       <api-authorization-editor 
         .amf="${amf}"

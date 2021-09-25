@@ -9,5 +9,9 @@ export const EventTypes = Object.freeze({
     abortApiRequestLegacy: 'abort-api-request',
     apiResponse: 'apiresponse',
     apiResponseLegacy: 'api-response',
+    redirectUriChange: 'oauth2redirecturichange',
+    redirectUriChangeLegacy: 'oauth2-redirect-uri-changed',
+    populateAnnotatedFields: 'populateannotatedfields',
+    populateAnnotatedFieldsLegacy: 'populate_annotated_fields',
   }),
 });

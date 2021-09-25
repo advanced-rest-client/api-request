@@ -115,18 +115,17 @@ const mxFunction = base => {
       if (InputCache.has(this.target, id, this.globalCache)) {
         return InputCache.get(this.target, id, this.globalCache);
       }
-      const opts = {};
-      if (parameter.required) {
-        opts.fromExamples = true;
-      }
       let result;
-      if (isArray) {
-        result = ApiSchemaValues.readInputValues(parameter, schema, opts);
-      } else {
-        result = ApiSchemaValues.readInputValue(parameter, schema, opts);
-      }
-      if (result !== undefined) {
-        InputCache.set(this.target, id, result, this.globalCache);
+      if (parameter.required) {
+        const opts = { fromExamples: true };
+        if (isArray) {
+          result = ApiSchemaValues.readInputValues(parameter, schema, opts);
+        } else {
+          result = ApiSchemaValues.readInputValue(parameter, schema, opts);
+        }
+        if (result !== undefined) {
+          InputCache.set(this.target, id, result, this.globalCache);
+        }
       }
       return result;
     }

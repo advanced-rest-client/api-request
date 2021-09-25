@@ -1,3 +1,3 @@
-import { ApiRequestPanelElement } from './src/elements/ApiRequestPanelElement.js';
+import Element from './src/elements/ApiRequestPanelElement.js';
 
-window.customElements.define('api-request-panel', ApiRequestPanelElement);
+window.customElements.define('api-request-panel', Element);

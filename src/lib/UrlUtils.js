@@ -7,14 +7,18 @@
  * Computes the URL value for the current serves, selected server, and endpoint's path.
  * @param {ApiEndPoint} endpoint The current endpoint
  * @param {ApiServer=} server The selected server definition. Optional.
+ * @param {string[]=} schemes API supported schemes. Optional.
  * @returns {string} The URL template value.
  */
- export function computeEndpointUrlValue(endpoint, server) {
+ export function computeEndpointUrlValue(endpoint, server, schemes=[]) {
   let result = '';
   if (server) {
     result += server.url;
     if (result.endsWith('/')) {
       result = result.substr(0, result.length - 1);
+    }
+    if (!(result.startsWith('http:') || result.startsWith('https:')) && schemes.length) {
+      result = `${schemes[0]}://${result}`;
     }
   }
   if (endpoint) {

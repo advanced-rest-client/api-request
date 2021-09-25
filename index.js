@@ -1,6 +1,6 @@
 export { XhrSimpleRequestElement } from './src/elements/XhrSimpleRequestElement.js';
 export { XhrSimpleRequestTransportElement } from './src/elements/XhrSimpleRequestTransportElement.js';
-export { ApiRequestPanelElement } from './src/elements/ApiRequestPanelElement.js';
+export { default as ApiRequestPanelElement } from './src/elements/ApiRequestPanelElement.js';
 export { ApiRequestEditorElement } from './src/elements/ApiRequestEditorElement.js';
 export { default as ApiAuthorizationEditorElement } from './src/elements/ApiAuthorizationEditorElement.js';
 export { default as ApiAuthorizationMethodElement } from './src/elements/ApiAuthorizationMethodElement.js';

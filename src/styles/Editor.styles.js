@@ -142,6 +142,7 @@ api-url-editor {
 
 .url-input-wrapper {
   display: flex;
+  margin: 16px 0;
 }
 
 .url-input {

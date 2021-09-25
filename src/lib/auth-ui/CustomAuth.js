@@ -11,6 +11,8 @@ import * as InputCache from '../InputCache.js';
 /** @typedef {import('@api-components/amf-helper-mixin').ParametrizedSecurityScheme} ParametrizedSecurityScheme */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiNodeShape} ApiNodeShape */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParameter} ApiParameter */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiPropertyShape} ApiPropertyShape */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiShapeUnion} ApiShapeUnion */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.RamlCustomAuthorization} RamlCustomAuthorization */
 /** @typedef {import('../../types').OperationParameter} OperationParameter */
 
@@ -77,8 +79,10 @@ export default class CustomAuth extends ApiUiBase {
         });
       });
     }
+    let addedParameters = false;
     if (Array.isArray(queryParameters)) {
       queryParameters.forEach((p) => {
+        addedParameters = true;
         const param = { ...p, required: true };
         params.push({
           binding: param.binding,
@@ -90,37 +94,80 @@ export default class CustomAuth extends ApiUiBase {
         });
       });
     }
-    if (queryString) {
+    if (!addedParameters && queryString) {
       const shape = /** @type ApiNodeShape */ (queryString);
       const { properties } = shape;
       const binding = 'query';
-      properties.forEach((property) => {
-        const { id, range, name, minCount } = property;
-        const constructed = /** @type ApiParameter */ ({
-          id,
-          binding,
-          schema: range,
-          name,
-          examples: [],
-          payloads: [],
-          types: [ns.aml.vocabularies.apiContract.Parameter],
-          required: minCount > 0,
+      if (!properties) {
+        params.push(this.createParameterFromSchema(shape, binding, source));
+      } else {
+        properties.forEach((property) => {
+          params.push(this.createParameterFromProperty(property, binding, source));
         });
-        params.push({
-          binding,
-          paramId: id,
-          parameter: constructed,
-          source,
-          schemaId: property.id,
-          // @ts-ignore
-          schema: property,
-        });
-      })
+      }
     }
     this.schemeName = security.name || scheme.name;
     this.schemeDescription = scheme.description;
     this.requestUpdate();
     this.notifyChange();
+  }
+
+  /**
+   * @param {ApiShapeUnion} shape
+   * @param {string} binding
+   * @param {string} source
+   * @returns {OperationParameter}
+   */
+  createParameterFromSchema(shape, binding, source) {
+    const { id, name } = shape;
+    const constructed = /** @type ApiParameter */ ({
+      id,
+      binding,
+      schema: shape,
+      name,
+      examples: [],
+      payloads: [],
+      types: [ns.aml.vocabularies.apiContract.Parameter],
+      required: false,
+    });
+    return {
+      binding,
+      paramId: id,
+      parameter: constructed,
+      source,
+      schemaId: id,
+      // @ts-ignore
+      schema: shape,
+    };
+  }
+
+  /**
+   * @param {ApiPropertyShape} property
+   * @param {string} binding
+   * @param {string} source
+   * @returns {OperationParameter}
+   */
+  createParameterFromProperty(property, binding, source) {
+    const { id, range, name, minCount } = property;
+    const constructed = /** @type ApiParameter */ ({
+      id,
+      binding,
+      schema: range,
+      name,
+      examples: [],
+      payloads: [],
+      types: [ns.aml.vocabularies.apiContract.Parameter],
+      required: minCount > 0,
+    });
+    return {
+      binding,
+      paramId: id,
+      parameter: constructed,
+      source,
+      schemaId: property.id,
+      // @ts-ignore
+      schema: property,
+    };
   }
 
   /**
