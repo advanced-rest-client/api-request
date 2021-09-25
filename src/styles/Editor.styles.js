@@ -131,4 +131,12 @@ api-url-editor {
 .hide-optional .optional {
   display: none;
 }
+
+.custom-item .custom-name {
+  margin-right: 4px;
+}
+
+.custom-item .custom-value {
+  margin-left: 4px;
+}
 `;

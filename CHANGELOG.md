@@ -31,11 +31,17 @@ Use the `src/lib/InputCache.js` class to manipulate the cache programmatically w
 #### Refactor
 
 - `serializeRequest()` -> `serialize()`
+- removed option `allowDisableParams`
 
 #### Setting URL values (baseUri, protocols, server)
 
 With version `0.2.x` it was possible to set `server`, `baseUri`, and `protocols` properties so the component is able to compute the endpoint URL without having the `server` value read from the AMF graph model. This turned out to be a feature that is not used so it is removed in `0.3.0`. Use `baseUri` to override any value defined in the servers.
 Note, when `baseUri` is set it takes precedence over any other URI configuration (like a selected server).
+
+### URL editor
+
+The URL editor is optional by default. The input won't be rendered until the `urlEditor` property is set.
+For a better user experience do not set this option unless crucial for the application. To give user a feedback when updating parameters use option `urlLabel`.
 
 ### Body editor
 

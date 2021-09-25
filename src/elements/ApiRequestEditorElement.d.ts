@@ -19,7 +19,6 @@ import {
   ApiOperation,
   ApiPayload,
 } from '@api-components/amf-helper-mixin';
-import { ApiUrlDataModel } from '@api-components/api-url';
 import { AmfFormItem } from '@advanced-rest-client/arc-types/src/forms/FormTypes';
 import { Oauth2Credentials, } from '@advanced-rest-client/authorization';
 import { ApiConsoleRequest, PopulationInfo, SecuritySelectorListItem } from '../types';
@@ -33,6 +32,10 @@ export const authorizationTemplate: unique symbol;
 export const authorizationSelectorTemplate: unique symbol;
 export const authorizationSelectorItemTemplate: unique symbol;
 
+/**
+ * @fires api-request
+ * @fires apirequest
+ */
 export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
   /** 
    * The currently selected media type for the payloads.
@@ -48,15 +51,7 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    */
   selected: string;
   /**
-   * Hides the URL editor from the view.
-   * The editor is still in the DOM.
-   * @attribute
-   */
-  noUrlEditor: boolean;
-  /**
    * When set it renders a label with the computed URL.
-   * This intended to be used with `noUrlEditor` set to true.
-   * This way it replaces the editor with a simple label.
    * @attribute
    */
   urlLabel: boolean;
@@ -74,12 +69,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @attribute
    */
   allowHideOptional: boolean;
-  /**
-   * If set, enable / disable param checkbox is rendered next to each
-   * form item.
-   * @attribute
-   */
-  allowDisableParams: boolean;
   /**
    * When set, renders "add custom" item button.
    * If the element is to be used without AMF model this should always
@@ -321,8 +310,6 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @returns True when there are not enough servers to render the selector
    */
   get _serverSelectorHidden(): boolean;
-
-  urlFactory: ApiUrlDataModel;
   /** 
    * Set when the selection change, this is a JS object created form the 
    * supportedOperation definition of the AMF graph.

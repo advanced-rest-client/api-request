@@ -14,13 +14,9 @@ class ComponentDemo extends ApiDemoPage {
     super();
     this.initObservableProperties([
       'outlined',
-      'readOnly',
-      'disabled',
       'selectedAmfId',
       'allowCustom',
       'allowHideOptional',
-      'allowDisableParams',
-      'noUrlEditor',
       'responseBody',
       'urlLabel',
       'renderCustomServer',
@@ -29,12 +25,8 @@ class ComponentDemo extends ApiDemoPage {
       'applyAuthorization',
     ]);
     this.componentName = 'api-request-editor';
-    this.allowCustom = false;
+    this.allowCustom = true;
     this.allowHideOptional = true;
-    this.allowDisableParams = true;
-    this.readOnly = false;
-    this.disabled = false;
-    this.noUrlEditor = false;
     this.urlLabel = false;
     this.renderCustomServer = false;
     this.noServerSelector = false;
@@ -134,15 +126,11 @@ class ComponentDemo extends ApiDemoPage {
       darkThemeActive,
       outlined,
       compatibility,
-      readOnly,
-      disabled,
       amf,
       redirectUri,
       allowCustom,
       allowHideOptional,
-      allowDisableParams,
       selectedAmfId,
-      noUrlEditor,
       responseBody,
       urlLabel,
       noServerSelector,
@@ -170,12 +158,8 @@ class ComponentDemo extends ApiDemoPage {
             .selected="${selectedAmfId}"
             ?allowCustom="${allowCustom}"
             ?allowHideOptional="${allowHideOptional}"
-            ?allowDisableParams="${allowDisableParams}"
             ?outlined="${outlined}"
             ?compatibility="${compatibility}"
-            ?readOnly="${readOnly}"
-            ?disabled="${disabled}"
-            ?noUrlEditor="${noUrlEditor}"
             ?urlLabel="${urlLabel}"
             ?applyAuthorization="${applyAuthorization}"
             globalCache
@@ -195,20 +179,6 @@ class ComponentDemo extends ApiDemoPage {
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"
-          name="readOnly"
-          @change="${this._toggleMainOption}"
-          >Read only</anypoint-checkbox
-        >
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
-          name="disabled"
-          @change="${this._toggleMainOption}"
-          >Disabled</anypoint-checkbox
-        >
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
           name="allowCustom"
           .checked="${allowCustom}"
           @change="${this._toggleMainOption}"
@@ -221,21 +191,6 @@ class ComponentDemo extends ApiDemoPage {
           .checked="${allowHideOptional}"
           @change="${this._toggleMainOption}"
           >Allow hide optional</anypoint-checkbox
-        >
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
-          name="allowDisableParams"
-          .checked="${allowDisableParams}"
-          @change="${this._toggleMainOption}"
-          >Allow disable params</anypoint-checkbox
-        >
-        <anypoint-checkbox
-          aria-describedby="mainOptionsLabel"
-          slot="options"
-          name="noUrlEditor"
-          @change="${this._toggleMainOption}"
-          >No url editor</anypoint-checkbox
         >
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"

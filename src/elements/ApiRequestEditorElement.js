@@ -30,6 +30,7 @@ import '@api-components/api-server-selector/api-server-selector.js';
 import '@advanced-rest-client/body-editor/body-formdata-editor.js';
 import '@advanced-rest-client/body-editor/body-multipart-editor.js';
 import '@advanced-rest-client/body-editor/body-raw-editor.js';
+import '@advanced-rest-client/arc-icons/arc-icon.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
@@ -58,6 +59,7 @@ import '../../api-authorization-editor.js';
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParameter} ApiParameter */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
 /** @typedef {import('@api-components/amf-helper-mixin').Operation} Operation */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiScalarShape} ApiScalarShape */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 /** @typedef {import('@anypoint-web-components/anypoint-radio-button/index').AnypointRadioGroupElement} AnypointRadioGroupElement */
 /** @typedef {import('../elements/ApiAuthorizationEditorElement').default} ApiAuthorizationEditorElement */
@@ -87,6 +89,7 @@ export const updateServerParameters = Symbol('updateServerParameters');
 export const updateEndpointParameters = Symbol('updateEndpointParameters');
 export const computeMethodAmfModel = Symbol('computeMethodAmfModel');
 export const computeUrlValue = Symbol('computeUrlValue');
+export const collectReportParameters = Symbol('collectReportParameters');
 export const processSelection = Symbol('processSelection');
 export const authSelectorHandler = Symbol('authSelectorHandler');
 export const mediaTypeSelectHandler = Symbol('mediaTypeSelectHandler');
@@ -100,6 +103,7 @@ export const responseHandler = Symbol('responseHandler');
 export const sendHandler = Symbol('sendHandler');
 export const abortHandler = Symbol('abortHandler');
 export const optionalToggleHandler = Symbol('optionalToggleHandler');
+export const addCustomHandler = Symbol('addCustomHandler');
 export const authorizationTemplate = Symbol('authorizationTemplate');
 export const authorizationSelectorTemplate = Symbol('authorizationSelectorTemplate');
 export const authorizationSelectorItemTemplate = Symbol('authorizationSelectorItemTemplate');
@@ -116,6 +120,7 @@ export const urlLabelTemplate = Symbol('urlLabelTemplate');
 export const formActionsTemplate = Symbol('formActionsTemplate');
 export const abortButtonTemplate = Symbol('abortButtonTemplate');
 export const sendButtonTemplate = Symbol('sendButtonTemplate');
+export const addCustomButtonTemplate = Symbol('addCustomButtonTemplate');
 
 export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(EventsTargetMixin(LitElement))) {
   get styles() {
@@ -151,11 +156,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
        * form to show / hide optional properties.
        */
       allowHideOptional: { type: Boolean },
-      /**
-       * If set, enable / disable param checkbox is rendered next to each
-       * form item.
-       */
-      allowDisableParams: { type: Boolean },
       /**
        * When set, renders "add custom" item button.
        * If the element is to be used without AMF model this should always
@@ -402,7 +402,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.compatibility = false;
     this.noServerSelector = false;
     this.allowCustom = false;
-    this.allowDisableParams = false;
     this.allowHideOptional = false;
     this.allowCustomBaseUri = false;
     /** @type Oauth2Credentials[] */
@@ -526,11 +525,24 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     } else {
       result = computeEndpointUrlValue(this[endpointValue], server);
     }
-    const params = this.parametersValue.map(item => item.parameter);
+    const params = this[collectReportParameters]()
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
     let url = applyUrlVariables(result, report.path, true);
     url = applyUrlParameters(url, report.query, true);
     this.url = url;
+  }
+
+  /**
+   * Creates a list of parameters that are used to generate the inputs report for `AmfInputParser.reportRequestInputs`
+   * @returns {ApiParameter[]} 
+   */
+  [collectReportParameters]() {
+    const params = /** @type ApiParameter[] */ ([]);
+    this.parametersValue.forEach((item) => {
+      const { parameter } = item;
+      params.push(parameter);
+    });
+    return params;
   }
 
   /**
@@ -876,7 +888,14 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       throw new Error(`No API is operation defined on the editor`);
     }
     const method = (op.method || 'get').toUpperCase();
-    const params = this.parametersValue.map(item => item.parameter);
+    const params = [];
+    this.parametersValue.forEach((item) => {
+      const { parameter, enabled } = item;
+      if (enabled === false) {
+        return;
+      }
+      params.push(parameter);
+    });
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
     const serverUrl = `${this.url}`;
     let url = applyUrlVariables(serverUrl, report.path, true);
@@ -1034,6 +1053,32 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     } else {
       this.openedOptional.push(target);
     }
+    this.requestUpdate();
+  }
+
+  /**
+   * When enabled it adds a new custom parameter to the request section defined in the source button.
+   * @param {Event} e
+   */
+  [addCustomHandler](e) {
+    const button = /** @type HTMLElement */ (e.currentTarget);
+    const { type } = button.dataset;
+    if (!['query', 'header'].includes(type)) {
+      return;
+    }
+    const id = v4();
+    const param = /** @type OperationParameter */ ({
+      binding: type,
+      source: 'custom',
+      paramId: id,
+      parameter: {
+        id,
+        required: true,
+        binding: type,
+        name: '',
+      },
+    });
+    this.parametersValue.push(param);
     this.requestUpdate();
   }
 
@@ -1224,10 +1269,10 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
         path.push(item);
       }
     });
-    if (!qp.length && !path.length) {
+    const { allowCustom, openedOptional=[] } = this;
+    if (!allowCustom && !qp.length && !path.length) {
       return '';
     }
-    const { openedOptional=[] } = this;
     const pathOptions = Object.freeze({ required: true });
     const queryClasses = {
       'query-params': true,
@@ -1242,6 +1287,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       <div class="${classMap(queryClasses)}">
         ${this[toggleOptionalTemplate]('query', qp)}
         ${qp.map(param => this.parameterTemplate(param))}
+        ${allowCustom ? this[addCustomButtonTemplate]('query') : ''}
       </div>
     </section>
     `;
@@ -1249,10 +1295,10 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
 
   [headersTemplate]() {
     const headers = this.parametersValue.filter(item => item.binding === 'header');
-    if (!headers.length) {
+    const { allowCustom, openedOptional=[] } = this;
+    if (!allowCustom && !headers.length) {
       return '';
     }
-    const { openedOptional=[] } = this;
     const classes = {
       'header-params': true,
       'hide-optional': this.allowHideOptional && !openedOptional.includes('header'),
@@ -1263,8 +1309,28 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       ${this[toggleOptionalTemplate]('header', headers)}
       <div class="${classMap(classes)}">
         ${headers.map(param => this.parameterTemplate(param))}
+        ${allowCustom ? this[addCustomButtonTemplate]('header') : ''}
       </div>
     </section>
+    `;
+  }
+
+  /**
+   * @param {string} type
+   * @returns {TemplateResult} The template for the add custom parameter button
+   */
+  [addCustomButtonTemplate](type) {
+    return html`
+    <div class="add-custom-button">
+      <anypoint-button
+        data-type="${type}"
+        title="Adds a new custom parameter to the request"
+        @click="${this[addCustomHandler]}"
+      >
+        <arc-icon icon="addCircleOutline"></arc-icon>
+        Add custom
+      </anypoint-button>
+    </div>
     `;
   }
 
@@ -1385,7 +1451,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     if (!allowHideOptional || !params || !params.length) {
       return '';
     }
-    const optional = params.some(p => !p.parameter.required);
+    const optional = params.some(p => !!p.parameter && !p.parameter.required);
     if (!optional) {
       return '';
     }

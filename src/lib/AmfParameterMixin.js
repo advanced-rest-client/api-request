@@ -13,6 +13,7 @@ import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
+import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import '@advanced-rest-client/arc-icons/arc-icon.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js'
 import { classMap } from 'lit-html/directives/class-map.js';
@@ -31,9 +32,14 @@ import { readLabelValue } from './Utils.js';
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 /** @typedef {import('@anypoint-web-components/anypoint-input').SupportedInputTypes} SupportedInputTypes */
 /** @typedef {import('@anypoint-web-components/anypoint-checkbox').AnypointCheckbox} AnypointCheckbox */
+/** @typedef {import('@anypoint-web-components/anypoint-switch').AnypointSwitch} AnypointSwitch */
 /** @typedef {import('../types').OperationParameter} OperationParameter */
 /** @typedef {import('../types').ShapeTemplateOptions} ShapeTemplateOptions */
 /** @typedef {import('../types').ParameterRenderOptions} ParameterRenderOptions */
+
+export const customParamTemplate = Symbol('customParamTemplate');
+export const customParamChangeHandler = Symbol('customParamChangeHandler');
+export const deleteParamHandler = Symbol('deleteParamHandler');
 
 /**
  * @param {any} base
@@ -56,9 +62,10 @@ const mxFunction = base => {
       this.addArrayValueHandler = this.addArrayValueHandler.bind(this);
       this.paramChangeHandler = this.paramChangeHandler.bind(this);
       this.booleanHandler = this.booleanHandler.bind(this);
-      this.deleteParamHandler = this.deleteParamHandler.bind(this);
+      this[deleteParamHandler] = this[deleteParamHandler].bind(this);
       this.enumSelectionHandler = this.enumSelectionHandler.bind(this);
       this.nilHandler = this.nilHandler.bind(this);
+      this[customParamChangeHandler] = this[customParamChangeHandler].bind(this);
     }
 
     /**
@@ -116,7 +123,6 @@ const mxFunction = base => {
       if (isArray) {
         result = ApiSchemaValues.readInputValues(parameter, schema, opts);
       } else {
-        
         result = ApiSchemaValues.readInputValue(parameter, schema, opts);
       }
       if (result !== undefined) {
@@ -169,20 +175,28 @@ const mxFunction = base => {
      * A handler for the remove param button click.
      * @param {Event} e
      */
-    deleteParamHandler(e) {
+    [deleteParamHandler](e) {
       const button = /** @type HTMLElement */ (e.currentTarget);
       const { dataset } = button;
-      const { domainId, index } = dataset;
+      const { domainId, index, deleteParam } = dataset;
       if (!domainId) {
         return;
       }
-      if (!InputCache.has(this.target, domainId, this.globalCache)) {
-        return;
+      let forceUpdate = false;
+      if (deleteParam === 'true') {
+        const pIndex = this.parametersValue.findIndex(p => p.paramId === domainId);
+        this.parametersValue.splice(pIndex, 1);
+        forceUpdate = true;
       }
-      InputCache.remove(this.target, domainId, this.globalCache, index ? Number(index) : undefined);
-      this.requestUpdate();
-      this.notifyChange();
-      this.paramChanged(domainId);
+      if (InputCache.has(this.target, domainId, this.globalCache)) {
+        InputCache.remove(this.target, domainId, this.globalCache, index ? Number(index) : undefined);
+        forceUpdate = true;
+      }
+      if (forceUpdate) {
+        this.requestUpdate();
+        this.notifyChange();
+        this.paramChanged(domainId);
+      }
     }
 
     /**
@@ -238,7 +252,10 @@ const mxFunction = base => {
      * @returns {TemplateResult|string} The template for the request parameter form control.
      */
     parameterTemplate(param, opts={}) {
-      const { schema, parameter } = param;
+      const { schema, parameter, source } = param;
+      if (source === 'custom') {
+        return this[customParamTemplate](param);
+      }
       if (!schema) {
         return '';
       }
@@ -248,14 +265,13 @@ const mxFunction = base => {
     /**
      * @param {ApiParameter} parameter
      * @param {ApiShapeUnion} schema
-     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} [opts=[]] Internal Process options
      * @returns {TemplateResult|string} The template for the request parameter form control.
      */
-    parameterSchemaTemplate(parameter, schema, userOpts={}, opts={}) {
+    parameterSchemaTemplate(parameter, schema, opts={}) {
       const { types } = schema;
       if (types.includes(ns.aml.vocabularies.shapes.ScalarShape)) {
-        return this.scalarShapeTemplate(parameter, /** @type ApiScalarShape */ (schema), userOpts, opts);
+        return this.scalarShapeTemplate(parameter, /** @type ApiScalarShape */ (schema), opts);
       }
       if (types.includes(ns.w3.shacl.NodeShape)) {
         return this.nodeShapeTemplate();
@@ -281,39 +297,37 @@ const mxFunction = base => {
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
-     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @returns {TemplateResult|string} The template for the schema parameter.
      */
-    scalarShapeTemplate(parameter, schema, userOpts={}, opts={}) {
+    scalarShapeTemplate(parameter, schema, opts={}) {
       const { readOnly, values, dataType } = schema;
       if (readOnly) {
         return '';
       }
       if (values && values.length) {
-        return this.enumTemplate(parameter, schema, userOpts, opts);
+        return this.enumTemplate(parameter, schema, opts);
       }
       const inputType = ApiSchemaValues.readInputType(dataType);
       if (inputType === 'boolean') {
         return this.booleanTemplate(parameter, schema, opts);
       }
-      return this.textInputTemplate(parameter, schema, inputType, userOpts, opts);
+      return this.textInputTemplate(parameter, schema, inputType, opts);
     }
 
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
      * @param {SupportedInputTypes=} type The input type.
-     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @return {TemplateResult} A template for an input form item for the given type and schema
      */
-    textInputTemplate(parameter, schema, type, userOpts={}, opts={}) {
-      const { id, binding } = parameter;
+    textInputTemplate(parameter, schema, type, opts={}) {
+      const { id, binding, } = parameter;
       const { pattern, minimum, minLength, maxLength, maximum, multipleOf } = schema;
       let required;
-      if (typeof userOpts.required === 'boolean') {
-        required = userOpts.required;
+      if (typeof opts.required === 'boolean') {
+        required = opts.required;
       } else {
         required = parameter.required;
       }
@@ -383,14 +397,15 @@ const mxFunction = base => {
      */
     deleteParamTemplate(paramId, arrayIndex) {
       const { compatibility, anypoint } = this;
-      const title = 'Removes this parameter value.';
+      const title = 'Removes this parameter.';
       return html`
       <anypoint-icon-button 
         ?compatibility="${compatibility || anypoint}" 
         title="${title}" 
         data-domain-id="${paramId}"
         data-index="${ifDefined(arrayIndex)}"
-        @click="${this.deleteParamHandler}"
+        data-delete-param="true"
+        @click="${this[deleteParamHandler]}"
       >
         <arc-icon icon="removeCircleOutline"></arc-icon>
       </anypoint-icon-button>
@@ -400,15 +415,14 @@ const mxFunction = base => {
     /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
-     * @param {ParameterRenderOptions=} [userOpts={}] Render options
      * @param {ShapeTemplateOptions=} opts
      * @returns {TemplateResult|string} The template for the enum input.
      */
-    enumTemplate(parameter, schema, userOpts={}, opts={}) {
+    enumTemplate(parameter, schema, opts={}) {
       const { compatibility, anypoint } = this;
       let required;
-      if (typeof userOpts.required === 'boolean') {
-        required = userOpts.required;
+      if (typeof opts.required === 'boolean') {
+        required = opts.required;
       } else {
         required = parameter.required;
       }
@@ -541,7 +555,7 @@ const mxFunction = base => {
         // this is a case where a scalar is marked as nillable instead of not required
         // (which for some reason is a common practice among RAML developers).
         const scalar = anyOf.find(shape => shape !== nil);
-        return this.parameterSchemaTemplate(parameter, scalar, {}, {
+        return this.parameterSchemaTemplate(parameter, scalar, {
           nillable: true,
         });
       }
@@ -554,11 +568,12 @@ const mxFunction = base => {
       // at this point only scalars are possible. For that we render a regular text field 
       // and while serializing the values we figure out what type it should be giving the 
       // value provided and available types in the union.
+      /** @type ShapeTemplateOptions */
       let opts;
       if (nil) {
         opts = { nillable: true };
       }
-      return this.textInputTemplate(parameter, schema, 'text', {}, opts);
+      return this.textInputTemplate(parameter, schema, 'text', opts);
     }
 
     /**
@@ -593,7 +608,7 @@ const mxFunction = base => {
       const label = readLabelValue(parameter, schema);
       const values = /** @type any[] */ (this.readInputValue(parameter, schema, true));
       const options = { arrayItem: true, };
-      const inputs = values.map((value, index) => this.parameterSchemaTemplate(parameter, items, {}, { ...options, value, index }));
+      const inputs = values.map((value, index) => this.parameterSchemaTemplate(parameter, items, { ...options, value, index }));
       return html`
       <div class="array-form-item" data-param-id="${id}" data-param-label="${label}">
         <div class="array-title"><span class="label">${label}</span></div>
@@ -633,6 +648,95 @@ const mxFunction = base => {
     addArrayItemTemplate(id) {
       return html`
       <anypoint-button data-id="${id}" @click="${this.addArrayValueHandler}">Add new value</anypoint-button>
+      `;
+    }
+
+    /**
+     * Handler for a custom parameter input change.
+     * @param {Event} e
+     */
+    [customParamChangeHandler](e) {
+      const input = /** @type HTMLInputElement */ (e.target);
+      const { value, name, dataset } = input;
+      const { domainId } = dataset;
+      if (!domainId || !['paramName', 'paramValue'].includes(name)) {
+        return;
+      }
+      if (name === 'paramName') {
+        const param = this.parametersValue.find(item => item.paramId === domainId);
+        if (!param) {
+          return;
+        }
+        param.parameter.name = value;
+      } else {
+        InputCache.set(this.target, domainId, value, this.globalCache);
+      }
+      this.notifyChange();
+      this.paramChanged(domainId);
+    }
+
+    /**
+     * @param {OperationParameter} param The parameter to render
+     * @returns {TemplateResult} The template for a custom parameter
+     */
+    [customParamTemplate](param) {
+      const value = InputCache.get(this.target, param.paramId, this.globalCache);
+      const classes = {
+        'form-item': true,
+        'custom-item': true,
+      };
+      let nameLabel;
+      let nameTitle;
+      let valueLabel;
+      let valueTitle;
+      if (param.binding === 'query') {
+        nameLabel = 'Query parameter'
+        nameTitle = 'The name of this query parameter';
+        valueLabel = 'Parameter value';
+        valueTitle = 'The value of this query parameter';
+      } else if (param.binding === 'header') {
+        nameLabel = 'Header name'
+        nameTitle = 'The name of this header';
+        valueLabel = 'Header value';
+        valueTitle = 'The value of this header';
+      } else {
+        nameLabel = 'Parameter name'
+        nameTitle = 'The name of the parameter';
+        valueLabel = 'Parameter value';
+        valueTitle = 'The value of the parameter';
+      }
+      return html`
+      <div class="${classMap(classes)}">
+        <anypoint-input 
+          data-domain-id="${param.paramId}"
+          data-binding="${param.binding}"
+          class="form-input custom-name"
+          .value="${param.parameter.name}"
+          title="${nameTitle}"
+          name="paramName"
+          @change="${this[customParamChangeHandler]}"
+          ?compatibility="${this.compatibility || this.anypoint}"
+          ?outlined="${this.outlined}"
+          noLabelFloat
+        >
+          <label slot="label">${nameLabel}</label>
+        </anypoint-input>
+        <anypoint-input 
+          data-domain-id="${param.paramId}"
+          data-binding="${param.binding}"
+          class="form-input custom-value"
+          .value="${value}"
+          title="${valueTitle}"
+          name="paramValue"
+          @change="${this[customParamChangeHandler]}"
+          ?compatibility="${this.compatibility || this.anypoint}"
+          ?outlined="${this.outlined}"
+          noLabelFloat
+        >
+          <label slot="label">${valueLabel}</label>
+        </anypoint-input>
+        ${this.deleteParamTemplate(param.paramId)}
+      </div>
       `;
     }
   }

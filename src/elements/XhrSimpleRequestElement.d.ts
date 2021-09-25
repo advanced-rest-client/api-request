@@ -56,6 +56,8 @@ import { XhrSimpleRequestTransportElement } from './XhrSimpleRequestTransportEle
  *
  * Please note that aborting the request always sends `api-response` event
  * with `isError` set to true.
+ * 
+ * @fires api-response
  */
 export declare class XhrSimpleRequestElement extends EventsTargetMixin(LitElement) {
   /**

@@ -98,13 +98,6 @@ export interface OperationParameter {
   source: string;
 }
 
-export interface ShapeTemplateOptions {
-  nillable?: boolean;
-  arrayItem?: boolean;
-  index?: number;
-  value?: any;
-}
-
 export interface SecuritySelectorListItem {
   types: string[];
   labels: string[];
@@ -118,8 +111,11 @@ export interface ParameterRenderOptions {
    * This also forces the renderer to force example value when default is not present.
    */
   required?: boolean;
-  /**
-   * Renders the toggle button to ignore the control.
-   */
-  allowDisable?: boolean;
+}
+
+export interface ShapeTemplateOptions extends ParameterRenderOptions {
+  nillable?: boolean;
+  arrayItem?: boolean;
+  index?: number;
+  value?: any;
 }
