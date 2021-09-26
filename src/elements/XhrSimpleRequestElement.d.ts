@@ -99,9 +99,10 @@ export declare class XhrSimpleRequestElement extends EventsTargetMixin(LitElemen
    * If `proxy` is set, it will URL encode the request URL before appending it to the proxy URL.
    * `http://domain.com/path/?query=some+value` will become
    * `https://proxy.com/?url=http%3A%2F%2Fdomain.com%2Fpath%2F%3Fquery%3Dsome%2Bvalue`
+   * 
    * @attribute
    */
-  proxyEncodeUrl: string;
+  proxyEncodeUrl: boolean;
 
   /**
    * True while loading latest started requests.

@@ -1,5 +1,4 @@
 import { fixture, assert, html, aTimeout } from '@open-wc/testing';
-import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 
@@ -20,29 +19,15 @@ describe('ApiRequestEditorElement', () => {
     }
 
     const apiFile = 'APIC-289';
-    [
-      ['Compact model', true],
-      ['Full model', false]
-    ].forEach(([label, compact]) => {
-      describe(`${label}`, () => {
+    [true, false].forEach((compact) => {
+      describe(compact ? 'Compact model' : 'Full model', () => {
         /** @type AmfLoader */
         let store;
         /** @type AmfDocument */
         let amf;
-        /** @type ApiViewModel */
-        let factory;
         before(async () => {
           store = new AmfLoader();
-          amf = await store.getGraph(Boolean(compact), apiFile);
-          factory = new ApiViewModel();
-        });
-
-        after(() => {
-          factory = null;
-        });
-
-        afterEach(() => {
-          factory.clearCache();
+          amf = await store.getGraph(compact, apiFile);
         });
 
         it('generates query parameters model', async () => {
@@ -50,7 +35,7 @@ describe('ApiRequestEditorElement', () => {
           const element = await modelFixture(amf, method['@id']);
           await aTimeout(0);
           await aTimeout(0);
-          const model = element._queryModel;
+          const model = element.parametersValue;
           assert.lengthOf(model, 1);
         });
 
@@ -59,8 +44,17 @@ describe('ApiRequestEditorElement', () => {
           const element = await modelFixture(amf, method['@id']);
           await aTimeout(0);
           await aTimeout(0);
-          const model = element._queryModel;
-          assert.equal(model[0].name, 'foo');
+          const model = element.parametersValue.find(p => p.parameter.name === 'foo_bar');
+          assert.equal(model.parameter.paramName, 'foo');
+        });
+
+        it('render parameter name with the input', async () => {
+          const method = store.lookupOperation(amf, '/organization', 'get');
+          const element = await modelFixture(amf, method['@id']);
+          await aTimeout(0);
+          await aTimeout(0);
+          const node = element.shadowRoot.querySelector('.form-input label');
+          assert.equal(node.textContent.trim(), 'foo*');
         });
       });
     });

@@ -2,6 +2,7 @@
 import { fixture, assert, nextFrame, html } from '@open-wc/testing';
 import { MockServer } from './server.js';
 import '../../xhr-simple-request.js';
+import { EventTypes } from '../../src/events/EventTypes.js';
 
 /** @typedef {import('../../').XhrSimpleRequestElement} XhrSimpleRequestElement */
 
@@ -44,7 +45,7 @@ describe('<xhr-simple-request>', () => {
     let lastId = 0;
     function fire(detail) {
       detail.id = `request${++lastId}`;
-      const e = new CustomEvent('api-request', {
+      const e = new CustomEvent(EventTypes.Request.apiRequest, {
         cancelable: true,
         bubbles: true,
         composed: true,
@@ -71,8 +72,8 @@ describe('<xhr-simple-request>', () => {
       });
 
       it('Cancelled event is not handled', () => {
-        document.body.addEventListener('api-request', function clb(e) {
-          document.body.removeEventListener('api-request', clb);
+        document.body.addEventListener(EventTypes.Request.apiRequest, function clb(e) {
+          document.body.removeEventListener(EventTypes.Request.apiRequest, clb);
           e.preventDefault();
         });
         const request = {
@@ -84,8 +85,8 @@ describe('<xhr-simple-request>', () => {
       });
 
       it('Processes not cancelled event', (done) => {
-        element.addEventListener('api-response', function clb() {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb() {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           done();
         });
         const request = {
@@ -97,8 +98,8 @@ describe('<xhr-simple-request>', () => {
       });
 
       it('Reports aborted request', (done) => {
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const { detail } = e;
           assert.equal(detail.id, `request${  lastId}`);
@@ -112,7 +113,7 @@ describe('<xhr-simple-request>', () => {
         };
         fire(request);
         setTimeout(() => {
-          const e = new CustomEvent('abort-api-request', {
+          const e = new CustomEvent(EventTypes.Request.abortApiRequest, {
             cancelable: true,
             bubbles: true,
             composed: true,
@@ -148,8 +149,8 @@ describe('<xhr-simple-request>', () => {
           method: 'GET'
         };
         fire(request);
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail;
           assert.isFalse(data.isError, 'isError is set');
@@ -168,8 +169,8 @@ describe('<xhr-simple-request>', () => {
           method: 'GET'
         };
         fire(request);
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail.response;
           assert.equal(data.status, 200, 'status is set');
@@ -186,8 +187,8 @@ describe('<xhr-simple-request>', () => {
           method: 'GET'
         };
         fire(request);
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail.response;
           assert.equal(data.status, 200, 'status is set');
@@ -204,8 +205,8 @@ describe('<xhr-simple-request>', () => {
           method: 'GET'
         };
         fire(request);
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail.response;
           assert.equal(data.status, 200, 'status is set');
@@ -225,8 +226,8 @@ describe('<xhr-simple-request>', () => {
           headers: 'Content-Type: plain/text'
         };
         fire(request);
-        element.addEventListener('api-response', function clb(e) {
-          element.removeEventListener('api-response', clb);
+        element.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          element.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail.response;
           assert.equal(data.payload, body, 'payload is set');
@@ -241,8 +242,8 @@ describe('<xhr-simple-request>', () => {
           headers: 'x-test: test\r\naccept: application/json'
         };
         fire(request);
-        window.addEventListener('api-response', function clb(e) {
-          window.removeEventListener('api-response', clb);
+        window.addEventListener(EventTypes.Request.apiResponse, function clb(e) {
+          window.removeEventListener(EventTypes.Request.apiResponse, clb);
           // @ts-ignore
           const data = e.detail.response;
           assert.equal(data.payload,

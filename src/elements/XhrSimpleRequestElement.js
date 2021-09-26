@@ -15,6 +15,7 @@ the License.
 import { LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import { EventTypes } from '../events/EventTypes.js';
+import { RequestEvents } from '../events/RequestEvents.js';
 import '../../xhr-simple-request-transport.js';
 
 /** @typedef {import('./XhrSimpleRequestTransportElement').XhrSimpleRequestTransportElement} XhrSimpleRequestTransportElement */
@@ -279,7 +280,7 @@ export class XhrSimpleRequestElement extends EventsTargetMixin(LitElement) {
     this._loading = false;
     const info = this.activeRequests.get(id);
     const result = this._createDetail(info, id);
-    this._notifyResponse(result);
+    RequestEvents.apiResponse(this, result);
   }
 
   /**
@@ -298,21 +299,7 @@ export class XhrSimpleRequestElement extends EventsTargetMixin(LitElement) {
     const result = this._createDetail(request, id);
     result.isError = true;
     result.error = error;
-    this._notifyResponse(result);
-  }
-
-  /**
-   * Dispatches `api-response` custom event.
-   *
-   * @param {ApiConsoleResponse} detail Request and response data.
-   */
-  _notifyResponse(detail) {
-    const e = new CustomEvent('api-response', {
-      bubbles: true,
-      composed: true,
-      detail
-    });
-    this.dispatchEvent(e);
+    RequestEvents.apiResponse(this, result);
   }
 
   /**

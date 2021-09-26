@@ -744,7 +744,7 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
     Object.keys(values).forEach((key) => {
       const value = values[key];
       const info = params.find(p => p.parameter.name === key);
-      if (!info.parameter.required) {
+      if (info.parameter.required !== true) {
         const type = typeof value;
         if (type === 'number') {
           if (!value && value !== 0) {

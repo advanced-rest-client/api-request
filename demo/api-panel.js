@@ -90,7 +90,7 @@ class ComponentDemo extends ApiDemoPage {
       ['SE-12224', 'Scope is not an array issues (SE-12224)'],
       ['APIC-168', 'Custom scheme support (APIC-168)'],
       ['async-api', 'AsyncAPI'],
-      ['APIC-289', 'OAS param names'],
+      ['APIC-289', 'OAS param names (APIC-289)'],
       ['api-keys', 'API key'],
       ['oas-demo', 'OAS Demo API'],
       ['oauth-flows', 'OAS OAuth Flow'],

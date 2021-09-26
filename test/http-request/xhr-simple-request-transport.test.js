@@ -191,6 +191,7 @@ describe('<xhr-simple-request-transport>', () => {
         requestHeaders.set('accept', 'application/json');
         element.send({
           url: 'http://success.domain.com/headers',
+          // @ts-ignore
           headers: requestHeaders,
           method: 'GET',
         });
@@ -350,95 +351,95 @@ describe('<xhr-simple-request-transport>', () => {
           test: true
         });
       });
-    
-      describe('constructor()', () => {
-        let element = /** @type XhrSimpleRequestTransportElement */ (null);
-        beforeEach(async () => {
-          element = await basicFixture();
-        });
-    
-        it('sets _xhr', () => {
-          assert.ok(element._xhr);
-        });
-    
-        it('sets null response', () => {
-          assert.equal(element.response, null);
-        });
-    
-        it('sets 0 status', () => {
-          assert.equal(element.status, 0);
-        });
-    
-        it('sets empty statusText', () => {
-          assert.equal(element.statusText, '');
-        });
-    
-        it('sets completes', () => {
-          assert.ok(element.completes);
-        });
-    
-        it('sets default aborted', () => {
-          assert.isFalse(element.aborted);
-        });
-    
-        it('sets error property', () => {
-          assert.isFalse(element.error);
-        });
-    
-        it('sets timedOut aborted', () => {
-          assert.isFalse(element.timedOut);
-        });
-    
-        it('sets resolveCompletes', async () => {
-          await nextFrame();
-          assert.ok(element.resolveCompletes);
-        });
-    
-        it('sets rejectCompletes', async () => {
-          await nextFrame();
-          assert.ok(element.rejectCompletes);
-        });
+    });
+
+    describe('constructor()', () => {
+      let element = /** @type XhrSimpleRequestTransportElement */ (null);
+      beforeEach(async () => {
+        element = await basicFixture();
       });
-    
-      describe('send()', () => {
-        let srv;
-        before(() => {
-          srv = new MockServer();
-          srv.createServer();
+  
+      it('sets _xhr', () => {
+        assert.ok(element._xhr);
+      });
+  
+      it('sets null response', () => {
+        assert.equal(element.response, null);
+      });
+  
+      it('sets 0 status', () => {
+        assert.equal(element.status, 0);
+      });
+  
+      it('sets empty statusText', () => {
+        assert.equal(element.statusText, '');
+      });
+  
+      it('sets completes', () => {
+        assert.ok(element.completes);
+      });
+  
+      it('sets default aborted', () => {
+        assert.isFalse(element.aborted);
+      });
+  
+      it('sets error property', () => {
+        assert.isFalse(element.error);
+      });
+  
+      it('sets timedOut aborted', () => {
+        assert.isFalse(element.timedOut);
+      });
+  
+      it('sets resolveCompletes', async () => {
+        await nextFrame();
+        assert.ok(element.resolveCompletes);
+      });
+  
+      it('sets rejectCompletes', async () => {
+        await nextFrame();
+        assert.ok(element.rejectCompletes);
+      });
+    });
+  
+    describe('send()', () => {
+      let srv;
+      before(() => {
+        srv = new MockServer();
+        srv.createServer();
+      });
+  
+      after(() => {
+        srv.restore();
+      });
+  
+      let element = /** @type XhrSimpleRequestTransportElement */ (null);
+      beforeEach(async () => {
+        element = await basicFixture();
+      });
+  
+      it('makes a request', async () => {
+        element.send({
+          url: 'http://success.domain.com/',
+          method: 'GET',
         });
-    
-        after(() => {
-          srv.restore();
+        const result = await element.completes;
+        assert.equal(result.response, 'test');
+      });
+  
+      it('rejects when error', async () => {
+        element.send({
+          url: 'http://error.domain.com/404',
+          method: 'GET',
         });
-    
-        let element = /** @type XhrSimpleRequestTransportElement */ (null);
-        beforeEach(async () => {
-          element = await basicFixture();
-        });
-    
-        it('makes a request', async () => {
-          element.send({
-            url: 'http://success.domain.com/',
-            method: 'GET',
-          });
-          const result = await element.completes;
-          assert.equal(result.response, 'test');
-        });
-    
-        it('rejects when error', async () => {
-          element.send({
-            url: 'http://error.domain.com/404',
-            method: 'GET',
-          });
-          let rejected = false;
-          try {
-            await element.completes;
-          } catch (e) {
-            rejected = true;
-            assert.equal(e.error.message, 'The request failed with status code: 404');
-          }
-          assert.isTrue(rejected);
-        });
+        let rejected = false;
+        try {
+          await element.completes;
+        } catch (e) {
+          rejected = true;
+          assert.equal(e.error.message, 'The request failed with status code: 404');
+        }
+        assert.isTrue(rejected);
       });
     });
 

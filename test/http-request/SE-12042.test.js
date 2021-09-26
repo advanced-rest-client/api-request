@@ -1,6 +1,5 @@
 import { fixture, assert, html, aTimeout } from '@open-wc/testing';
 import sinon from 'sinon';
-import { ApiViewModel } from '@api-components/api-forms'
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 
@@ -32,20 +31,9 @@ describe('ApiRequestEditorElement', () => {
           let store;
           /** @type AmfDocument */
           let amf;
-          /** @type ApiViewModel */
-          let factory;
           before(async () => {
             store = new AmfLoader();
             amf = await store.getGraph(Boolean(compact), apiFile);
-            factory = new ApiViewModel();
-          });
-
-          after(() => {
-            factory = null;
-          });
-
-          afterEach(() => {
-            factory.clearCache();
           });
 
           it('sets headers from the authorization method', async () => {

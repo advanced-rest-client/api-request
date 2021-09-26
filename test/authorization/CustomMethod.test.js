@@ -1,6 +1,5 @@
 import { fixture, assert, aTimeout, nextFrame, html } from '@open-wc/testing';
 import sinon from 'sinon';
-import { ApiViewModel } from '@api-components/api-forms';
 import { AmfLoader } from "../AmfLoader.js";
 import '../../api-authorization-method.js';
 
@@ -295,27 +294,16 @@ describe('RAML custom scheme', () => {
   [true, false].forEach((compact) => {
     describe(compact ? 'Compact model' : 'Full model', () => {
       describe('Event-based population', () => {
-        /** @type ApiViewModel */
-        let factory;
         /** @type ApiAuthorizationMethodElement */
         let element;
     
         before(async () => {
           model = await store.getGraph(compact);
-          factory = new ApiViewModel();
-        });
-
-        after(() => {
-          factory = null;
         });
     
         beforeEach(async () => {
           const security = getApiParametrizedSecurityScheme('/authorization/custom1', 'get');
           element = await methodFixture(model, security);
-        });
-    
-        afterEach(() => {
-          factory.clearCache();
         });
     
         it('populates the header field (compatibility v0.2.0)', async () => {
@@ -393,27 +381,16 @@ describe('RAML custom scheme', () => {
       });
 
       describe('clear()', () => {
-        /** @type ApiViewModel */
-        let factory;
         /** @type ApiAuthorizationMethodElement */
         let element;
     
         before(async () => {
           model = await store.getGraph(compact);
-          factory = new ApiViewModel();
-        });
-
-        after(() => {
-          factory = null;
         });
     
         beforeEach(async () => {
           const security = getApiParametrizedSecurityScheme('/authorization/custom1', 'get');
           element = await methodFixture(model, security);
-        });
-    
-        afterEach(() => {
-          factory.clearCache();
         });
 
         it('clears headers', () => {

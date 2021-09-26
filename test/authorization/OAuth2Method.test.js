@@ -28,7 +28,7 @@ describe('OAuth 2', () => {
   let model;
   before(async () => {
     store = new AmfLoader();
-    model = await store.getGraph(false, 'secured-api');
+    model = await store.getGraph(true, 'secured-api');
   });
 
   /**
@@ -249,7 +249,7 @@ describe('OAuth 2', () => {
     let element;
 
     beforeEach(async () => {
-      const scheme = await getApiParametrizedSecurityScheme('/oauth2-with-annotations', 'get');
+      const scheme = getApiParametrizedSecurityScheme('/oauth2-with-annotations', 'get');
       element = await methodFixture(model, scheme);
     });
 
@@ -258,7 +258,10 @@ describe('OAuth 2', () => {
       await nextFrame();
       const info = element.serialize();
       assert.typeOf(info.customData.auth.parameters, 'array');
-      assert.lengthOf(info.customData.auth.parameters, 3);
+      assert.lengthOf(info.customData.auth.parameters, 1);
+      const [param] = info.customData.auth.parameters;
+      assert.equal(param.name, 'resource');
+      assert.equal(param.value, 'default');
     });
 
     it('has no token properties for implicit data', async () => {
@@ -278,9 +281,14 @@ describe('OAuth 2', () => {
       input.value = 'test';
       input.dispatchEvent(new Event('change'));
       const info = element.serialize();
-      assert.typeOf(info.customData.token.parameters, 'array');
-      assert.lengthOf(info.customData.token.parameters, 2);
-
+      assert.lengthOf(info.customData.auth.parameters, 1, 'has auth parameter');
+      assert.lengthOf(info.customData.token.parameters, 1, 'has token parameter');
+      const [authParam] = info.customData.auth.parameters;
+      assert.equal(authParam.name, 'resource');
+      assert.equal(authParam.value, 'default');
+      const [tokenParam] = info.customData.token.parameters;
+      assert.equal(tokenParam.name, 'queryTokenResource');
+      assert.equal(tokenParam.value, 'test');
       assert.isUndefined(element.pkce, 'pkce is not set');
     });
     
@@ -294,7 +302,10 @@ describe('OAuth 2', () => {
       input.dispatchEvent(new Event('change'));
       const info = element.serialize();
       assert.typeOf(info.customData.token.parameters, 'array');
-      assert.lengthOf(info.customData.token.parameters, 2);
+      assert.lengthOf(info.customData.token.parameters, 1);
+      const [param] = info.customData.token.parameters;
+      assert.equal(param.name, 'queryTokenResource');
+      assert.equal(param.value, 'test');
     });
 
     it('serializes password data', async () => {
@@ -306,7 +317,10 @@ describe('OAuth 2', () => {
       input.dispatchEvent(new Event('change'));
       const info = element.serialize();
       assert.typeOf(info.customData.token.parameters, 'array');
-      assert.lengthOf(info.customData.token.parameters, 2);
+      assert.lengthOf(info.customData.token.parameters, 1);
+      const [param] = info.customData.token.parameters;
+      assert.equal(param.name, 'queryTokenResource');
+      assert.equal(param.value, 'test');
     });
 
     it('serializes custom grant data', async () => {
@@ -318,7 +332,10 @@ describe('OAuth 2', () => {
       input.dispatchEvent(new Event('change'));
       const info = element.serialize();
       assert.typeOf(info.customData.token.parameters, 'array');
-      assert.lengthOf(info.customData.token.parameters, 2);
+      assert.lengthOf(info.customData.token.parameters, 1);
+      const [param] = info.customData.token.parameters;
+      assert.equal(param.name, 'queryTokenResource');
+      assert.equal(param.value, 'test');
     });
   });
 });

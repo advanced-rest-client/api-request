@@ -42,7 +42,6 @@ export const updateServerParameters: unique symbol;
 export const updateEndpointParameters: unique symbol;
 export const computeMethodAmfModel: unique symbol;
 export const computeUrlValue: unique symbol;
-export const collectReportParameters: unique symbol;
 export const processSelection: unique symbol;
 export const getOrderedPathParams: unique symbol;
 export const validateUrl: unique symbol;
@@ -297,6 +296,12 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * The list of parameter groups that are opened when `allowHideOptional` is set.
    */
   openedOptional: string[];
+
+  serversCount?: number;
+  /**
+   * The list of computed servers for this AMF configuration.
+   */
+  servers: ApiServer[];
   
   constructor();
 
@@ -325,11 +330,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * Computes the URL value for the current serves, selected server, and endpoint's path.
    */
   [computeUrlValue](): void;
-
-  /**
-   * Creates a list of parameters that are used to generate the inputs report for `AmfInputParser.reportRequestInputs`
-   */
-  [collectReportParameters](): ApiParameter[];
 
   /**
    * Checks if the current server has variables and update the parameters array

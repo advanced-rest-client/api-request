@@ -66,10 +66,15 @@ export class AmfInputParser {
         report[binding][name] = defaultNil;
         return;
       }
-      const value = values.get(id);
+      let value = values.get(id);
       const jsType = typeof value;
       if (jsType === 'undefined' && !required) {
         return;
+      }
+      if (jsType === 'undefined') {
+        if (schema.types.includes(ns.aml.vocabularies.shapes.ScalarShape)) {
+          value = ApiSchemaValues.readInputValue(param, /** @type ApiScalarShape */ (schema));
+        }
       }
       if (!schema) {
         // without schema we treat it as "any". It generates string values.

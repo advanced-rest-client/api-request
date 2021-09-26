@@ -95,3 +95,7 @@ window.addEventListener(EventTypes.Request.apiRequest, (e) => {
 // dispatch the request event
 RequestEvents.apiRequest(window, { /* the request definition */ });
 ```
+
+### Tests
+
+The tests for Firefox currently fails because `playwright` uses a previous version of the browser which has no support for ES modules in web workers. However, the current version support them. Firefox is temporarily removed from tests.

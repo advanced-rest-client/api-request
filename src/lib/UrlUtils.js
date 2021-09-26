@@ -4,13 +4,34 @@
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
 
 /**
+ * Computes the URL value for the endpoint's path and the base uri.
+ * @param {ApiEndPoint} endpoint The current endpoint
+ * @param {string} baseUri The base uri to use.
+ * @returns {string} The URL template value.
+ */
+export function computeBaseUriEndpointUrlValue(endpoint, baseUri) {
+  let result = baseUri;
+  if (result.endsWith('/')) {
+    result = result.substr(0, result.length - 1);
+  }
+  if (endpoint) {
+    let { path='' } = endpoint;
+    if (path[0] !== '/') {
+      path = `/${path}`;
+    }
+    result += path;
+  }
+  return result;
+}
+
+/**
  * Computes the URL value for the current serves, selected server, and endpoint's path.
  * @param {ApiEndPoint} endpoint The current endpoint
  * @param {ApiServer=} server The selected server definition. Optional.
  * @param {string[]=} schemes API supported schemes. Optional.
  * @returns {string} The URL template value.
  */
- export function computeEndpointUrlValue(endpoint, server, schemes=[]) {
+export function computeEndpointUrlValue(endpoint, server, schemes=[]) {
   let result = '';
   if (server) {
     result += server.url;

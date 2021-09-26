@@ -1,0 +1,588 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Test API.",
+    "version": "1.0.0",
+    "title": "Test API",
+    "contact": {},
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "Orders",
+      "description": "Secured calls made by authorized external system users."
+    },
+    {
+      "name": "Webhooks"
+    },
+    {
+      "name": "Reports",
+      "description": "Pre-signed report endpoint given to trusted systems for long-term storage."
+    },
+    {
+      "name": "Consent Activity",
+      "description": "Secured calls made by a front-end application."
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/prescreens": {
+      "post": {
+        "summary": "add a new screening",
+        "description": "By passing in the appropriate data, you can order a new pre-employment screening in the system",
+        "operationId": "newPreScreening",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PreScreenOrder"
+            },
+            "x-examples": {
+              "application/json": {
+                "firstName": "Bob",
+                "lastName": "Jones",
+                "email": "bob@jones.com",
+                "smsNumber": "15564548890",
+                "applicationRefId": "abc1223",
+                "applicantRefId": "abc123",
+                "userRefId": "abc123",
+                "externalRefId": "abc123",
+                "webhookUrl": "https://my.webhook.com",
+                "workHistory": [
+                  {
+                    "companyName": "deverus, inc.",
+                    "startDate": "04/2010",
+                    "endDate": "06/2017",
+                    "jobTitle": "developer",
+                    "supervisor": "John Doe",
+                    "country": "United States",
+                    "state": "Texas",
+                    "city": "Austin",
+                    "postalCode": "75020",
+                    "companyContact": "Elmer Fudd"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/Created"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/prescreens/{id}": {
+      "get": {
+        "summary": "fetches a screening",
+        "description": "By passing in the appropriate ID, you can fetch a pre-employment screening in the system",
+        "operationId": "fetchPreScreening",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "tags": [
+          "Consent Activity"
+        ]
+      },
+      "patch": {
+        "summary": "updates a screening",
+        "description": "Updates a pre-employment screening with subject data and/or status information.",
+        "operationId": "updatePreScreening",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PreScreenPatch"
+            },
+            "x-examples": {
+              "application/json": {
+                "firstName": "Bob",
+                "lastName": "Jones",
+                "ssn": "111-22-4444",
+                "status": "Consent Complete"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "tags": [
+          "Consent Activity"
+        ],
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "$ref": "#/parameters/pre-employment-id"
+        }
+      ]
+    },
+    "/events/{partnerName}": {
+      "post": {
+        "summary": "add a new webhook event",
+        "description": "By passing in the data, you can publish a pre-employment screening event in the system",
+        "operationId": "newEvent",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "partnerName",
+            "in": "path",
+            "description": "Name of the partner",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Webhook event object",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "x-examples": {}
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/Created"
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "tags": [
+          "Webhooks"
+        ],
+        "security": [
+          {
+            "basic": []
+          }
+        ]
+      }
+    },
+    "/prescreens/{id}/report": {
+      "get": {
+        "responses": {
+          "200": {
+            "$ref": "#/responses/OK"
+          },
+          "301": {
+            "description": "",
+            "schema": {
+              "type": "null"
+            },
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The URI where the resource can be found."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        },
+        "summary": "fetch the report for a screening",
+        "description": "By passing in the appropriate ID, you can fetch a pre-employment screening report in the system",
+        "operationId": "fetchPreScreeningReport",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Reports"
+        ]
+      },
+      "parameters": [
+        {
+          "$ref": "#/parameters/pre-employment-id"
+        }
+      ]
+    }
+  },
+  "securityDefinitions": {
+    "basic": {
+      "type": "basic",
+      "description": "Basic authentication is required using the API token provided as the `username` and an empty password."
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "PreScreenOrder": {
+      "type": "object",
+      "title": "Pre-Employment Screening Order",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "smsNumber": {
+          "type": "string",
+          "pattern": "^1?[-. ]*\\(?([0-9]{3})\\)*?[-. ]*([0-9]{3})[-.]*([0-9]{4})$|^\\+(?:[0-9] ?){6,14}[0-9]$"
+        },
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "applicationRefId": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "applicantRefId": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "userRefId": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "externalRefId": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "webhookUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "workHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "companyName": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "startDate": {
+                "type": "string",
+                "pattern": "^\\d{2}/\\d{4}$",
+                "maxLength": 7
+              },
+              "endDate": {
+                "type": "string",
+                "pattern": "^\\d{2}/\\d{4}$",
+                "maxLength": 7
+              },
+              "jobTitle": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "supervisor": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "country": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "state": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "city": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "postalCode": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "companyContact": {
+                "type": "string",
+                "maxLength": 50
+              }
+            },
+            "required": [
+              "companyName",
+              "startDate"
+            ]
+          }
+        }
+      },
+      "required": [
+        "email",
+        "firstName",
+        "lastName"
+      ]
+    },
+    "PreScreenPatch": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "ssn": {
+          "type": "string",
+          "pattern": "^((?!000)(?!666)(?:[0-6]\\d{2}|7[0-2][0-9]|73[0-3]|7[5-6][0-9]|77[0-2]))-((?!00)\\d{2})-((?!0000)\\d{4})$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Consent Pending",
+            "Consent Expired",
+            "Consent Refused",
+            "Consent Complete",
+            "Pre-Employment Complete"
+          ]
+        },
+        "consentSignature": {
+          "type": "string",
+          "example": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP"
+        },
+        "ipAddress": {
+          "type": "string",
+          "format": "ipv4"
+        },
+        "userAgent": {
+          "type": "string",
+          "example": "Mozilla 34.0"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "Pre-Employment Screening Update"
+    }
+  },
+  "responses": {
+    "BadRequest": {
+      "description": "The input was not valid",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "InternalServerError": {
+      "description": "Application error",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "NotFound": {
+      "description": "The specified resource was not found",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      }
+    },
+    "Unauthorized": {
+      "description": "Unauthorized",
+      "schema": {
+        "$ref": "#/definitions/Error"
+      },
+      "examples": {
+        "application/json": {
+          "code": "Unauthorized",
+          "message": "The provided token is not authorized to access this resource."
+        }
+      }
+    },
+    "Created": {
+      "description": "The new screening was created",
+      "schema": {
+        "$ref": "#/definitions/PreScreenOrder"
+      },
+      "examples": {
+        "id": "6CD8F158-FEED-4CCC-A291-2DCBA39B3EE9",
+        "application/json": {
+          "firstName": "Bob",
+          "lastName": "Jones",
+          "email": "bob@jones.com",
+          "smsNumber": "15564548890",
+          "applicationRefId": "abc1223",
+          "applicantRefId": "abc123",
+          "userRefId": "abc123",
+          "externalRefId": "abc123",
+          "webhookUrl": "https://my.webhook.com",
+          "workHistory": [
+            {
+              "companyName": "deverus, inc.",
+              "startDate": "04/2010",
+              "endDate": "06/2017",
+              "jobTitle": "developer",
+              "supervisor": "John Doe",
+              "country": "United States",
+              "state": "Texas",
+              "city": "Austin",
+              "postalCode": "75020",
+              "companyContact": "Elmer Fudd"
+            }
+          ]
+        }
+      }
+    },
+    "OK": {
+      "description": "A Pre-Employment Screening record.",
+      "schema": {
+        "$ref": "#/definitions/PreScreenOrder"
+      },
+      "examples": {
+        "application/json": {
+          "id": "6CD8F158-FEED-4CCC-A291-2DCBA39B3EE9",
+          "firstName": "Bob",
+          "lastName": "Jones",
+          "email": "bob@jones.com",
+          "smsNumber": "15564548890",
+          "applicationRefId": "abc1223",
+          "applicantRefId": "abc123",
+          "userRefId": "abc123",
+          "externalRefId": "abc123",
+          "webhookUrl": "https://my.webhook.com",
+          "workHistory": [
+            {
+              "companyName": "deverus, inc.",
+              "startDate": "04/2010",
+              "endDate": "06/2017",
+              "jobTitle": "developer",
+              "supervisor": "John Doe",
+              "country": "United States",
+              "state": "Texas",
+              "city": "Austin",
+              "postalCode": "75020",
+              "companyContact": "Elmer Fudd"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "parameters": {
+    "pre-employment-id": {
+      "name": "id",
+      "in": "path",
+      "type": "string",
+      "description": "The GUID of the Pre-Employment Screening record.",
+      "pattern": "^[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}$",
+      "required": true
+    }
+  }
+}

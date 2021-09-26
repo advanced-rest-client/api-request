@@ -3,6 +3,8 @@ import sinon from 'sinon';
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-panel.js';
 import { loadMonaco } from '../MonacoSetup.js';
+import { EventTypes } from '../../src/events/EventTypes.js';
+import { propagateResponse, responseHandler } from '../../src/elements/ApiRequestPanelElement.js';
 
 /** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('../../').ApiRequestPanelElement} ApiRequestPanelElement */
@@ -24,16 +26,6 @@ describe('ApiRequestPanelElement', () => {
    */
   async function basicFixture(model, selected) {
     return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}"></api-request-panel>`);
-  }
-
-  /**
-   * @param {AmfDocument=} model
-   * @param {string=} selected
-   * @returns {Promise<ApiRequestPanelElement>}
-   */
-  async function authPopupFixture(model, selected) {
-    return fixture(html`<api-request-panel .amf="${model}"  .selected="${selected}"
-      authPopupLocation="test/"></api-request-panel>`);
   }
 
   /**
@@ -65,16 +57,6 @@ describe('ApiRequestPanelElement', () => {
    * @param {string=} selected
    * @returns {Promise<ApiRequestPanelElement>}
    */
-  async function redirectUriFixture(model, selected) {
-    return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}"
-      redirectUri="https://auth.domain.com/token"></api-request-panel>`);
-  }
-
-  /**
-   * @param {AmfDocument=} model
-   * @param {string=} selected
-   * @returns {Promise<ApiRequestPanelElement>}
-   */
   async function addHeadersFixture(model, selected) {
     const headers = [{"name": "x-test", "value": "header-value"}];
     return fixture(html`<api-request-panel .amf="${model}" .selected="${selected}" .appendHeaders="${headers}"></api-request-panel>`);
@@ -94,9 +76,6 @@ describe('ApiRequestPanelElement', () => {
   function appendRequestData(element, request={}) {
     const editor = /** @type ApiRequestEditorElement */ (element.shadowRoot.querySelector('api-request-editor'));
     editor.url = request.url || 'https://domain.com';
-    editor._httpMethod = request.method || 'get';
-    editor._headers = request.headers || '';
-    // editor._payload = request.payload;
   }
 
   describe('Initialization', () => {
@@ -111,9 +90,9 @@ describe('ApiRequestPanelElement', () => {
       assert.ok(button);
     });
 
-    it('_hasResponse is false', async () => {
+    it('hasResponse is false', async () => {
       const element = await basicFixture(model);
-      assert.isFalse(element._hasResponse);
+      assert.isFalse(element.hasResponse);
     });
 
     it('api-request is dispatched', async () => {
@@ -128,33 +107,6 @@ describe('ApiRequestPanelElement', () => {
     });
   });
 
-  describe('Redirect URI computation', () => {
-    it('redirectUri has default value', async () => {
-      const element = await basicFixture();
-      assert.isTrue(
-        element.redirectUri.indexOf(
-          '@advanced-rest-client/oauth-authorization/oauth-popup.html'
-        ) !== -1
-      );
-    });
-
-    it('redirectUri is computed for auth-popup location', async () => {
-      const element = await authPopupFixture();
-      assert.isTrue(
-        element.redirectUri.indexOf(
-          'test/@advanced-rest-client/oauth-authorization/oauth-popup.html'
-        ) !== -1
-      );
-    });
-
-    it('redirectUri is not computed when redirectUri is set', async () => {
-      const element = await redirectUriFixture();
-      assert.isTrue(
-        element.redirectUri.indexOf('https://auth.domain.com/token') !== -1
-      );
-    });
-  });
-
   describe('Proxy settings', () => {
     /** @type AmfDocument */
     let model;
@@ -162,32 +114,33 @@ describe('ApiRequestPanelElement', () => {
       model = await store.getGraph(true);
     });
 
-    it('Changes URL in the api-request event', async () => {
+    it('changes URL in the api request event', async () => {
       const method = store.lookupOperation(model, '/people', 'get');
       const element = await proxyFixture(model, method['@id']);
-      appendRequestData(element);
       const editor = element.shadowRoot.querySelector('api-request-editor');
 
       const spy = sinon.spy();
-      element.addEventListener('api-request', spy);
+      element.addEventListener(EventTypes.Request.apiRequest, spy);
       editor.execute();
+      const { url } = element.shadowRoot.querySelector('api-request-editor').serialize();
       assert.equal(
         spy.args[0][0].detail.url,
-        'https://proxy.domain.com/https://domain.com'
+        `https://proxy.domain.com/${url}`
       );
     });
 
-    it('Encodes original URL', async () => {
+    it('encodes the original URL', async () => {
       const method = store.lookupOperation(model, '/people', 'get');
       const element = await proxyEncFixture(model, method['@id']);
       appendRequestData(element);
       const spy = sinon.spy();
-      element.addEventListener('api-request', spy);
+      element.addEventListener(EventTypes.Request.apiRequest, spy);
       const editor = element.shadowRoot.querySelector('api-request-editor');
       editor.execute();
+      const { url } = element.shadowRoot.querySelector('api-request-editor').serialize();
       assert.equal(
         spy.args[0][0].detail.url,
-        'https://proxy.domain.com/https%3A%2F%2Fdomain.com'
+        `https://proxy.domain.com/${encodeURIComponent(url)}`
       );
     });
   });
@@ -199,48 +152,34 @@ describe('ApiRequestPanelElement', () => {
       model = await store.getGraph(true);
     });
 
-    it('Adds headers to the request', async () => {
+    it('adds headers to the request', async () => {
       const method = store.lookupOperation(model, '/people', 'get');
       const element = await addHeadersFixture(model, method['@id']);
-      appendRequestData(element);
       const spy = sinon.spy();
-      element.addEventListener('api-request', spy);
+      element.addEventListener(EventTypes.Request.apiRequest, spy);
       const editor = element.shadowRoot.querySelector('api-request-editor');
       editor.execute();
-      assert.equal(spy.args[0][0].detail.headers, 'x-test: header-value');
+      assert.equal(spy.args[0][0].detail.headers, 'x-people-op-id: 9719fa6f-c666-48e0-a191-290890760b30\nx-test: header-value');
     });
 
-    it('Should add string headers to api-request event', async () => {
-      const method = store.lookupOperation(model, '/people', 'get');
-      const element = await basicFixture(model, method['@id']);
-
-      const headers = new Headers();
-      headers.append('content-type', 'application/json');
-      appendRequestData(element, { headers });
-
-      const spy = sinon.spy();
-      element.addEventListener('api-request', spy);
-      const editor = element.shadowRoot.querySelector('api-request-editor');
-      editor.execute();
-
-      assert.equal(spy.args[0][0].detail.headers, 'content-type: application/json');
-    });
-
-    it('Replaces headers in the request', async () => {
+    it('replaces headers in the request', async () => {
       const method = store.lookupOperation(model, '/people', 'get');
       const element = await addHeadersFixture(model, method['@id']);
       appendRequestData(element, {
         headers: 'x-test: other-value',
       });
       const spy = sinon.spy();
-      element.addEventListener('api-request', spy);
+      element.addEventListener(EventTypes.Request.apiRequest, spy);
       const editor = element.shadowRoot.querySelector('api-request-editor');
       editor.execute();
-      assert.equal(spy.args[0][0].detail.headers, 'x-test: header-value');
+      assert.equal(spy.args[0][0].detail.headers, 'x-people-op-id: 9719fa6f-c666-48e0-a191-290890760b30\nx-test: header-value');
     });
   });
 
   describe('Response handling', () => {
+    /**
+     * @param {ApiRequestPanelElement} element
+     */
     function propagate(element) {
       const detail = /** @type ApiConsoleResponse */ ({
         request: {
@@ -257,9 +196,10 @@ describe('ApiRequestPanelElement', () => {
         loadingTime: 124.12345678,
         isError: false,
       });
-      element._propagateResponse(detail);
+      element[propagateResponse](detail);
     }
-    let element = /** @type ApiRequestPanelElement */ (null);
+    /** @type ApiRequestPanelElement */
+    let element;
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -323,7 +263,7 @@ describe('ApiRequestPanelElement', () => {
     });
   });
 
-  describe('_apiResponseHandler()', () => {
+  describe('[responseHandler]()', () => {
     let element = /** @type ApiRequestPanelElement */ (null);
     const requestId = 'test-id';
     beforeEach(async () => {
@@ -349,23 +289,24 @@ describe('ApiRequestPanelElement', () => {
     };
 
     it('Does nothing when ID is different', () => {
-      const spy = sinon.spy(element, '_propagateResponse');
-      const e = new CustomEvent('api-response', {
+      const spy = sinon.spy(element, propagateResponse);
+      const e = new CustomEvent(EventTypes.Request.apiResponse, {
         detail: {
           id: 'otherId',
         },
       });
-      element._apiResponseHandler(e);
+      // @ts-ignore
+      element[responseHandler](e);
       assert.isFalse(spy.called);
     });
 
     it('Calls _propagateResponse()', () => {
       const detail = { id: requestId, ...xhrResponse };
-      const spy = sinon.spy(element, '_propagateResponse');
-      const e = new CustomEvent('api-response', {
+      const spy = sinon.spy(element, propagateResponse);
+      const e = new CustomEvent(EventTypes.Request.apiResponse, {
         detail
       });
-      element._apiResponseHandler(e);
+      element[responseHandler](e);
       assert.isTrue(spy.called);
       assert.deepEqual(spy.args[0][0], detail);
     });

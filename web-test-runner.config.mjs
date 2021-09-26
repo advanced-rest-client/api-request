@@ -1,14 +1,7 @@
 export default {
   files: "test/**/*.test.js",
+  // files: "test/http-request/APIC-689.test.js",
   nodeResolve: true,
-  middleware: [
-    function rewriteBase(context, next) {
-      if (context.url.indexOf("/base") === 0) {
-        context.url = context.url.replace("/base", "");
-      }
-      return next();
-    },
-  ],
   testFramework: {
     config: {
       timeout: 600000,

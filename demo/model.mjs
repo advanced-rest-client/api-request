@@ -29,5 +29,8 @@ config.set('modular-api/modular-api.raml', { type: "RAML 1.0" });
 config.set('oauth-pkce/oauth-pkce.raml', { type: "RAML 1.0" });
 config.set('petstore/petstore.yaml', { type: "OAS 3.0" });
 config.set('21143/21143.json', { type: "OAS 2.0" });
+config.set('APIC-298/APIC-298.json', { type: 'OAS 2.0', mime: 'application/json' });
+config.set('APIC-289/APIC-289.yaml', { type: 'OAS 2.0', mime: 'application/yaml' });
+config.set('APIC-689/APIC-689.raml', { type: 'RAML 1.0' });
 
 generator.generate(config);

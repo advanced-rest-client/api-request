@@ -93,6 +93,7 @@ class ComponentDemo extends ApiDemoPage {
       ['secured-api', 'Security demo'],
       ['21143', '21143'],
       ['annotated-parameters', 'annotated-parameters'],
+      ['APIC-689', 'Enum values (APIC-689)'],
     ].map(([file, label]) => html`
       <anypoint-item data-src="${file}-compact.json">${label} - compact model</anypoint-item>
       <anypoint-item data-src="${file}.json">${label}</anypoint-item>
@@ -123,7 +124,7 @@ class ComponentDemo extends ApiDemoPage {
         { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
       ] 
     };
-    document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
+    document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
   }
 
   _demoTemplate() {

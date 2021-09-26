@@ -607,7 +607,7 @@ const mxFunction = base => {
       const label = readLabelValue(parameter, schema);
       const values = /** @type any[] */ (this.readInputValue(parameter, schema, true));
       const options = { arrayItem: true, };
-      const inputs = values.map((value, index) => this.parameterSchemaTemplate(parameter, items, { ...options, value, index }));
+      const inputs = (values || []).map((value, index) => this.parameterSchemaTemplate(parameter, items, { ...options, value, index }));
       return html`
       <div class="array-form-item" data-param-id="${id}" data-param-label="${label}">
         <div class="array-title"><span class="label">${label}</span></div>

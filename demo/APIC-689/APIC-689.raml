@@ -1,0 +1,20 @@
+#%RAML 1.0
+title: test API
+
+/test:
+  get:
+    queryParameters: 
+      param1:
+        required: false
+        type: string
+        enum: 
+          - A
+          - B
+  post:
+    queryParameters: 
+      param1:
+        required: true
+        type: string
+        enum: 
+          - A
+          - B

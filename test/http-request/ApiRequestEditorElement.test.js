@@ -1,10 +1,18 @@
 /* eslint-disable no-param-reassign */
 import { fixture, assert, html, nextFrame, aTimeout } from '@open-wc/testing';
 import * as sinon from 'sinon';
-import { ApiViewModel } from '@api-components/api-forms'
+import * as InputCache from '../../src/lib/InputCache.js';
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-editor.js';
 import { loadMonaco } from '../MonacoSetup.js';
+import { RequestEvents, ApiResponseEvent } from '../../src/events/RequestEvents.js';
+import { EventTypes } from '../../src/events/EventTypes.js';
+import { 
+  responseHandler, 
+  loadingRequestValue, 
+  requestIdValue,
+  serverHandler,
+} from '../../src/elements/ApiRequestEditorElement.js';
 
 /** @typedef {import('@api-components/amf-helper-mixin').ApiParametrizedSecurityScheme} ApiParametrizedSecurityScheme */
 /** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
@@ -47,6 +55,18 @@ describe('ApiRequestEditorElement', () => {
   }
 
   /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
+   * @returns {Promise<ApiRequestEditorElement>}
+   */
+  async function urlEditorFixture(model, selected) {
+    return (fixture(html`<api-request-editor
+      .amf="${model}"
+      .selected="${selected}"
+      urlEditor></api-request-editor>`));
+  }
+
+  /**
    * @param {AmfDocument} model
    * @param {string} selected
    * @returns {Promise<ApiRequestEditorElement>}
@@ -65,7 +85,7 @@ describe('ApiRequestEditorElement', () => {
   async function customBaseUriSlotFixture(model) {
     return (fixture(html`
       <api-request-editor .amf="${model}">
-        <anypoint-item slot="custom-base-uri" value="http://customServer.com">Custom</anypoint-item>
+        <anypoint-item slot="custom-base-uri" data-value="http://customServer.com">Custom</anypoint-item>
       </api-request-editor>`));
   }
 
@@ -76,13 +96,20 @@ describe('ApiRequestEditorElement', () => {
   async function noSelectorFixture(model) {
     return (fixture(html`
       <api-request-editor noServerSelector .amf="${model}">
-        <anypoint-item slot="custom-base-uri" value="http://customServer.com">http://customServer.com</anypoint-item>
+        <anypoint-item slot="custom-base-uri" data-value="http://customServer.com">http://customServer.com</anypoint-item>
       </api-request-editor>`));
   }
 
-  function clearCache() {
-    const transformer = new ApiViewModel();
-    transformer.clearCache();
+  /**
+   * @param {AmfDocument=} model
+   * @param {string=} selected
+   * @returns {Promise<ApiRequestEditorElement>}
+   */
+  async function hideOptionalFixture(model, selected) {
+    return (fixture(html`<api-request-editor
+      .amf="${model}"
+      .selected="${selected}"
+      allowHideOptional></api-request-editor>`));
   }
 
   describe('initialization', () => {
@@ -91,13 +118,19 @@ describe('ApiRequestEditorElement', () => {
       assert.ok(element);
     });
 
-    it('renders url editor without the model', async () => {
+    it('does not render the URL editor by default', async () => {
       const element = await basicFixture();
-      const node = element.shadowRoot.querySelector('.url-editor');
-      assert.isFalse(node.hasAttribute('hidden'));
+      const node = element.shadowRoot.querySelector('.url-input');
+      assert.notOk(node);
     });
 
-    it('renders send button without the model', async () => {
+    it('renders the url editor when configured', async () => {
+      const element = await urlEditorFixture();
+      const node = element.shadowRoot.querySelector('.url-input');
+      assert.ok(node);
+    });
+
+    it('renders the send button without the model', async () => {
       const element = await basicFixture();
       const node = element.shadowRoot.querySelector('.send-button');
       assert.ok(node);
@@ -109,21 +142,27 @@ describe('ApiRequestEditorElement', () => {
       assert.equal(node.textContent.trim(), 'Send');
     });
 
-    it('hides headers editor without the model', async () => {
+    it('does not render headers form without the model', async () => {
       const element = await basicFixture();
-      const node = element.shadowRoot.querySelector('api-headers-editor').parentElement;
-      assert.isTrue(node.hasAttribute('hidden'));
+      const node = element.shadowRoot.querySelector('.params-section.header');
+      assert.notOk(node);
+    });
+
+    it('does not render parameters form without the model', async () => {
+      const element = await basicFixture();
+      const node = element.shadowRoot.querySelector('.params-section.parameter');
+      assert.notOk(node);
     });
 
     it('does not render payload editor without the model', async () => {
       const element = await basicFixture();
-      const node = element.shadowRoot.querySelector('api-body-editor');
+      const node = element.shadowRoot.querySelector('.body-editor');
       assert.notOk(node);
     });
 
     it('does not render authorization editor without the model', async () => {
       const element = await basicFixture();
-      const node = element.shadowRoot.querySelector('api-authorization');
+      const node = element.shadowRoot.querySelector('api-authorization-editor');
       assert.notOk(node);
     });
 
@@ -134,244 +173,178 @@ describe('ApiRequestEditorElement', () => {
     });
   });
 
-  describe('allows custom property', () => {
+  describe('custom properties', () => {
     let element = /** @type ApiRequestEditorElement */ (null);
     beforeEach(async () => {
       element = await allowCustomFixture();
     });
 
-    it('renders query editor', async () => {
-      const node = element.shadowRoot.querySelector('api-url-params-editor').parentElement;
-      assert.isFalse(node.hasAttribute('hidden'));
+    it('renders parameters form', async () => {
+      const node = element.shadowRoot.querySelector('.params-section.parameter');
+      assert.ok(node);
+    });
+
+    it('renders the parameters add button', async () => {
+      const node = element.shadowRoot.querySelector('.params-section.parameter .add-custom-button');
+      assert.ok(node);
+    });
+
+    it('renders header form', async () => {
+      const node = element.shadowRoot.querySelector('.params-section.header');
+      assert.ok(node);
+    });
+
+    it('renders the header add button', async () => {
+      const node = element.shadowRoot.querySelector('.params-section.header .add-custom-button');
+      assert.ok(node);
     });
   });
 
-  describe('oauth2-redirect-uri-changed', () => {
+  describe('OAuth2 redirect URI change event', () => {
     let element = /** @type ApiRequestEditorElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
 
-    it('sets redirectUri from the event', () => {
+    it('sets redirectUri from the event (legacy)', () => {
       const value = 'https://auth.domain.com';
-      document.body.dispatchEvent(new CustomEvent('oauth2-redirect-uri-changed', {
+      document.body.dispatchEvent(new CustomEvent(EventTypes.Request.redirectUriChangeLegacy, {
         bubbles: true,
         detail: {
           value
         }
       }));
+      assert.equal(element.redirectUri, value);
+    });
 
+    it('sets redirectUri from the event', () => {
+      const value = 'https://auth.domain.com';
+      document.body.dispatchEvent(new CustomEvent(EventTypes.Request.redirectUriChange, {
+        bubbles: true,
+        detail: {
+          value
+        }
+      }));
       assert.equal(element.redirectUri, value);
     });
   });
 
-  describe('_computeIsPayloadRequest()', () => {
-    let element = /** @type ApiRequestEditorElement */ (null);
-    beforeEach(async () => {
-      element = await allowCustomFixture();
-    });
-
-    it('Returns false for GET', () => {
-      const result = element._computeIsPayloadRequest('get');
-      assert.isFalse(result);
-    });
-
-    it('Returns false for HEAD', () => {
-      const result = element._computeIsPayloadRequest('head');
-      assert.isFalse(result);
-    });
-
-    it('Returns true for other inputs', () => {
-      const result = element._computeIsPayloadRequest('post');
-      assert.isTrue(result);
-    });
-  });
-
-  describe('_dispatch()', () => {
-    let element = /** @type ApiRequestEditorElement */ (null);
-    beforeEach(async () => {
-      element = await allowCustomFixture();
-    });
-    const eName = 'test-event';
-    const eDetail = 'test-detail';
-
-    it('Dispatches an event', () => {
-      const spy = sinon.spy();
-      element.addEventListener(eName, spy);
-      element._dispatch(eName);
-      assert.isTrue(spy.called);
-    });
-
-    it('Returns the event', () => {
-      const e = element._dispatch(eName);
-      assert.typeOf(e, 'customevent');
-    });
-
-    it('Event is cancelable by default', () => {
-      const e = element._dispatch(eName);
-      assert.isTrue(e.cancelable);
-    });
-
-    it('Event is composed', () => {
-      const e = element._dispatch(eName);
-      if (typeof e.composed !== 'undefined') {
-        assert.isTrue(e.composed);
-      }
-    });
-
-    it('Event bubbles', () => {
-      const e = element._dispatch(eName);
-      assert.isTrue(e.bubbles);
-    });
-
-    it('Event is not cancelable when set', () => {
-      const e = element._dispatch(eName, eDetail, false);
-      assert.isFalse(e.cancelable);
-    });
-
-    it('Event has detail', () => {
-      const e = element._dispatch(eName, eDetail);
-      assert.equal(e.detail, eDetail);
-    });
-  });
-
-  describe('_responseHandler()', () => {
+  describe('[responseHandler]()', () => {
     let element = /** @type ApiRequestEditorElement */ (null);
     const requestId = 'test-id';
     beforeEach(async () => {
-      clearCache();
+      InputCache.globalValues.clear();
       element = await basicFixture();
-      element._loadingRequest = true;
-      element._requestId = requestId;
+      element[loadingRequestValue] = true;
+      element[requestIdValue] = requestId;
     });
 
-    it('Does nothing when ID is different', () => {
-      const e = new CustomEvent('api-response', {
-        detail: {
-          id: 'otherId',
-        }
+    it('does nothing when the id is different', () => {
+      const e = new ApiResponseEvent(EventTypes.Request.apiResponse, {
+        id: 'otherId',
+        isError: true,
+        loadingTime: 0,
+        request: {
+          method: '',
+          url: '',
+        },
+        response: {
+          status: 0,
+        },
       });
-      element._responseHandler(e);
+      element[responseHandler](e);
       assert.isTrue(element.loadingRequest);
     });
 
-    it('Does nothing when no detail', () => {
-      const e = new CustomEvent('api-response');
-      element._responseHandler(e);
+    it('does nothing when no detail', () => {
+      const e = new CustomEvent(EventTypes.Request.apiResponse);
+      element[responseHandler](e);
       assert.isTrue(element.loadingRequest);
     });
 
     it('resets the loadingRequest property', () => {
-      const e = new CustomEvent('api-response', {
+      const e = new CustomEvent(EventTypes.Request.apiResponse, {
         detail: {
           id: requestId,
         }
       });
-      element._responseHandler(e);
+      element[responseHandler](e);
       assert.isFalse(element.loadingRequest);
     });
 
-    it('Event handler is connected', () => {
-      document.body.dispatchEvent(new CustomEvent('api-response', {
-        bubbles: true,
-        detail: {
-          id: requestId
-        }
-      }));
+    it('event handler is connected', () => {
+      RequestEvents.apiResponse(document.body, {
+        id: requestId,
+        isError: true,
+        loadingTime: 0,
+        request: {
+          method: '',
+          url: '',
+        },
+        response: {
+          status: 0,
+        },
+      });
       assert.isFalse(element.loadingRequest);
     });
   });
 
-  [
-    ['Compact model', true],
-    ['Full model', false]
-  ].forEach(([label, compact]) => {
-    describe(`${label}`, () => {
+  [true, false].forEach((compact) => {
+    describe(compact ? 'Compact model' : 'Full model', () => {
       const httpbinApi = 'httpbin';
       const driveApi = 'google-drive-api';
       const demoApi = 'demo-api';
-
-      
 
       describe('http method computation', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
-          model = await store.getGraph(Boolean(compact), httpbinApi);
+          model = await store.getGraph(compact, httpbinApi);
         });
 
-        it('sets _httpMethod property (get)', async () => {
+        it('sets httpMethod property (get)', async () => {
           const method = store.lookupOperation(model, '/anything', 'get');
           const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'get');
         });
 
-        it('sets _httpMethod property (post)', async () => {
+        it('sets httpMethod property (post)', async () => {
           const method = store.lookupOperation(model, '/anything', 'post');
           const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'post');
         });
 
-        it('sets _httpMethod property (put)', async () => {
+        it('sets httpMethod property (put)', async () => {
           const method = store.lookupOperation(model, '/anything', 'put');
           const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'put');
         });
 
-        it('sets _httpMethod property (delete)', async () => {
+        it('sets httpMethod property (delete)', async () => {
           const method = store.lookupOperation(model, '/anything', 'delete');
           const element = await modelFixture(model, method['@id']);
           assert.equal(element.httpMethod, 'delete');
         });
       });
 
-      describe('_computeApiPayload() and _apiPayload', () => {
+      describe('#payloads and #payload', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
-          model = await store.getGraph(Boolean(compact), driveApi);
+          model = await store.getGraph(compact, driveApi);
         });
 
-        it('returns undefined when no model', async () => {
-          const element = await basicFixture();
-          assert.isUndefined(element._computeApiPayload());
-        });
-
-        it('returns undefined when no "expects"', async () => {
-          const element = await basicFixture(model);
-          assert.isUndefined(element._computeApiPayload({}));
-        });
-
-        it('returns payload definition', async () => {
-          const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
-          const element = await basicFixture(model);
-          assert.typeOf(element._computeApiPayload(method), 'array');
-        });
-
-        it('sets _apiPayload when selection changed', async () => {
+        it('sets the #payloads for the endpoint', async () => {
           const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
           const element = await modelFixture(model, method['@id']);
-          assert.typeOf(element.apiPayload, 'array');
-        });
-      });
-
-      describe('_isPayloadRequest', () => {
-        /** @type AmfDocument */
-        let model;
-        before(async () => {
-          model = await store.getGraph(Boolean(compact), driveApi);
+          assert.typeOf(element.payloads, 'array');
+          assert.lengthOf(element.payloads, 1);
         });
 
-        it('is false for get request', async () => {
-          const method = store.lookupOperation(model, '/files/{fileId}', 'get');
-          const element = await modelFixture(model, method['@id']);
-          assert.isFalse(element.isPayloadRequest);
-        });
-
-        it('returns true for post request', async () => {
+        it('sets the #payload property', async () => {
           const method = store.lookupOperation(model, '/files/{fileId}', 'patch');
           const element = await modelFixture(model, method['@id']);
-          assert.isTrue(element.isPayloadRequest);
+          assert.typeOf(element.payload, 'object');
         });
       });
 
@@ -405,39 +378,74 @@ describe('ApiRequestEditorElement', () => {
         });
       });
 
-      describe('_computeHeaders() and _apiHeaders', () => {
+      describe('RAML parameters computations', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
-          model = await store.getGraph(Boolean(compact), demoApi);
+          model = await store.getGraph(compact, demoApi);
         });
 
-        it('returns undefined when no model', async () => {
+        it('sets server parameters when no operation', async () => {
           const element = await basicFixture(model);
-          assert.isUndefined(element._computeHeaders());
+          assert.lengthOf(element.parametersValue, 1, 'has a single parameter');
+          const [param] = element.parametersValue;
+          assert.equal(param.binding, 'path', 'has a path parameter');
+          assert.equal(param.source, 'server', 'the parameter was set by the server');
         });
 
-        it('returns undefined when no security model', async () => {
-          const element = await basicFixture(model);
-          assert.isUndefined(element._computeHeaders({}));
+        it('sets path parameters from the server and the endpoint', async () => {
+          const method = store.lookupOperation(model, '/test-parameters/{feature}', 'get');
+          const element = await modelFixture(model, method['@id']);
+          const path = element.parametersValue.filter(p => p.binding === 'path')
+          assert.lengthOf(path, 2, 'has all parameters');
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'feature'),
+            'object',
+            'has the endpoints path parameter'
+          );
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'instance'),
+            'object',
+            'has the server path parameter'
+          );
         });
 
-        it('returns headers model', async () => {
+        it('sets query parameters', async () => {
+          const method = store.lookupOperation(model, '/test-parameters/{feature}', 'get');
+          const element = await modelFixture(model, method['@id']);
+          const path = element.parametersValue.filter(p => p.binding === 'query')
+          assert.lengthOf(path, 3, 'has all parameters');
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'testRepeatable'),
+            'object',
+            'has the testRepeatable parameter'
+          );
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'numericRepeatable'),
+            'object',
+            'has the numericRepeatable parameter'
+          );
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'notRequiredRepeatable'),
+            'object',
+            'has the notRequiredRepeatable parameter'
+          );
+        });
+
+        it('sets header parameters', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          const security = element._computeHeaders(method);
-          assert.typeOf(security, 'array');
-        });
-
-        it('sets _apiHeaders', async () => {
-          const method = store.lookupOperation(model, '/people', 'get');
-          const element = await modelFixture(model, method['@id']);
-          assert.typeOf(element.apiHeaders, 'array');
-          assert.lengthOf(element.apiHeaders, 1);
+          const path = element.parametersValue.filter(p => p.binding === 'header')
+          assert.lengthOf(path, 1, 'has all parameters');
+          assert.typeOf(
+            path.find(p => p.parameter.name === 'x-people-op-id'),
+            'object',
+            'has the x-people-op-id parameter'
+          );
         });
       });
 
-      describe('#contentType', () => {
+      describe('#mimeType', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
@@ -447,9 +455,7 @@ describe('ApiRequestEditorElement', () => {
         it('sets content type from the body', async () => {
           const method = store.lookupOperation(model, '/content-type', 'post');
           const element = await modelFixture(model, method['@id']);
-          await aTimeout(100);
-          await nextFrame();
-          assert.equal(element.contentType, 'application/json');
+          assert.equal(element.mimeType, 'application/json');
         });
       });
 
@@ -460,42 +466,32 @@ describe('ApiRequestEditorElement', () => {
           model = await store.getGraph(Boolean(compact), demoApi);
         });
 
-        it('renders authorization panel when authorization is required', async () => {
+        it('renders the authorization editor when authorization is required', async () => {
           const method = store.lookupOperation(model, '/messages', 'get');
           const element = await modelFixture(model, method['@id']);
           const node = element.shadowRoot.querySelector('api-authorization-editor');
           assert.ok(node);
         });
 
-        it('renders query/uri editor when model is set', async () => {
+        it('renders query/uri forms when model is set', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          const node = element.shadowRoot.querySelector('api-url-params-editor').parentElement;
-          assert.isFalse(node.hasAttribute('hidden'));
+          const node = element.shadowRoot.querySelector('.params-section.parameter');
+          assert.ok(node);
         });
 
         it('renders headers editor when model is set', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          const node = element.shadowRoot.querySelector('api-headers-editor').parentElement;
-          assert.isFalse(node.hasAttribute('hidden'));
+          const node = element.shadowRoot.querySelector('.params-section.header');
+          assert.ok(node);
         });
 
-        it('hides URL editor when noUrlEditor', async () => {
+        it('renders the URL editor when urlEditor', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
-          const element = await modelFixture(model, method['@id']);
-          element.noUrlEditor = true;
-          await nextFrame();
-          const node = element.shadowRoot.querySelector('.url-editor');
-          assert.isTrue(node.hasAttribute('hidden'));
-        });
-
-        it('computes URL when URL editor is hidden', async () => {
-          const method = store.lookupOperation(model, '/people', 'get');
-          const element = await modelFixture(model, method['@id']);
-          element.noUrlEditor = true;
-          await nextFrame();
-          assert.equal(element.url, 'http://production.domain.com/people');
+          const element = await urlEditorFixture(model, method['@id']);
+          const node = element.shadowRoot.querySelector('.url-input');
+          assert.ok(node);
         });
       });
 
@@ -509,52 +505,52 @@ describe('ApiRequestEditorElement', () => {
         /** @type ApiRequestEditorElement */
         let element;
         beforeEach(async () => {
-          clearCache();
+          InputCache.globalValues.clear();
           const method = store.lookupOperation(model, '/people', 'get');
           element = await modelFixture(model, method['@id']);
         });
 
-        it('Dispatches `api-request` event', () => {
+        it('dispatches the legacy request event', () => {
           const spy = sinon.spy();
-          element.addEventListener('api-request', spy);
+          element.addEventListener(EventTypes.Request.apiRequestLegacy, spy);
           element.execute();
           assert.isTrue(spy.called);
         });
 
-        it('Sets loadingRequest property', () => {
+        it('dispatches the request event', () => {
+          const spy = sinon.spy();
+          element.addEventListener(EventTypes.Request.apiRequest, spy);
+          element.execute();
+          assert.isTrue(spy.called);
+        });
+
+        it('sets loadingRequest property', () => {
           element.execute();
           assert.isTrue(element.loadingRequest);
         });
 
-        it('Sets requestId property', () => {
+        it('sets requestId property', () => {
           element.execute();
           assert.typeOf(element.requestId, 'string');
         });
 
-        it('Calls serialize()', () => {
+        it('calls the serialize() function', () => {
           const spy = sinon.spy(element, 'serialize');
           element.execute();
           assert.isTrue(spy.called);
         });
 
-        it('Calls _dispatch()', () => {
-          const spy = sinon.spy(element, '_dispatch');
+        it('event has the serialized request', () => {
+          const spy = sinon.spy();
+          element.addEventListener(EventTypes.Request.apiRequest, spy);
           element.execute();
-          assert.isTrue(spy.called);
-        });
-
-        it('_dispatch() is called with event name', () => {
-          const spy = sinon.spy(element, '_dispatch');
-          element.execute();
-          assert.equal(spy.args[0][0], 'api-request');
-        });
-
-        it('_dispatch() is called with serialized request', () => {
-          const spy = sinon.spy(element, '_dispatch');
-          element.execute();
-          const compare = element.serialize();
-          compare.id = element.requestId;
-          assert.deepEqual(spy.args[0][1], compare);
+          const { detail } = spy.args[0][0];
+          assert.equal(detail.method, 'GET');
+          assert.equal(detail.url, 'http://production.domain.com/people');
+          assert.equal(detail.headers, 'x-people-op-id: 9719fa6f-c666-48e0-a191-290890760b30');
+          assert.typeOf(detail.id, 'string');
+          assert.typeOf(detail.authorization, 'array', 'has the authorization array');
+          assert.lengthOf(detail.authorization, 1, 'has as single authorization definition');
         });
       });
 
@@ -567,40 +563,45 @@ describe('ApiRequestEditorElement', () => {
         
         let element = /** @type ApiRequestEditorElement */ (null);
         beforeEach(async () => {
-          clearCache();
+          InputCache.globalValues.clear();
           const method = store.lookupOperation(model, '/people', 'get');
           element = await modelFixture(model, method['@id']);
-          element._loadingRequest = true;
-          element._requestId = 'test-request';
-          await nextFrame();
+          element[loadingRequestValue] = true;
+          element[requestIdValue] = 'test-request';
+          await element.requestUpdate();
         });
 
-        it('Fires when abort button pressed', () => {
+        it('dispatched the event when the abort button pressed', () => {
           const spy = sinon.spy();
-          element.addEventListener('abort-api-request', spy);
+          element.addEventListener(EventTypes.Request.abortApiRequest, spy);
           const button = /** @type HTMLElement */ (element.shadowRoot.querySelector('.send-button.abort'));
           button.click();
           assert.isTrue(spy.calledOnce);
         });
 
-        it('Event contains the URL and the ID', (done) => {
-          element.addEventListener('abort-api-request', function clb(e) {
-            element.removeEventListener('abort-api-request', clb);
-            // @ts-ignore
-            const { detail } = e;
-            assert.equal(detail.url, 'http://production.domain.com/people', 'URL is set');
-            assert.equal(detail.id, 'test-request', 'id is set');
-            done();
-          });
-          element.abort();
+        it('dispatched the legacy event when the abort button pressed', () => {
+          const spy = sinon.spy();
+          element.addEventListener(EventTypes.Request.abortApiRequestLegacy, spy);
+          const button = /** @type HTMLElement */ (element.shadowRoot.querySelector('.send-button.abort'));
+          button.click();
+          assert.isTrue(spy.calledOnce);
         });
 
-        it('Resets loadingRequest property', () => {
+        it('the event contains the url and the id', () => {
+          const spy = sinon.spy();
+          element.addEventListener(EventTypes.Request.abortApiRequest, spy);
+          element.abort();
+          const { detail } = spy.args[0][0];
+          assert.equal(detail.url, element.url, 'URL is set');
+          assert.equal(detail.id, 'test-request', 'id is set');
+        });
+
+        it('resets the loadingRequest property', () => {
           element.abort();
           assert.isFalse(element.loadingRequest);
         });
 
-        it('Resets requestId property', () => {
+        it('resets the requestId property', () => {
           element.abort();
           assert.isUndefined(element.requestId);
         });
@@ -614,7 +615,7 @@ describe('ApiRequestEditorElement', () => {
         });
 
         beforeEach(async () => {
-          clearCache();
+          InputCache.globalValues.clear();
         });
 
         it('returns an object', async () => {
@@ -658,7 +659,7 @@ describe('ApiRequestEditorElement', () => {
           assert.equal(body.etag, '', 'has payload values');
         });
 
-        it('sets auth data', async () => {
+        it('sets authorization data', async () => {
           const method = store.lookupOperation(model, '/people/{personId}', 'get');
           const element = await modelFixture(model, method['@id']);
           await aTimeout(0);
@@ -690,16 +691,16 @@ describe('ApiRequestEditorElement', () => {
           assert.isUndefined(result.payload);
         });
 
-        it('sets Content-Type header if not present but set in component', async () => {
+        it('sets the content-type header if not present but set in component', async () => {
           const method = store.lookupOperation(model, '/people', 'post');
           const element = await modelFixture(model, method['@id']);
-          element._headers = '';
+          element.parametersValue = element.parametersValue.filter(p => p.binding !== 'header');
           const result = element.serialize();
           assert.equal(result.headers, 'content-type: application/json');
         });
       });
 
-      describe('_sendHandler()', () => {
+      describe('[sendHandler]()', () => {
         /** @type AmfDocument */
         let model;
         before(async () => {
@@ -720,7 +721,6 @@ describe('ApiRequestEditorElement', () => {
         it('calls execute() when authorization is not required', async () => {
           const method = store.lookupOperation(model, '/people', 'get');
           const element = await modelFixture(model, method['@id']);
-          await aTimeout(5);
           const spy = sinon.spy(element, 'execute');
           const button = element.shadowRoot.querySelector('.send-button');
           /** @type HTMLElement */ (button).click();
@@ -748,7 +748,7 @@ describe('ApiRequestEditorElement', () => {
           await nextFrame();
           const node = element.shadowRoot.querySelector('.url-label');
           const text = node.textContent.trim();
-          assert.equal(text, 'http://production.domain.com/people');
+          assert.equal(text, element.url);
         });
       });
 
@@ -763,17 +763,124 @@ describe('ApiRequestEditorElement', () => {
 
         beforeEach(async () => {
           element = await customBaseUriSlotFixture(model);
-          const op = store.lookupOperation(model, '/people', 'get')
+          const op = store.lookupOperation(model, '/people/{personId}', 'get')
           element.selected = op['@id'];
           await aTimeout(0);
         });
 
         it('should update api-url-editor value after selecting slotted base uri', async () => {
-          element._serverHandler(new CustomEvent('apiserverchanged', { detail: { value: 'http://customServer.com', type: 'uri' } }));
+          element[serverHandler](new CustomEvent('apiserverchanged', { detail: { value: 'http://customServer.com', type: 'uri' } }));
           await aTimeout(0);
-          assert.equal(element.shadowRoot.querySelector('api-url-editor').value, 'http://customServer.com/people');
+          assert.equal(element.url, 'http://customServer.com/people/1234');
         });
-      })
+
+        it('changing the URL in the url input changes the parameters', async () => {
+          element.urlEditor = true;
+          element[serverHandler](new CustomEvent('apiserverchanged', { detail: { value: 'http://customServer.com', type: 'uri' } }));
+          await nextFrame();
+          const input = /** @type HTMLInputElement */ (element.shadowRoot.querySelector('.url-input'));
+          input.value = 'http://customServer.com/people/5678';
+          input.dispatchEvent(new Event('change'));
+          assert.equal(element.url, 'http://customServer.com/people/5678', 'url value is changed');
+          await nextFrame();
+          const paramInput = /** @type HTMLInputElement */ (element.shadowRoot.querySelector('[name="personId"]'));
+          assert.equal(paramInput.value, '5678', 'the input is changed');
+        });
+      });
+
+      describe('#allowHideOptional', () => {
+        /** @type AmfDocument */
+        let model;
+        before(async () => {
+          model = await store.getGraph(compact, demoApi);
+        });
+
+        describe('query parameters', () => {
+          it('renders the optional toggle button', async () => {
+            const method = store.lookupOperation(model, '/people', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = element.shadowRoot.querySelector('.query-params .toggle-optional-switch');
+            assert.ok(toggle);
+          });
+  
+          it('optional parameters are hidden', async () => {
+            const method = store.lookupOperation(model, '/people', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const allItems = element.shadowRoot.querySelectorAll('.query-params .form-item.optional');
+            Array.from(allItems).forEach((node) => {
+              const { display } = getComputedStyle(node);
+              assert.equal(display, 'none');
+            });
+          });
+  
+          it('toggles the visibility of the parameters', async () => {
+            const method = store.lookupOperation(model, '/people', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = /** @type HTMLElement */ (element.shadowRoot.querySelector('.query-params .toggle-optional-switch'));
+            toggle.click();
+            await nextFrame();
+            assert.deepEqual(element.openedOptional, ['query'], 'adds query to the openedOptional');
+            const container = element.shadowRoot.querySelector('.query-params .form-item.optional');
+            const { display } = getComputedStyle(container);
+            assert.equal(display, 'flex');
+          });
+  
+          it('does not render the toggle button for all required', async () => {
+            const method = store.lookupOperation(model, '/required-query-parameters', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = element.shadowRoot.querySelector('.query-params .toggle-optional-switch');
+            assert.notOk(toggle, 'toggle is not rendered');
+            const allItems = element.shadowRoot.querySelectorAll('.query-params .form-item');
+            Array.from(allItems).forEach((node) => {
+              const { display } = getComputedStyle(node);
+              assert.equal(display, 'flex');
+            });
+          });
+        });
+
+        describe('header parameters', () => {
+          it('renders the optional toggle button', async () => {
+            const method = store.lookupOperation(model, '/optional-headers', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = element.shadowRoot.querySelector('.params-section.header .toggle-optional-switch');
+            assert.ok(toggle);
+          });
+  
+          it('optional parameters are hidden', async () => {
+            const method = store.lookupOperation(model, '/optional-headers', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const allItems = element.shadowRoot.querySelectorAll('.params-section.header .form-item.optional');
+            Array.from(allItems).forEach((node) => {
+              const { display } = getComputedStyle(node);
+              assert.equal(display, 'none');
+            });
+          });
+  
+          it('toggles the visibility of the parameters', async () => {
+            const method = store.lookupOperation(model, '/optional-headers', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = /** @type HTMLElement */ (element.shadowRoot.querySelector('.params-section.header .toggle-optional-switch'));
+            toggle.click();
+            await nextFrame();
+            assert.deepEqual(element.openedOptional, ['header'], 'adds query to the openedOptional');
+            const container = element.shadowRoot.querySelector('.params-section.header .form-item.optional');
+            const { display } = getComputedStyle(container);
+            assert.equal(display, 'flex');
+          });
+  
+          it('does not render the toggle button for all required', async () => {
+            const method = store.lookupOperation(model, '/required-headers', 'get');
+            const element = await hideOptionalFixture(model, method['@id']);
+            const toggle = element.shadowRoot.querySelector('.params-section.header .toggle-optional-switch');
+            assert.notOk(toggle, 'toggle is not rendered');
+            const allItems = element.shadowRoot.querySelectorAll('.params-section.header .form-item');
+            Array.from(allItems).forEach((node) => {
+              const { display } = getComputedStyle(node);
+              assert.equal(display, 'flex');
+            });
+          });
+        });
+      });
     });
   });
 
@@ -788,7 +895,7 @@ describe('ApiRequestEditorElement', () => {
     });
 
     it('hides server selector with a single server', async () => {
-      assert.isTrue(element._serverSelectorHidden);
+      assert.isTrue(element.serverSelectorHidden);
     });
 
     it('sets hidden attribute to server selector', async () => {
@@ -797,16 +904,16 @@ describe('ApiRequestEditorElement', () => {
       assert.isTrue(serverSelector.hasAttribute('hidden'));
     });
 
-    it('should have 2 servers', async () => {
+    it('has 2 servers', async () => {
       element.allowCustomBaseUri = true;
       await nextFrame();
       assert.equal(element.serversCount, 2);
     });
 
-    it('should not hide server selector', async () => {
+    it('does not hide server selector', async () => {
       element.allowCustomBaseUri = true;
       await nextFrame();
-      assert.isFalse(element._serverSelectorHidden);
+      assert.isFalse(element.serverSelectorHidden);
     })
 
     it('should set hidden attribute to false in server selector', async () => {
@@ -821,7 +928,7 @@ describe('ApiRequestEditorElement', () => {
   describe('#noServerSelector', () => {
     it('hides server selector', async () => {
       const element = await noSelectorFixture();
-      assert.isTrue(element._serverSelectorHidden);
+      assert.isTrue(element.serverSelectorHidden);
     });
 
     it('should set hidden attribute to server selector', async () => {
@@ -835,26 +942,23 @@ describe('ApiRequestEditorElement', () => {
       const element = await customBaseUriSlotFixture();
       element.allowCustomBaseUri = true;
       await nextFrame();
-      assert.isFalse(element._serverSelectorHidden);
+      assert.isFalse(element.serverSelectorHidden);
     });
 
-    it('renders server selector at first', async () => {
+    it('hides the selector', async () => {
       const element = await customBaseUriSlotFixture();
       element.allowCustomBaseUri = true;
       await nextFrame();
       element.noServerSelector = true
       await nextFrame()
-      assert.isTrue(element._serverSelectorHidden);
+      assert.isTrue(element.serverSelectorHidden);
       const serverSelector = element.shadowRoot.querySelector('api-server-selector');
       assert.exists(serverSelector);
       assert.isTrue(serverSelector.hasAttribute('hidden'));
     });
   });
 
-  [
-    ['Compact model', true],
-    ['Regular model', false]
-  ].forEach(([label, compact]) => {
+  [true, false].forEach((compact) => {
     const multiServerApi = 'multi-server';
 
     /**
@@ -881,7 +985,7 @@ describe('ApiRequestEditorElement', () => {
       element.selected = selected;
     }
 
-    describe(`server selection - ${label}`, () => {
+    describe(compact ? 'Compact model' : 'Full model', () => {
       describe('custom URI selection', () => {
         
         /** @type AmfDocument */
@@ -995,111 +1099,62 @@ describe('ApiRequestEditorElement', () => {
     });
   });
 
-  describe('allowHideOptional', () => {
-    let element
-
-    beforeEach(async () => {
-      element = await basicFixture();
-    });
-
-    it('should pass down value to api-url-params-editor', async () => {
-      element.allowHideOptional = true;
-      await nextFrame();
-      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowHideOptional);
-    });
-  });
-
-  describe('allowDisableParams', () => {
-    let element
-
-    beforeEach(async () => {
-      element = await basicFixture();
-    });
-
-    it('should pass down value to api-url-params-editor', async () => {
-      element.allowDisableParams = true;
-      await nextFrame();
-      assert.isTrue(element.shadowRoot.querySelector('api-url-params-editor').allowDisableParams);
-    });
-  });
-
-  describe('Persisting cache', () => {
-    it('should not clear cache without AMF change', async () => {
-      const clearCacheSpy = sinon.spy();
-      ApiViewModel.prototype.clearCache = clearCacheSpy
-      await basicFixture();
-      await nextFrame();
-      assert.isFalse(clearCacheSpy.called);
-    });
-
-    it('should clear cache after AMF change', async () => {
-      const clearCacheSpy = sinon.spy();
-      ApiViewModel.prototype.clearCache = clearCacheSpy
-      const model = await store.getGraph();
-      await basicFixture(model);
-      await nextFrame();
-      assert.isTrue(clearCacheSpy.called);
-    });
-
-    it('should not clear cache after AMF change with persistCache', async () => {
-      const clearCacheSpy = sinon.spy();
-      ApiViewModel.prototype.clearCache = clearCacheSpy
-      const model = await store.getGraph();
-      const element = await basicFixture();
-      element.persistCache = true;
-      element.amf = model;
-      await nextFrame();
-      assert.isFalse(clearCacheSpy.called);
-    });
-  });
-
-  [
-    { label: 'Compact model', compact: true },
-    { label: 'Regular model', compact:false }
-  ].forEach(({label, compact}) => {
-    describe(`Populating annotated fields - ${label}`, () => {
-      const annotatedParametersApi = 'annotated-parameters';
-      
-      /** @type AmfDocument */
-      let model;
-      before(async () => {
-        model = await store.getGraph(Boolean(compact), annotatedParametersApi);
-      });
-      
-      let element = null;
-      beforeEach(async () => {
-        clearCache();
-        const selected = store.lookupOperation(model, '/test', 'get')['@id'];
-        element = await modelFixture(model, selected);
-      });
-
-      it('should populate annotated query parameter field', async () => {
-        const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value' }] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
-        await aTimeout(50);
-        const finalValues = element._queryModel.map(qm => qm.value);
-        assert.deepEqual(finalValues, ['', 'test value']);
-      });
-
-      it('should populate annotated header field', async () => {
-        const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value' }] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
-        await aTimeout(50);
-        const finalValues = element._headers;
-        assert.equal(finalValues, 'annotatedHeader: test value\nnormalHeader: ');
-      });
-
-      it('should populate annotated query parameter and header fields', async () => {
-        const detail = { values: [
-          { annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value 1' },
-          { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
-        ] };
-        document.dispatchEvent(new CustomEvent('populate-annotated-fields', { detail, bubbles: true }));
-        await aTimeout(50);
-        const headers = element._headers;
-        assert.equal(headers, 'annotatedHeader: test value 2\nnormalHeader: ');
-        const queryParams = element._queryModel.map(qm => qm.value);
-        assert.deepEqual(queryParams, ['', 'test value 1']);
+  [true, false].forEach((compact) => {
+    describe(compact ? 'Compact model' : 'Full model', () => {
+      describe(`Populating annotated fields`, () => {
+        const annotatedParametersApi = 'annotated-parameters';
+        
+        /** @type AmfDocument */
+        let model;
+        before(async () => {
+          model = await store.getGraph(compact, annotatedParametersApi);
+        });
+        /** @type ApiRequestEditorElement */
+        let element;
+        beforeEach(async () => {
+          InputCache.globalValues.clear();
+          const selected = store.lookupOperation(model, '/test', 'get')['@id'];
+          element = await modelFixture(model, selected);
+        });
+  
+        it('should populate annotated query parameter field', () => {
+          const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value' }] };
+          document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
+          const values = [];
+          element.parametersValue.forEach((p) => {
+            if (p.parameter.binding !== 'query') {
+              return;
+            }
+            values[values.length] = InputCache.get(element, p.paramId, false);
+          })
+          assert.deepEqual(values, ['', 'test value']);
+        });
+  
+        it('should populate annotated header field', () => {
+          const detail = { values: [{ annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value' }] };
+          document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
+          const values = [];
+          element.parametersValue.forEach((p) => {
+            if (p.parameter.binding !== 'header') {
+              return;
+            }
+            values[values.length] = InputCache.get(element, p.paramId, false);
+          });
+          assert.deepEqual(values, [ 'test value', '' ]);
+          const { headers } = element.serialize();
+          assert.equal(headers, 'annotatedHeader: test value\nnormalHeader: ');
+        });
+  
+        it('should populate annotated query parameter and header fields', () => {
+          const detail = { values: [
+            { annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value 1' },
+            { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
+          ] };
+          document.dispatchEvent(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
+          const { headers, url } = element.serialize();
+          assert.equal(headers, 'annotatedHeader: test value 2\nnormalHeader: ');
+          assert.include(url, 'normalQueryparam=&annotatedQueryParam=test+value+1');
+        });
       });
     });
   });

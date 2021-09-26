@@ -18,9 +18,9 @@ import { html, LitElement } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import { AmfHelperMixin, AmfSerializer } from '@api-components/amf-helper-mixin';
-import { TelemetryEvents } from '@advanced-rest-client/arc-events';
+import { TelemetryEvents, RequestEventTypes } from '@advanced-rest-client/arc-events';
 import { v4 } from '@advanced-rest-client/uuid-generator';
-import { HeadersParser } from '@advanced-rest-client/arc-headers'
+import { HeadersParser } from '@advanced-rest-client/arc-headers';
 import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
@@ -38,7 +38,7 @@ import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
 import { ensureContentType, generateHeaders } from "../lib/Utils.js";
 import { cachePayloadValue, getPayloadValue, readCachePayloadValue } from "../lib/PayloadUtils.js";
-import { applyUrlParameters, applyUrlVariables, computeEndpointUrlValue, applyQueryParamStringToObject } from '../lib/UrlUtils.js';
+import { applyUrlParameters, applyUrlVariables, computeEndpointUrlValue, computeBaseUriEndpointUrlValue, applyQueryParamStringToObject } from '../lib/UrlUtils.js';
 import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 import { AmfParameterMixin } from '../lib/AmfParameterMixin.js';
 import { AmfInputParser } from '../lib/AmfInputParser.js';
@@ -82,6 +82,7 @@ export const serverLocalValue = Symbol('serverLocalValue');
 export const processOperation = Symbol('processOperation');
 export const processEndpoint = Symbol('processEndpoint');
 export const processSecurity = Symbol('processSecurity');
+export const processPayload = Symbol('processPayload');
 export const processServers = Symbol('processServers');
 export const appendToParams = Symbol('appendToParams');
 export const securityList = Symbol('securityList');
@@ -90,7 +91,6 @@ export const updateServerParameters = Symbol('updateServerParameters');
 export const updateEndpointParameters = Symbol('updateEndpointParameters');
 export const computeMethodAmfModel = Symbol('computeMethodAmfModel');
 export const computeUrlValue = Symbol('computeUrlValue');
-export const collectReportParameters = Symbol('collectReportParameters');
 export const processSelection = Symbol('processSelection');
 export const getOrderedPathParams = Symbol('getOrderedPathParams');
 export const validateUrl = Symbol('validateUrl');
@@ -108,6 +108,7 @@ export const sendHandler = Symbol('sendHandler');
 export const abortHandler = Symbol('abortHandler');
 export const optionalToggleHandler = Symbol('optionalToggleHandler');
 export const addCustomHandler = Symbol('addCustomHandler');
+export const internalSendHandler = Symbol('internalSendHandler');
 export const authorizationTemplate = Symbol('authorizationTemplate');
 export const authorizationSelectorTemplate = Symbol('authorizationSelectorTemplate');
 export const authorizationSelectorItemTemplate = Symbol('authorizationSelectorItemTemplate');
@@ -348,8 +349,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * @return {boolean} True when there are not enough servers to render the selector
    */
   get serverSelectorHidden() {
-    const { serversCount = 0, noServerSelector } = this;
-    return serversCount < 2 || noServerSelector;
+    const { serversCount = 0, noServerSelector, allowCustomBaseUri } = this;
+    return noServerSelector || (!allowCustomBaseUri && serversCount < 2);
   }
 
   /**
@@ -434,6 +435,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this[responseHandler] = this[responseHandler].bind(this);
     this[authRedirectChangedHandler] = this[authRedirectChangedHandler].bind(this);
     this[populateAnnotatedFieldsHandler] = this[populateAnnotatedFieldsHandler].bind(this);
+    this[internalSendHandler] = this[internalSendHandler].bind(this);
     /** @type boolean */
     this.urlLabel = undefined;
     /** @type boolean */
@@ -504,10 +506,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
      * @type {string[]}
      */
     this.openedOptional = [];
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
     InputCache.registerLocal(this);
   }
 
@@ -526,6 +524,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     node.addEventListener(EventTypes.Request.redirectUriChangeLegacy, this[authRedirectChangedHandler]);
     node.addEventListener(EventTypes.Request.populateAnnotatedFields, this[populateAnnotatedFieldsHandler]);
     node.addEventListener(EventTypes.Request.populateAnnotatedFieldsLegacy, this[populateAnnotatedFieldsHandler]);
+    this.addEventListener(RequestEventTypes.send, this[internalSendHandler]);
   }
 
   /**
@@ -538,6 +537,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     node.removeEventListener(EventTypes.Request.redirectUriChangeLegacy, this[authRedirectChangedHandler]);
     node.removeEventListener(EventTypes.Request.populateAnnotatedFields, this[populateAnnotatedFieldsHandler]);
     node.removeEventListener(EventTypes.Request.populateAnnotatedFieldsLegacy, this[populateAnnotatedFieldsHandler]);
+    this.removeEventListener(RequestEventTypes.send, this[internalSendHandler]);
   }
 
   /**
@@ -581,30 +581,17 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const { effectiveBaseUri, server } = this;
     let result;
     if (effectiveBaseUri) {
-      result = effectiveBaseUri;
+      result = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
     } else {
       const wa = this._computeWebApi(this.amf);
       const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
       result = computeEndpointUrlValue(this[endpointValue], server, schemes);
     }
-    const params = this[collectReportParameters]()
+    const params = this.parametersValue.map(p => p.parameter);
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
     let url = applyUrlVariables(result, report.path, true);
     url = applyUrlParameters(url, report.query, true);
     this.url = url;
-  }
-
-  /**
-   * Creates a list of parameters that are used to generate the inputs report for `AmfInputParser.reportRequestInputs`
-   * @returns {ApiParameter[]} 
-   */
-  [collectReportParameters]() {
-    const params = /** @type ApiParameter[] */ ([]);
-    this.parametersValue.forEach((item) => {
-      const { parameter } = item;
-      params.push(parameter);
-    });
-    return params;
   }
 
   /**
@@ -644,7 +631,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     // clears previously set request parameters related to server configuration.
     this.parametersValue = this.parametersValue.filter(item => item.source !== source);
     const endpoint = this[endpointValue];
-    if (!endpoint || ['custom', 'uri'].includes(this.serverType)) {
+    if (!endpoint) {
       // we don't need to compute endpoint variables for a custom URLs.
       return;
     }
@@ -688,6 +675,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this[processEndpoint]();
     this[processOperation]();
     this[processSecurity]();
+    this[processPayload]();
   }
 
   /**
@@ -735,6 +723,35 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const { security } = operation;
     this[securityList] = SecurityProcessor.readSecurityList(security);
     this.selectedSecurity = 0;
+  }
+
+  /**
+   * Makes sure the correct mime type is selected for the current selection.
+   */
+  [processPayload]() {
+    const operation = this[operationValue];
+    const { request } = operation;
+    if (!request) {
+      return;
+    }
+    const { payloads=[] } = request;
+    if (!payloads.length) {
+      return;
+    }
+    let mime = this.mimeType;
+    if (mime) {
+      const has = payloads.find(p => p.mediaType === mime);
+      if (!has) {
+        mime = undefined;
+      }
+    }
+    if (!mime) {
+      const first = payloads.find(p => p.mediaType);
+      if (first) {
+        mime = first.mediaType;
+      }
+    }
+    this.mimeType = mime;
   }
 
   /**
@@ -964,7 +981,15 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       params.push(parameter);
     });
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
-    const serverUrl = `${this.url}`;
+    let serverUrl;
+    if (this.effectiveBaseUri) {
+      serverUrl = computeBaseUriEndpointUrlValue(this[endpointValue], this.effectiveBaseUri);
+    } else {
+      const wa = this._computeWebApi(this.amf);
+      const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
+      serverUrl = computeEndpointUrlValue(this[endpointValue], this.server, schemes);
+    }
+
     let url = applyUrlVariables(serverUrl, report.path, true);
     url = applyUrlParameters(url, report.query, true);
     const headers = generateHeaders(report.header);
@@ -1038,7 +1063,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     populationInfoArray.forEach(({ annotationName, annotationValue, fieldValue }) => {
       allAnnotated.forEach((item) => {
         const { parameter, paramId } = item;
-        const hasAnnotation = parameter.customDomainProperties.some((property) => property.extensionName === annotationName && /** @type any */ (property).value === annotationValue);
+        const hasAnnotation = (parameter.customDomainProperties || []).some((property) => property.extensionName === annotationName && /** @type any */ (property).value === annotationValue);
         if (!hasAnnotation) {
           return;
         }
@@ -1087,7 +1112,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.serverValue = value;
     this[updateServer]();
     this[updateEndpointParameters]();
-    this.readUrlData();
   }
 
   /**
@@ -1096,7 +1120,13 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * This should be computed only when a server and en endpoint change.
    */
   [computeUrlRegexp]() {
-    let value = this.apiBaseUri;
+    const { effectiveBaseUri } = this;
+    let value;
+    if (effectiveBaseUri) {
+      value = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
+    } else {
+      value = this.apiBaseUri;
+    }
     if (!value) {
       this[urlSearchRegexpValue] = undefined;
     } else {
@@ -1240,11 +1270,17 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    */
   [getOrderedPathParams]() {
     const result = /** @type OperationParameter[] */ [];
-    const { apiBaseUri } = this;
-    if (!apiBaseUri) {
+    const { effectiveBaseUri } = this;
+    let url;
+    if (effectiveBaseUri) {
+      url = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
+    } else {
+      url = this.apiBaseUri;
+    }
+    if (!url) {
       return result;
     }
-    const matches = apiBaseUri.match(/{[\w\\+]+}/g);
+    const matches = url.match(/{[\w\\+]+}/g);
     if (!matches) {
       return result;
     }
@@ -1311,6 +1347,14 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       }
     });
     return changed;
+  }
+
+  /**
+   * @param {Event} e
+   */
+  [internalSendHandler](e) {
+    e.stopPropagation();
+    this.execute();
   }
 
   render() {
@@ -1426,9 +1470,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * @return {TemplateResult}
    */
   [abortButtonTemplate]() {
-    const {
-      compatibility,
-    } = this;
+    const { compatibility } = this;
     return html`
     <anypoint-button
       class="send-button abort"
@@ -1489,6 +1531,9 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     </api-server-selector>`;
   }
 
+  /**
+   * @return {TemplateResult|string} 
+   */
   [parametersTemplate]() {
     /** @type OperationParameter[] */
     const qp = [];
@@ -1511,7 +1556,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       'hide-optional': this.allowHideOptional && !openedOptional.includes('query'),
     };
     return html`
-    <section class="params-section">
+    <section class="params-section parameter">
       <div class="section-title"><span class="label">Parameters</span></div>
       <div class="path-params">
         ${path.map(param => this.parameterTemplate(param, pathOptions))}
@@ -1536,7 +1581,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       'hide-optional': this.allowHideOptional && !openedOptional.includes('header'),
     };
     return html`
-    <section class="params-section">
+    <section class="params-section header">
       <div class="section-title"><span class="label">Headers</span></div>
       ${this[toggleOptionalTemplate]('header', headers)}
       <div class="${classMap(classes)}">
@@ -1623,6 +1668,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const effectiveValue = Array.isArray(editorModel) && editorModel.length ? undefined : info.value;
     return html`
     <body-formdata-editor 
+      class="body-editor"
       autoEncode
       .value="${ifProperty(effectiveValue)}"
       .model="${ifProperty(editorModel)}"
@@ -1642,6 +1688,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const effectiveValue = Array.isArray(editorModel) && editorModel.length ? undefined : info.value;
     return html`
     <body-multipart-editor 
+      class="body-editor"
       .value="${ifProperty(effectiveValue)}"
       .model="${ifProperty(editorModel)}"
       ignoreContentType
@@ -1663,7 +1710,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       schemas = info.schemas;
     }
     return html`
-    <body-raw-editor 
+    <body-raw-editor
+      class="body-editor" 
       .value="${info.value}" 
       .contentType="${mimeType}"
       .schemas="${ifProperty(schemas)}"
