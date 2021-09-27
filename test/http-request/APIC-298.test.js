@@ -41,7 +41,7 @@ describe('ApiRequestEditorElement', () => {
           element = await modelFixture(amf, methodId);
         });
 
-        it('computes pathModel', () => {
+        it('computes pth uri parameters', () => {
           const params = element.parametersValue;
           assert.lengthOf(params, 1, 'pathModel has no elements');
           const [param] = params;
@@ -51,8 +51,7 @@ describe('ApiRequestEditorElement', () => {
         it('has OAS property name', () => {
           const params = element.parametersValue;
           const [param] = params;
-          assert.equal(param.binding, 'path');
-          assert.equal(params[0].parameter.paramName, 'id');
+          assert.equal(param.parameter.paramName, 'id');
         });
       });
     });

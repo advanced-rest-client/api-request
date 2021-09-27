@@ -57,13 +57,17 @@ export class AmfInputParser {
     });
 
     parameters.forEach((param) => {
-      const { id, required, schema, binding, name } = param;
+      const { id, required, schema, binding, name, paramName } = param;
+      const parameterName = paramName || name;
+      if (!parameterName) {
+        return;
+      }
       if (!report[binding]) {
         // for custom shapes
         report[binding] = {};
       }
       if (nillable.includes(id)) {
-        report[binding][name] = defaultNil;
+        report[binding][parameterName] = defaultNil;
         return;
       }
       let value = values.get(id);
@@ -72,7 +76,7 @@ export class AmfInputParser {
         return;
       }
       if (jsType === 'undefined') {
-        if (schema.types.includes(ns.aml.vocabularies.shapes.ScalarShape)) {
+        if (schema && schema.types.includes(ns.aml.vocabularies.shapes.ScalarShape)) {
           value = ApiSchemaValues.readInputValue(param, /** @type ApiScalarShape */ (schema));
         }
       }
@@ -81,13 +85,13 @@ export class AmfInputParser {
         if (Array.isArray(value)) {
           // this is a huge assumption here.
           // Todo: this should be done recursively.
-          report[binding][name] = value.map(i => i === undefined ? i : String(i));
+          report[binding][parameterName] = value.map(i => i === undefined ? i : String(i));
         } else {
           const isScalar = jsType !== 'undefined' && jsType !== 'object' && value !== null;
-          report[binding][name] = isScalar ? String(value) : value;
+          report[binding][parameterName] = isScalar ? String(value) : value;
         }
       } else {
-        const valid = AmfInputParser.addReportItem(report[binding], name, schema, value, required);
+        const valid = AmfInputParser.addReportItem(report[binding], parameterName, schema, value, required);
         if (!valid) {
           report.valid = false;
           report.invalid.push(id);

@@ -20,7 +20,7 @@ describe('ApiRequestEditorElement', () => {
         .selected="${selected}"></api-request-editor>`));
     }
 
-    [true].forEach((compact) => {
+    [true, false].forEach((compact) => {
       describe(compact ? 'Compact model' : 'Full model', () => {
         /** @type AmfLoader */
         let store;

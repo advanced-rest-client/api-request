@@ -40,6 +40,7 @@ import { readLabelValue } from './Utils.js';
 export const customParamTemplate = Symbol('customParamTemplate');
 export const customParamChangeHandler = Symbol('customParamChangeHandler');
 export const deleteParamHandler = Symbol('deleteParamHandler');
+export const correctDateTimeParameter = Symbol('correctDateTimeParameter');
 
 /**
  * @param {any} base
@@ -315,6 +316,25 @@ const mxFunction = base => {
     }
 
     /**
+     * Corrects the `http://www.w3.org/2001/XMLSchema#dateTime` schema with the `date-time` or `rfc3339` formats
+     * to remove the last `.ZZZ` part which is not recognizable by the `<input>` element.
+     * @param {ApiScalarShape} schema 
+     * @param {any} value 
+     * @returns {any}
+     */
+    [correctDateTimeParameter](schema, value) {
+      if (!value) {
+        return value;
+      }
+      if (schema.dataType === ns.w3.xmlSchema.dateTime) {
+        if (['date-time', 'rfc3339'].includes(schema.format)) {
+          return String(value).replace(/(\.\d\d\d)Z/, '$1');
+        }
+      }
+      return value;
+    }
+
+    /**
      * @param {ApiParameter} parameter
      * @param {ApiScalarShape} schema
      * @param {SupportedInputTypes=} type The input type.
@@ -340,6 +360,7 @@ const mxFunction = base => {
       }
       if (value) {
         value = ApiSchemaValues.parseScalarInput(value, schema);
+        value = this[correctDateTimeParameter](schema, value);
       }
       /** @type number */
       let step;

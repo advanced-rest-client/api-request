@@ -85,7 +85,9 @@ class ComponentDemo extends ApiDemoPage {
       ['SE-12042', 'SE-12042: Default values issue'],
       ['SE-12224', 'SE-12224: Scope is not an array issues'],
       ['APIC-168', 'APIC-168: Custom scheme support'],
-      ['APIC-289', 'OAS param names'],
+      ['APIC-289', 'APIC-289: OAS param names'],
+      ['APIC-298', 'APIC-298: OAS param names 2'],
+      ['APIC-689', 'APIC-689: Enum values'],
       ['api-keys', 'API key'],
       ['oas-demo', 'OAS Demo API'],
       ['oauth-flows', 'OAS OAuth Flow'],
@@ -93,11 +95,11 @@ class ComponentDemo extends ApiDemoPage {
       ['secured-api', 'Security demo'],
       ['21143', '21143'],
       ['annotated-parameters', 'annotated-parameters'],
-      ['APIC-689', 'Enum values (APIC-689)'],
+      ['SE-12957', 'SE-12957: OAS query parameters documentation'],
     ].map(([file, label]) => html`
-      <anypoint-item data-src="${file}-compact.json">${label} - compact model</anypoint-item>
-      <anypoint-item data-src="${file}.json">${label}</anypoint-item>
+      <anypoint-item data-src="${file}-compact.json">${label}</anypoint-item>
       `);
+      // <anypoint-item data-src="${file}.json">${label}</anypoint-item>
   }
 
   _responseReady(e) {

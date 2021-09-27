@@ -1,0 +1,741 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "SMART Downtime API Example4",
+    "description": "OAS2: URI parameters are not described nor published",
+    "contact": {
+      "name": "SMART Support",
+      "email": "smartsupport@res-group.com"
+    }
+  },
+  "paths": {
+    "/api/v1/alarm/{scada-object-key}": {
+      "get": {
+        "tags": [
+          "Alarm"
+        ],
+        "summary": "Get a list of alarms for a single downtime event.",
+        "operationId": "GetList",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "scada-object-key",
+            "in": "path",
+            "description": "The key identifies the SCADA object",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "time-on",
+            "in": "query",
+            "description": "The downtime event start time",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Alarm"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/site/{site-api-key}": {
+      "get": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Get a list of downtime events for a site that overlap with a time period",
+        "operationId": "GetSite",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "site-api-key",
+            "in": "path",
+            "description": "The SMART API key of the site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The inclusive start of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "The exclusive end of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DowntimeEvent"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/object/{scada-object-key}": {
+      "get": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Get a list of downtime events for a SCADA object that overlap with a time period",
+        "operationId": "GetObject",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "scada-object-key",
+            "in": "path",
+            "description": "The SMART API key of the object",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The inclusive start of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "The exclusive end of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DowntimeEvent"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/{site-api-key}/type/{scada-object-type}": {
+      "get": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Get a list of downtime events for all SCADA objects of a single type at one site that overlap with the selected time period",
+        "operationId": "GetType",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "site-api-key",
+            "in": "path",
+            "description": "The SMART API key of the site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scada-object-type",
+            "in": "path",
+            "description": "The SCADA object type",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "The inclusive start of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "The exclusive end of the time period. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DowntimeEvent"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/downtime": {
+      "put": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Update a downtime event",
+        "operationId": "Put",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "downtimeEvent",
+            "in": "body",
+            "description": "The downtime event to update",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/EditableDowntimeEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Create a new downtime event",
+        "operationId": "Post",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "downtimeEvent",
+            "in": "body",
+            "description": "The new downtime event",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/EditableDowntimeEvent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/revert/{scada-object-key}": {
+      "put": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Revert changes to a previously split downtime event",
+        "operationId": "Revert",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "scada-object-key",
+            "in": "path",
+            "description": "The SMART API key of the downtime event's SCADA object",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "time-on",
+            "in": "query",
+            "description": "The start time of the downtime event. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/DowntimeEvent"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/split/{scada-object-key}": {
+      "put": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Split a downtime event",
+        "operationId": "Split",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "scada-object-key",
+            "in": "path",
+            "description": "The SMART API key of the downtime event's SCADA object",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "time-on",
+            "in": "query",
+            "description": "The start time of the downtime event. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "split-time",
+            "in": "query",
+            "description": "The time to split. A date without a time is converted to the start of the day",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/downtime/copy/{scada-object-key}": {
+      "put": {
+        "tags": [
+          "Downtime"
+        ],
+        "summary": "Copy the properties of a downtime event to a list of downtime events.",
+        "description": "The following properties are copied:\r\nAlarmGroup\r\nAlarmDefinition\r\nAvailabilityIndicator\r\nDescription",
+        "operationId": "Copy",
+        "consumes": [
+          "application/json-patch+json",
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "scada-object-key",
+            "in": "path",
+            "description": "The SMART API key of the downtime event's SCADA object",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "time-on",
+            "in": "query",
+            "description": "The start time of the downtime event",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "downtimeEvents",
+            "in": "body",
+            "description": "Create or update these downtime events",
+            "required": false,
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DowntimeEventKey"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v1/group": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "Get a list of all alarm groups",
+        "operationId": "GetAlarmGroups",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AlarmGroup"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/object/{site-api-key}/{scada-object-type}": {
+      "get": {
+        "tags": [
+          "Object"
+        ],
+        "summary": "Get a list of SCADA objects of a single type at one site that can have Downtimes",
+        "operationId": "GetObjects",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "site-api-key",
+            "in": "path",
+            "description": "The SMART API key of the site",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scada-object-type",
+            "in": "path",
+            "description": "The SCADA object type",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ScadaObject"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/objecttype/{site-api-key}": {
+      "get": {
+        "tags": [
+          "ObjectType"
+        ],
+        "summary": "Get a list of types of the SCADA objects at one site that can have Downtimes",
+        "operationId": "GetTypes",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "site-api-key",
+            "in": "path",
+            "description": "The SMART API key of the site",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/penalising-status": {
+      "get": {
+        "tags": [
+          "PenalisingStatus"
+        ],
+        "summary": "Get a list of all penalising status",
+        "operationId": "GetPenalisingStatus",
+        "consumes": [],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "uniqueItems": false,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AvailabilityIndicator"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Alarm": {
+      "type": "object",
+      "properties": {
+        "timeOn": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "timeOff": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "parameter1": {
+          "type": "string"
+        },
+        "parameter2": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      }
+    },
+    "DowntimeEvent": {
+      "type": "object",
+      "properties": {
+        "alarmCode": {
+          "type": "string"
+        },
+        "siteKey": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "lostProduction": {
+          "format": "double",
+          "type": "number"
+        },
+        "meanWindSpeed": {
+          "format": "double",
+          "type": "number"
+        },
+        "windSpeedDataCoverage": {
+          "format": "double",
+          "type": "number"
+        },
+        "edited": {
+          "type": "boolean"
+        },
+        "canBeReverted": {
+          "type": "boolean"
+        },
+        "timeOff": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "subGroup": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "penalisingStatus": {
+          "type": "string"
+        },
+        "scadaObjectName": {
+          "type": "string"
+        },
+        "scadaObjectKey": {
+          "type": "string"
+        },
+        "timeOn": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "EditableDowntimeEvent": {
+      "type": "object",
+      "properties": {
+        "timeOff": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "subGroup": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "penalisingStatus": {
+          "type": "string"
+        },
+        "scadaObjectName": {
+          "type": "string"
+        },
+        "scadaObjectKey": {
+          "type": "string"
+        },
+        "timeOn": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "DowntimeEventKey": {
+      "type": "object",
+      "properties": {
+        "scadaObjectKey": {
+          "type": "string"
+        },
+        "timeOn": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "AlarmGroup": {
+      "type": "object",
+      "properties": {
+        "turbineBudget": {
+          "type": "boolean"
+        },
+        "windfarmBudget": {
+          "type": "boolean"
+        },
+        "operationalAvailability": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "technology": {
+          "$ref": "#/definitions/SiteTechnology"
+        },
+        "subGroups": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AlarmSubGroup"
+          }
+        }
+      }
+    },
+    "SiteTechnology": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "AlarmSubGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ScadaObject": {
+      "type": "object",
+      "properties": {
+        "apiKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "AvailabilityIndicator": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

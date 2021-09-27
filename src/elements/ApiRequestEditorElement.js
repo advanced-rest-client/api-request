@@ -710,6 +710,24 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     if (!request) {
       return;
     }
+    const uri = [];
+    if (Array.isArray(request.uriParameters)) {
+      // OAS has this weird thing where you can define URI parameters on the endpoint and the operation.
+      // this eliminates the duplicates and merges the schemas
+      request.uriParameters.forEach((param) => {
+        if (!param.paramName) {
+          uri.push(param);
+          return;
+        }
+        const index = this.parametersValue.findIndex(p => p.binding === 'path' && p.parameter.paramName === param.paramName);
+        if (index !== -1) {
+          // remove the parameter that is being replaced by the local definition
+          this.parametersValue.splice(index, 1);
+        }
+        uri.push(param);
+      });
+    }
+    this[appendToParams](uri, source);
     this[appendToParams](request.queryParameters, source);
     this[appendToParams](request.headers, source);
     this[appendToParams](request.cookieParameters, source);
@@ -1111,7 +1129,6 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.serverType = type;
     this.serverValue = value;
     this[updateServer]();
-    this[updateEndpointParameters]();
   }
 
   /**
