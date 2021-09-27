@@ -1156,7 +1156,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * Toggles optional parameter groups.
    * @param {Event} e
    */
-  [optionalToggleHandler](e) {
+  async [optionalToggleHandler](e) {
     const node = /** @type HTMLElement */ (e.target);
     const { target } = node.dataset;
     if (!target) {
@@ -1171,7 +1171,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     } else {
       this.openedOptional.push(target);
     }
-    this.requestUpdate();
+    await this.requestUpdate();
+    this.dispatchEvent(new Event('resize', { bubbles: true, composed: true }));
   }
 
   /**

@@ -177,7 +177,7 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
    *
    * @param {string} type Current value.
    */
-  [typeChangedSymbol](type) {
+  async [typeChangedSymbol](type) {
     const init = /** @type AuthUiInit */ ({
       renderCallback: this[renderCallback],
       changeCallback: this[changeCallback],
@@ -227,7 +227,8 @@ export default class ApiAuthorizationMethodElement extends AuthorizationMethod {
     }
     this[factory] = instance;
     instance.defaults();
-    this.requestUpdate();
+    await this.requestUpdate();
+    this.dispatchEvent(new Event('resize', { bubbles: true, composed: true }));
   }
 
   /**

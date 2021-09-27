@@ -382,7 +382,7 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    *
    * @param {ApiConsoleResponse} data Event's detail object
    */
-  [propagateResponse](data) {
+  async [propagateResponse](data) {
     if (data.isError) {
       this.response = /** @type ErrorResponse */ ({
         error: data.error,
@@ -411,6 +411,8 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
       headers: data.request.headers,
       payload: data.request.payload,
     });
+    await this.updateComplete;
+    this.dispatchEvent(new Event('resize', { bubbles: true, composed: true }));
   }
 
   /**
