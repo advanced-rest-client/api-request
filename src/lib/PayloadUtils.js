@@ -7,7 +7,7 @@ import { ApiExampleGenerator, ApiMonacoSchemaGenerator, ApiSchemaGenerator } fro
 
 /** 
  * @typedef PayloadInfo
- * @property {string} value
+ * @property {string|FormData|Blob} value
  * @property {ApiType[]=} model
  * @property {any[]=} schemas Monaco schemas
  */
@@ -24,6 +24,12 @@ export function getPayloadValue(payload) {
     return cache.get(payload.id);
   }
   const { id, mediaType='text/plain', schema } = payload;
+  if (mediaType === 'multipart/form-data') {
+    // schema generators don't support this yet,
+    const info = /** @type PayloadInfo */ ({ value: new FormData(), schemas: [] });
+    cache.set(id, info);
+    return info;
+  }
   const schemaFactory = new ApiMonacoSchemaGenerator();
   const monacoSchemes = schemaFactory.generate(schema, id);
   let { examples } = payload;
@@ -41,6 +47,9 @@ export function getPayloadValue(payload) {
   // generate values.
   const result = ApiSchemaGenerator.asExample(schema, mediaType, {
     selectedUnions: [],
+    renderExamples: true,
+    renderOptional: true,
+    renderMocked: true,
   });
   if (!result || !result.renderValue) {
     const info = { value: '', schemas: monacoSchemes };

@@ -881,6 +881,160 @@ describe('ApiRequestEditorElement', () => {
           });
         });
       });
+
+      describe('Body editing', () => {
+        describe('Value settings', () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, demoApi);
+          });
+
+          it('sets value from a RAML example for a JSON body', async () => {
+            const method = store.lookupOperation(model, '/body-types/json', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            const data = JSON.parse(String(request.payload));
+            assert.equal(data.name, 'Pawel Psztyc');
+
+            const bodyEditor = element.shadowRoot.querySelector('body-raw-editor');
+            assert.equal(bodyEditor.contentType, 'application/json', 'body editor has the content type');
+          });
+
+          it('sets value from a RAML example for an XML body', async () => {
+            const method = store.lookupOperation(model, '/body-types/xml', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            const body = String(request.payload);
+            assert.include(body, '<name>Pawel Psztyc</name>');
+
+            const bodyEditor = element.shadowRoot.querySelector('body-raw-editor');
+            assert.equal(bodyEditor.contentType, 'application/xml', 'body editor has the content type');
+          });
+
+          it('sets value from a RAML example for an x-www-form-urlencoded body', async () => {
+            const method = store.lookupOperation(model, '/body-types/form', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            const body = String(request.payload);
+            assert.include(body, 'name=Pawel+Psztyc');
+
+            const bodyEditor = element.shadowRoot.querySelector('body-formdata-editor');
+            assert.ok(bodyEditor, 'renders the specialized form data editor');
+          });
+
+          // this can be done by adding support for a new media type in the `api-schema` module.
+          // for now an empty FormData instance is created
+          it('it has no example values for form data', async () => {
+            const method = store.lookupOperation(model, '/body-types/multi-parts', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            assert.typeOf(request.payload, 'FormData');
+
+            const bodyEditor = element.shadowRoot.querySelector('body-multipart-editor');
+            assert.ok(bodyEditor, 'renders the specialized multipart editor');
+          });
+
+          it('sets a generated from schema example', async () => {
+            const method = store.lookupOperation(model, '/generated-example', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            const data = JSON.parse(String(request.payload));
+            assert.typeOf(data.birthday, 'string', 'a date property is set');
+            assert.isNotEmpty(data.birthday, 'a date property has a value');
+            assert.equal(data.name, 'John Smith', 'has generated schema value');
+          });
+
+          it('renders media type selector', async () => {
+            const method = store.lookupOperation(model, '/generated-example', 'post');
+            const element = await modelFixture(model, method['@id']);
+            
+            const container = element.shadowRoot.querySelector('.payload-mime-selector');
+            assert.ok(container, 'has the media selector container');
+
+            const options = container.querySelectorAll('anypoint-radio-button');
+            assert.lengthOf(options, 3, 'has all defined in the API media types');
+
+            assert.equal(options[0].textContent.trim(), 'application/json', 'has the application/json option');
+            assert.equal(options[1].textContent.trim(), 'application/xml', 'has the application/xml option');
+            assert.equal(options[2].textContent.trim(), 'application/x-www-form-urlencoded', 'has the application/x-www-form-urlencoded option');
+          });
+
+          it('changes selected mime type', async () => {
+            const method = store.lookupOperation(model, '/generated-example', 'post');
+            const element = await modelFixture(model, method['@id']);
+            
+            const options = /** @type NodeListOf<HTMLElement> */ (element.shadowRoot.querySelectorAll('.payload-mime-selector anypoint-radio-button'));
+            options[1].click();
+
+            await nextFrame();
+
+            const request = element.serialize();
+            const body = String(request.payload);
+            assert.include(body, '<url></url>');
+
+            const bodyEditor = element.shadowRoot.querySelector('body-raw-editor');
+            assert.equal(bodyEditor.contentType, 'application/xml', 'body editor has the content type');
+          });
+        });
+
+        describe('apic-169', () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, 'apic-169');
+          });
+
+          it('sets the value with optional and generated', async () => {
+            const method = store.lookupOperation(model, '/new', 'post');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            const data = JSON.parse(String(request.payload));
+            assert.equal(data.name, 'MuleSoft');
+          });
+        });
+
+        describe('APIC-480', () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, 'APIC-480');
+          });
+
+          it('sets the content type of the operation', async () => {
+            const method = store.lookupOperation(model, '/accounts/{accountNumber}', 'patch');
+            const element = await modelFixture(model, method['@id']);
+            const request = element.serialize();
+            assert.equal(request.headers, 'content-type: application/json');
+          });
+        });
+
+        describe('APIC-613', () => {
+          /** @type AmfDocument */
+          let model;
+          before(async () => {
+            model = await store.getGraph(compact, 'APIC-613');
+          });
+
+          it('should not reset input fields when manipulating them', async () => {
+            const method = store.lookupOperation(model, '/files', 'post');
+            const element = await modelFixture(model, method['@id']);
+            
+            const editor = element.shadowRoot.querySelector('body-multipart-editor');
+            /** @type HTMLElement */ (editor.shadowRoot.querySelector('.add-param.text-part')).click();
+            // waiting for the input to render.
+            await nextFrame();
+
+            const input = /** @type HTMLInputElement */ (editor.shadowRoot.querySelector('anypoint-input[data-property="name"]'));
+            input.value = 'Test';
+            input.dispatchEvent(new Event('input'));
+            input.dispatchEvent(new Event('change'));
+
+            await nextFrame();
+            assert.exists(editor.shadowRoot.querySelector('anypoint-input[data-property="name"]'));
+          });
+        });
+      });
     });
   });
 

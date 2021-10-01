@@ -20,7 +20,7 @@ describe('ApiRequestEditorElement', () => {
         .selected="${selected}"></api-request-editor>`));
     }
 
-    [true, false].forEach((compact) => {
+    [true].forEach((compact) => {
       describe(compact ? 'Compact model' : 'Full model', () => {
         let methodId;
 

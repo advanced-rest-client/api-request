@@ -59,6 +59,7 @@ import '../../api-authorization-editor.js';
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
 /** @typedef {import('@api-components/amf-helper-mixin').Operation} Operation */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiScalarShape} ApiScalarShape */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiScalarNode} ApiScalarNode */
 /** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 /** @typedef {import('@anypoint-web-components/anypoint-radio-button/index').AnypointRadioGroupElement} AnypointRadioGroupElement */
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
@@ -132,6 +133,7 @@ export const computeUrlRegexp = Symbol('computeUrlRegexp');
 export const urlSearchRegexpValue = Symbol('urlSearchRegexpValue');
 export const applyUriValues = Symbol('applyUriValues');
 export const applyQueryParamsValues = Symbol('applyQueryParamsValues');
+export const orderPathParameters = Symbol('orderPathParameters');
 
 export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(EventsTargetMixin(LitElement))) {
   get styles() {
@@ -558,6 +560,19 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   readUrlData() {
     this[computeUrlValue]();
     this[updateServerParameters]();
+    this[orderPathParameters]()
+  }
+
+  /**
+   * It makes sure that the path parameters are rendered in order (server, endpoint) and in order of occurrence in the URL. 
+   */
+  [orderPathParameters]() {
+    const params = this[getOrderedPathParams]();
+    if (!params || !params.length) {
+      return;
+    }
+    this.parametersValue = this.parametersValue.filter(item => item.binding !== 'path');
+    this.parametersValue = this.parametersValue.concat(params);
   }
 
   /**
@@ -1081,7 +1096,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     populationInfoArray.forEach(({ annotationName, annotationValue, fieldValue }) => {
       allAnnotated.forEach((item) => {
         const { parameter, paramId } = item;
-        const hasAnnotation = (parameter.customDomainProperties || []).some((property) => property.extensionName === annotationName && /** @type any */ (property).value === annotationValue);
+        const hasAnnotation = (parameter.customDomainProperties || []).some((property) => property.name === annotationName && /** @type ApiScalarNode */ (property.extension).value === annotationValue);
         if (!hasAnnotation) {
           return;
         }

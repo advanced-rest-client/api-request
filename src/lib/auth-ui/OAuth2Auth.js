@@ -22,7 +22,6 @@ const gtValue = Symbol("gtValue");
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityScheme} ApiSecurityScheme */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityOAuth2Settings} ApiSecurityOAuth2Settings */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiSecurityOAuth2Flow} ApiSecurityOAuth2Flow */
-/** @typedef {import('@api-components/amf-helper-mixin').ApiDomainExtension} ApiDomainExtension */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiCustomDomainProperty} ApiCustomDomainProperty */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiObjectNode} ApiObjectNode */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiArrayNode} ApiArrayNode */
@@ -359,8 +358,8 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
     const { customDomainProperties=[] } = model;
     const properties = ['accessTokenSettings', 'authorizationGrants', 'authorizationSettings'];
     return customDomainProperties.find((property) => {
-      const node = /** @type ApiObjectNode */ (/** @type unknown */ (property));
-      if (!node.properties || !property.types.includes(ns.aml.vocabularies.data.Object)) {
+      const node = /** @type ApiObjectNode */ (property.extension);
+      if (!node.properties || !node.types.includes(ns.aml.vocabularies.data.Object)) {
         return false;
       }
       return Object.keys(node.properties).some(name => properties.includes(name));
@@ -372,14 +371,14 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
    * https://github.com/raml-org/raml-annotations/blob/master/annotations/security-schemes/oauth-2-custom-settings.raml
    * 
    * @param {string[]} grans The API spec annotation grants
-   * @param {ApiDomainExtension=} extension The domain extension with the custom data
+   * @param {ApiCustomDomainProperty=} customProperty The domain extension with the custom data
    * @returns {string[]} The list of authorization grants to apply to the current operation.
    */
-  computeGrants(grans=[], extension) {
-    if (!extension || !extension.types.includes(ns.aml.vocabularies.data.Object)) {
+  computeGrants(grans=[], customProperty) {
+    if (!customProperty || !customProperty.extension || !customProperty.extension.types.includes(ns.aml.vocabularies.data.Object)) {
       return grans;
     }
-    const typed = /** @type ApiObjectNode */ (extension);
+    const typed = /** @type ApiObjectNode */ (customProperty.extension);
     if (!typed.properties.authorizationGrants) {
       return grans;
     }
@@ -560,11 +559,11 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
     if (!Array.isArray(customDomainProperties) || !customDomainProperties.length) {
       return undefined;
     }
-    const pkce = customDomainProperties.find(e => e.extensionName === 'pkce');
+    const pkce = customDomainProperties.find(e => e.name === 'pkce');
     if (!pkce) {
       return undefined;
     }
-    const info = /** @type ApiScalarNode */ (pkce);
+    const info = /** @type ApiScalarNode */ (pkce.extension);
     if (info.dataType === ns.w3.xmlSchema.boolean) {
       return info.value === 'true';
     }
@@ -617,15 +616,15 @@ export default class OAuth2Auth extends AmfParameterMixin(Oauth2) {
    * - token headers
    * - token body
    *
-   * @param {ApiDomainExtension} annotation Annotation applied to the OAuth settings
+   * @param {ApiCustomDomainProperty} customProperty Annotation applied to the OAuth settings
    */
-  setupAnnotationParameters(annotation) {
+  setupAnnotationParameters(customProperty) {
     this.parametersValue = /** @type OperationParameter[] */ ([]);
     /* istanbul ignore if */
-    if (!annotation || !annotation) {
+    if (!customProperty || !customProperty.extension) {
       return;
     }
-    const typed = /** @type ApiObjectNode */ (annotation);
+    const typed = /** @type ApiObjectNode */ (customProperty.extension);
     const authSettings = /** @type ApiObjectNode */ (typed.properties.authorizationSettings);
     const tokenSettings = /** @type ApiObjectNode */ (typed.properties.accessTokenSettings);
     if (authSettings) {

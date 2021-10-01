@@ -1,0 +1,16 @@
+#%RAML 1.0
+title: My API
+
+types: 
+  File: 
+    type: file
+
+/files: 
+  post: 
+    body: 
+      multipart/form-data: 
+        properties: 
+          files: 
+            description: The file(s) to be uploaded
+            required: true
+            type: File

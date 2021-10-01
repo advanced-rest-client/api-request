@@ -1,0 +1,61 @@
+#%RAML 1.0
+title: Innotrust System API
+version: v1
+description: This API is the system API to interact with Innotrust
+
+protocols:
+  - https
+mediaType:
+  - application/json
+
+traits:
+  event-tracking:
+    headers:
+      X-Transaction-ID:
+      X-Correlation-ID:
+
+/accounts:
+  displayName: Accounts
+  description:  Accounts endpoint to access and create account resource.
+  post:
+    displayName: Open A New Account
+    description: This endpoint should be used to open new accounts.
+    is:
+      - event-tracking
+    body:
+    responses:
+      201:
+        body:
+          example: !include examples/account-response.json
+
+  /{accountNumber}:
+    displayName: Account
+    get:
+      displayName: Get A Account
+      description: Method to get account accounts.
+      is:
+        - event-tracking
+      responses:
+        200:
+          body:
+    patch:
+      displayName: Update a  Account
+      description: This endpoint should be used to update account.
+      is:
+        - event-tracking
+      body:
+    /fee-account:
+      displayName: Fee account
+      description: Endpoint to access and create fee account.
+      post:
+        displayName: Add Fee Account
+        description: This method should be used to add fee account.
+        is:
+          - event-tracking
+        body:
+      patch:
+        displayName: Update Fee Account
+        description: This method should be used to add fee account.
+        is:
+          - event-tracking
+        body:

@@ -82,12 +82,16 @@ class ComponentDemo extends ApiDemoPage {
       ['google-drive-api', 'Google Drive'],
       ['multi-server', 'Multiple servers'],
       ['httpbin', 'httpbin.org'],
-      ['SE-12042', 'SE-12042: Default values issue'],
-      ['SE-12224', 'SE-12224: Scope is not an array issues'],
       ['APIC-168', 'APIC-168: Custom scheme support'],
+      ['apic-169', 'apic-169'],
       ['APIC-289', 'APIC-289: OAS param names'],
       ['APIC-298', 'APIC-298: OAS param names 2'],
+      ['APIC-480', 'APIC-480'],
+      ['APIC-613', 'APIC-613'],
       ['APIC-689', 'APIC-689: Enum values'],
+      ['SE-12042', 'SE-12042: Default values issue'],
+      ['SE-12224', 'SE-12224: Scope is not an array issues'],
+      ['SE-12957', 'SE-12957: OAS query parameters documentation'],
       ['api-keys', 'API key'],
       ['oas-demo', 'OAS Demo API'],
       ['oauth-flows', 'OAS OAuth Flow'],
@@ -95,7 +99,6 @@ class ComponentDemo extends ApiDemoPage {
       ['secured-api', 'Security demo'],
       ['21143', '21143'],
       ['annotated-parameters', 'annotated-parameters'],
-      ['SE-12957', 'SE-12957: OAS query parameters documentation'],
     ].map(([file, label]) => html`
       <anypoint-item data-src="${file}-compact.json">${label}</anypoint-item>
       `);

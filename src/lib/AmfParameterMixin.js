@@ -629,8 +629,13 @@ const mxFunction = base => {
       const values = /** @type any[] */ (this.readInputValue(parameter, schema, true));
       const options = { arrayItem: true, };
       const inputs = (values || []).map((value, index) => this.parameterSchemaTemplate(parameter, items, { ...options, value, index }));
+      const classes = {
+        'array-form-item': true,
+        required: parameter.required,
+        optional: !parameter.required,
+      };
       return html`
-      <div class="array-form-item" data-param-id="${id}" data-param-label="${label}">
+      <div class="${classMap(classes)}" data-param-id="${id}" data-param-label="${label}">
         <div class="array-title"><span class="label">${label}</span></div>
         ${inputs}
         ${this.addArrayItemTemplate(id)}
