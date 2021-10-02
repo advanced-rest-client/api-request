@@ -1,49 +1,50 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
+
 /** @typedef {import('@api-components/amf-helper-mixin').ApiEndPoint} ApiEndPoint */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
+/** @typedef {import('../types').ComputeBaseUriOptions} ComputeBaseUriOptions */
 
 /**
- * Computes the URL value for the endpoint's path and the base uri.
- * @param {ApiEndPoint} endpoint The current endpoint
- * @param {string} baseUri The base uri to use.
- * @returns {string} The URL template value.
+ * Computes the base URI value for the API/endpoint/operation.
+ * 
+ * @param {ComputeBaseUriOptions} options The computation options
+ * @returns {string} Base uri value. Can be empty string.
  */
-export function computeBaseUriEndpointUrlValue(endpoint, baseUri) {
-  let result = baseUri;
+export function computeApiBaseUri(options={}) {
+  const { baseUri, server, protocols=[] } = options;
+  if (baseUri) {
+    return baseUri;
+  }
+  if (!server) {
+    return '';
+  }
+  const { url='', protocol } = server;
+  const schemes = [...protocols];
+  if (protocol) {
+    schemes.unshift(protocol);
+  }
+  let result = url;
   if (result.endsWith('/')) {
     result = result.substr(0, result.length - 1);
   }
-  if (endpoint) {
-    let { path='' } = endpoint;
-    if (path[0] !== '/') {
-      path = `/${path}`;
-    }
-    result += path;
+  // adds the protocol only when the base URI is defined.
+  if (result && !(result.startsWith('http:') || result.startsWith('https:')) && schemes.length) {
+    result = `${schemes[0]}://${result}`;
   }
   return result;
 }
 
 /**
- * Computes the URL value for the current serves, selected server, and endpoint's path.
- * @param {ApiEndPoint} endpoint The current endpoint
- * @param {ApiServer=} server The selected server definition. Optional.
- * @param {string[]=} schemes API supported schemes. Optional.
- * @returns {string} The URL template value.
+ * Computes the base URI value for the API/endpoint/operation.
+ * 
+ * @param {ComputeBaseUriOptions} options The computation options
+ * @returns {string} Base uri value. Can be empty string.
  */
-export function computeEndpointUrlValue(endpoint, server, schemes=[]) {
-  let result = '';
-  if (server) {
-    result += server.url;
-    if (result.endsWith('/')) {
-      result = result.substr(0, result.length - 1);
-    }
-    if (!(result.startsWith('http:') || result.startsWith('https:')) && schemes.length) {
-      result = `${schemes[0]}://${result}`;
-    }
-  }
-  if (endpoint) {
-    let { path='' } = endpoint;
+export function computeEndpointUri(options={}) {
+  let result = computeApiBaseUri(options);
+  if (options.endpoint) {
+    let { path='' } = options.endpoint;
     if (path[0] !== '/') {
       path = `/${path}`;
     }
@@ -76,12 +77,12 @@ export function wwwFormUrlEncode(str, replacePlus) {
 /**
  * Creates a RegExp object to replace template variable from the base string
  * @param {string} name Name of the parameter to be replaced
- * @return {RegExp}
+ * @returns {RegExp}
  */
 function createUrlReplaceRegex(name) {
   if (name[0] === '+' || name[0] === '#') {
     // eslint-disable-next-line no-param-reassign
-    name = `\\${  name}`;
+    name = `\\${name}`;
   }
   return new RegExp(`{${name}}`, 'g');
 }

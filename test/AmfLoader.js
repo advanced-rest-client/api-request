@@ -2,8 +2,11 @@ import { AmfHelperMixin, AmfSerializer } from '@api-components/amf-helper-mixin'
 
 /** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('@api-components/amf-helper-mixin').EndPoint} EndPoint */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiEndPoint} ApiEndPoint */
 /** @typedef {import('@api-components/amf-helper-mixin').Operation} Operation */
 /** @typedef {import('@api-components/amf-helper-mixin').ApiOperation} ApiOperation */
+/** @typedef {import('@api-components/amf-helper-mixin').Server} Server */
+/** @typedef {import('@api-components/amf-helper-mixin').ApiServer} ApiServer */
 
 export class AmfLoader extends AmfHelperMixin(Object) {
   /**
@@ -29,13 +32,27 @@ export class AmfLoader extends AmfHelperMixin(Object) {
 
   /**
    * @param {AmfDocument} model
-   * @param {string} endpoint
+   * @param {string} path
    * @return {EndPoint}
    */
-  lookupEndpoint(model, endpoint) {
+  lookupEndpoint(model, path) {
     this.amf = model;
     const webApi = this._computeWebApi(model);
-    return this._computeEndpointByPath(webApi, endpoint);
+    return this._computeEndpointByPath(webApi, path);
+  }
+
+  /**
+   * @param {AmfDocument} model
+   * @param {string} path
+   * @return {ApiEndPoint}
+   */
+  getEndpoint(model, path) {
+    const op = this.lookupEndpoint(model, path);
+    if (!op) {
+      throw new Error(`Unknown endpoint for path ${path}`);
+    }
+    const serializer = new AmfSerializer(model);
+    return serializer.endPoint(op);
   }
 
   /**
@@ -64,5 +81,33 @@ export class AmfLoader extends AmfHelperMixin(Object) {
     }
     const serializer = new AmfSerializer(model);
     return serializer.operation(op);
+  }
+
+  /**
+   * @param {AmfDocument} model
+   * @return {Server[]}
+   */
+  lookupServers(model) {
+    this.amf = model;
+    const webApi = this._computeWebApi(model);
+    const key = this._getAmfKey(this.ns.aml.vocabularies.apiContract.server);
+    let result = webApi[key];
+    if (result && !Array.isArray(result)) {
+      result = [result];
+    }
+    return result;
+  }
+
+  /**
+   * @param {AmfDocument} model
+   * @return {ApiServer[]}
+   */
+  getServers(model) {
+    const servers = this.lookupServers(model);
+    if (servers) {
+      const serializer = new AmfSerializer(model);
+      return servers.map(s => serializer.server(s));
+    }
+    return undefined;
   }
 }

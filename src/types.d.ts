@@ -1,5 +1,5 @@
 import { HTTPRequest, RequestAuthorization } from '@advanced-rest-client/arc-types/src/request/ArcRequest';
-import { ApiParameter, ApiShapeUnion, ApiSecurityRequirement } from '@api-components/amf-helper-mixin';
+import { ApiParameter, ApiShapeUnion, ApiSecurityRequirement, ApiServer, ApiEndPoint } from '@api-components/amf-helper-mixin';
 import { XhrSimpleRequestTransportElement } from './elements/XhrSimpleRequestTransportElement';
 
 export declare interface ApiConsoleRequest extends HTTPRequest {
@@ -118,4 +118,30 @@ export interface ShapeTemplateOptions extends ParameterRenderOptions {
   arrayItem?: boolean;
   index?: number;
   value?: any;
+}
+
+export interface ComputeBaseUriOptions {
+  /**
+   * The API base URI to use. When not set it computes the base URI from the `server` and `protocols`.
+   */
+  baseUri?: string;
+  /**
+   * When set it uses the server to determine the base URI.
+   * When the `baseUri` is set this value is ignored.
+   * When both are missing then the URL computations ignores the base URI part and reads the path only.
+   */
+  server?: ApiServer;
+  /**
+   * The endpoint definition used to compute path of the URL.
+   * When not set it ignores the path part.
+   */
+  endpoint?: ApiEndPoint;
+  /**
+   * The protocols to use with the computation of the URL.
+   * When the server has no protocol (http or https) defined on the base URI
+   * then these protocols will be used.
+   * If in both cases this is missing then the protocol is not included.
+   * Note, it adds the protocol only when the base URI is defined (from the server).
+   */
+  protocols?: string[];
 }

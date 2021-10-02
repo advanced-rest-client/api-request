@@ -38,7 +38,7 @@ import { ifProperty } from "@advanced-rest-client/body-editor";
 import elementStyles from '../styles/Editor.styles.js';
 import { ensureContentType, generateHeaders } from "../lib/Utils.js";
 import { cachePayloadValue, getPayloadValue, readCachePayloadValue } from "../lib/PayloadUtils.js";
-import { applyUrlParameters, applyUrlVariables, computeEndpointUrlValue, computeBaseUriEndpointUrlValue, applyQueryParamStringToObject } from '../lib/UrlUtils.js';
+import { applyUrlParameters, applyUrlVariables, computeEndpointUri, applyQueryParamStringToObject } from '../lib/UrlUtils.js';
 import { SecurityProcessor } from '../lib/SecurityProcessor.js';
 import { AmfParameterMixin } from '../lib/AmfParameterMixin.js';
 import { AmfInputParser } from '../lib/AmfInputParser.js';
@@ -594,14 +594,14 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    */
   [computeUrlValue]() {
     const { effectiveBaseUri, server } = this;
-    let result;
-    if (effectiveBaseUri) {
-      result = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
-    } else {
-      const wa = this._computeWebApi(this.amf);
-      const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
-      result = computeEndpointUrlValue(this[endpointValue], server, schemes);
-    }
+    const wa = this._computeWebApi(this.amf);
+    const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
+    const result = computeEndpointUri({
+      baseUri: effectiveBaseUri, 
+      server, 
+      endpoint: this[endpointValue], 
+      protocols: schemes,
+    });
     const params = this.parametersValue.map(p => p.parameter);
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
     let url = applyUrlVariables(result, report.path, true);
@@ -1014,15 +1014,15 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
       params.push(parameter);
     });
     const report = AmfInputParser.reportRequestInputs(params, InputCache.getStore(this, this.globalCache), this.nilValues);
-    let serverUrl;
-    if (this.effectiveBaseUri) {
-      serverUrl = computeBaseUriEndpointUrlValue(this[endpointValue], this.effectiveBaseUri);
-    } else {
-      const wa = this._computeWebApi(this.amf);
-      const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
-      serverUrl = computeEndpointUrlValue(this[endpointValue], this.server, schemes);
-    }
 
+    const wa = this._computeWebApi(this.amf);
+    const schemes = /** @type string[] */ (this._getValueArray(wa, this.ns.aml.vocabularies.apiContract.scheme));
+    const serverUrl = computeEndpointUri({
+      baseUri: this.effectiveBaseUri, 
+      server: this.server, 
+      endpoint: this[endpointValue], 
+      protocols: schemes,
+    });
     let url = applyUrlVariables(serverUrl, report.path, true);
     url = applyUrlParameters(url, report.query, true);
     const headers = generateHeaders(report.header);
@@ -1155,7 +1155,10 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const { effectiveBaseUri } = this;
     let value;
     if (effectiveBaseUri) {
-      value = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
+      value = computeEndpointUri({
+        baseUri: effectiveBaseUri, 
+        endpoint: this[endpointValue],
+      });
     } else {
       value = this.apiBaseUri;
     }
@@ -1306,7 +1309,10 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     const { effectiveBaseUri } = this;
     let url;
     if (effectiveBaseUri) {
-      url = computeBaseUriEndpointUrlValue(this[endpointValue], effectiveBaseUri);
+      url = computeEndpointUri({
+        baseUri: effectiveBaseUri, 
+        endpoint: this[endpointValue],
+      });
     } else {
       url = this.apiBaseUri;
     }

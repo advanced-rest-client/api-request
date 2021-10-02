@@ -7,3 +7,4 @@ export { default as ApiAuthorizationMethodElement } from './src/elements/ApiAuth
 export * from './src/events/EventTypes';
 export * from './src/events/RequestEvents';
 export * as InputCache from './src/lib/InputCache';
+export * as UrlLib from './src/lib/UrlUtils.js';
