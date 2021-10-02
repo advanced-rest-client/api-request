@@ -12,7 +12,7 @@
  * @returns {string} Base uri value. Can be empty string.
  */
 export function computeApiBaseUri(options={}) {
-  const { baseUri, server, protocols=[] } = options;
+  const { baseUri, server, protocols=[], version } = options;
   if (baseUri) {
     return baseUri;
   }
@@ -25,6 +25,9 @@ export function computeApiBaseUri(options={}) {
     schemes.unshift(protocol);
   }
   let result = url;
+  if (version && result) {
+    result = result.replace('{version}', version);
+  }
   if (result.endsWith('/')) {
     result = result.substr(0, result.length - 1);
   }

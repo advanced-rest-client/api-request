@@ -125,6 +125,19 @@ describe('Libraries', () => {
 
         assert.equal(result, '');
       });
+
+      it('replaces the version value', () => {
+        const server = /** @type ApiServer */ ({
+          id: '',
+          types: [],
+          customDomainProperties: [],
+          url: `${baseUri}/{version}`,
+          variables: [],
+        });
+        const result = computeApiBaseUri({ server, version: 'v1' });
+
+        assert.equal(result, `${baseUri}/v1`);
+      });
     });
 
     describe('computeEndpointUri', () => {

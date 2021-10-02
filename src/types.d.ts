@@ -144,4 +144,8 @@ export interface ComputeBaseUriOptions {
    * Note, it adds the protocol only when the base URI is defined (from the server).
    */
   protocols?: string[];
+  /**
+   * The API version. When set it replaces the `{version}` URI template with the value.
+   */
+  version?: string;
 }
