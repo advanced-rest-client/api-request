@@ -558,9 +558,9 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
    * Reads the URL data from the ApiUrlDataModel library and sets local variables.
    */
   readUrlData() {
-    this[computeUrlValue]();
     this[updateServerParameters]();
     this[orderPathParameters]()
+    this[computeUrlValue]();
   }
 
   /**

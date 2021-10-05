@@ -83,7 +83,7 @@ api-url-editor {
 }
 
 .url-label {
-  /* margin: 0 8px; */
+  margin: 8px 0;
   padding: 12px 8px;
   border-radius: 3px;
 
