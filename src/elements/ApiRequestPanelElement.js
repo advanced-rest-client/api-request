@@ -30,6 +30,7 @@ import '../../api-response-view.js';
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
 /** @typedef {import('@api-components/amf-helper-mixin').AmfDocument} AmfDocument */
 /** @typedef {import('@api-components/api-server-selector').ServerType} ServerType */
+/** @typedef {import('../types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('../types').ApiConsoleResponse} ApiConsoleResponse */
 /** @typedef {import('../events/RequestEvents').ApiRequestEvent} ApiRequestEvent */
 /** @typedef {import('../events/RequestEvents').ApiResponseEvent} ApiResponseEvent */
@@ -44,6 +45,7 @@ export const appendConsoleHeaders = Symbol('appendConsoleHeaders');
 export const navigationHandler = Symbol('navigationHandler');
 export const requestTemplate = Symbol('requestTemplate');
 export const responseTemplate = Symbol('requestTemplate');
+export const changeHandler = Symbol('changeHandler');
 
 export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   get styles() {
@@ -312,6 +314,18 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
   }
 
   /**
+   * Serializes the state of the request editor into the `ApiConsoleRequest` object.
+   * 
+   * Note this is the same object as the one passed to the detail of the api request event.
+   * 
+   * @return {ApiConsoleRequest}
+   */
+  serialize() {
+    const editor = this.shadowRoot.querySelector('api-request-editor');
+    return editor.serialize();
+  }
+
+  /**
    * A handler for the API call.
    * This handler will only check if there is authorization required
    * and if the user is authorized.
@@ -452,6 +466,13 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
     }
   }
 
+  /**
+   * Retargets the change event from the editor.
+   */
+  [changeHandler]() {
+    this.dispatchEvent(new Event('change'));
+  }
+
   render() {
     return html`<style>${this.styles}</style>${this[requestTemplate]()}${this[responseTemplate]()}`;
   }
@@ -501,6 +522,7 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
       .credentialsSource="${credentialsSource}"
       ?globalCache="${globalCache}"
       ?applyAuthorization="${applyAuthorization}"
+      @change="${this[changeHandler]}"
     >
       <slot name="custom-base-uri" slot="custom-base-uri"></slot>
     </api-request-editor>`;

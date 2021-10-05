@@ -277,6 +277,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this.requestUpdate('selected', old);
     this[processSelection]();
     this.readUrlData();
+    this.notifyChange();
   }
 
   /**
@@ -552,6 +553,7 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
     this[processServers]();
     this[processSelection]();
     this.readUrlData();
+    this.notifyChange();
   }
 
   /**
@@ -976,27 +978,8 @@ export class ApiRequestEditorElement extends AmfParameterMixin(AmfHelperMixin(Ev
   }
 
   /**
-   * Returns an object with the request properties.
-   * The object contains:
-   * - `method` (String)
-   * - `url` (String)
-   * - `headers` (String)
-   * - `payload` (String)
-   * - `auth` (Object[])
-   *
-   * The `auth` property is optional and is only added to the request if
-   * simple `authorization` header will not work. For example NTLM auth
-   * method has to be made on a single socket connection (authorization
-   * and the request) so it can't be made before the request.
-   *
-   * The `auth` object contains 2 properties:
-   * - `type` (String) the authorization type - one of from the
-   * `auth-methods` element
-   * - `settings` (Object) Authorization parameters entered by the user.
-   * It vary and depends on selected auth method.
-   * For example in case of the NTLM it will be: `username`, `password` and
-   * `domain`. See `advanced-rest-client/auth-methods` for model descriptions.
-   *
+   * Serializes the state of the request editor into the `ApiConsoleRequest` object.
+   * 
    * @return {ApiConsoleRequest}
    */
   serialize() {

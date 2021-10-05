@@ -1,4 +1,4 @@
-import { fixture, assert, html } from '@open-wc/testing';
+import { fixture, assert, html, nextFrame } from '@open-wc/testing';
 import sinon from 'sinon';
 import { AmfLoader } from '../AmfLoader.js';
 import '../../api-request-panel.js';
@@ -86,8 +86,8 @@ describe('ApiRequestPanelElement', () => {
     });
 
     it('can be constructed with document.createElement', () => {
-      const button = document.createElement('api-request-panel');
-      assert.ok(button);
+      const panel = document.createElement('api-request-panel');
+      assert.ok(panel);
     });
 
     it('hasResponse is false', async () => {
@@ -309,6 +309,53 @@ describe('ApiRequestPanelElement', () => {
       element[responseHandler](e);
       assert.isTrue(spy.called);
       assert.deepEqual(spy.args[0][0], detail);
+    });
+  });
+
+  describe('Change notification', () => {
+    /** @type AmfDocument */
+    let model;
+    before(async () => {
+      model = await store.getGraph(true);
+    });
+
+    it('dispatches the change event when the selected change', async () => {
+      const method = store.lookupOperation(model, '/people', 'get');
+      const panel = await basicFixture(model, method['@id']);
+      const spy = sinon.spy();
+      panel.addEventListener('change', spy);
+      const other = store.lookupOperation(model, '/people', 'post');
+      panel.selected = other['@id'];
+      await nextFrame();
+      assert.isTrue(spy.called);
+    });
+
+    it('dispatches the change event when a value change', async () => {
+      const method = store.lookupOperation(model, '/people', 'get');
+      const panel = await basicFixture(model, method['@id']);
+      const spy = sinon.spy();
+      panel.addEventListener('change', spy);
+      const editor = panel.shadowRoot.querySelector('api-request-editor');
+      const input = /** @type HTMLInputElement */ (editor.shadowRoot.querySelector('[name="x-people-op-id"]'));
+      input.value = 'test';
+      input.dispatchEvent(new Event('change'));
+      await nextFrame();
+      assert.isTrue(spy.called);
+    });
+  });
+
+  describe('serialize()', () => {
+    /** @type AmfDocument */
+    let model;
+    before(async () => {
+      model = await store.getGraph(true);
+    });
+
+    it('serializes the current request', async () => {
+      const method = store.lookupOperation(model, '/people', 'get');
+      const panel = await basicFixture(model, method['@id']);
+      const result = panel.serialize();
+      assert.equal(result.url, 'http://production.domain.com/people');
     });
   });
 });

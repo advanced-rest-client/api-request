@@ -30,6 +30,7 @@ export const appendConsoleHeaders: unique symbol;
 export const navigationHandler: unique symbol;
 export const requestTemplate: unique symbol;
 export const responseTemplate: unique symbol;
+export const changeHandler: unique symbol;
 
 export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   /**
@@ -216,6 +217,11 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
   _detachListeners(node: EventTarget): void;
 
   /**
+   * Serializes the state of the request editor into the `ApiConsoleRequest` object.
+   */
+  serialize(): ApiConsoleRequest;
+
+  /**
    * A handler for the API call.
    * This handler will only check if there is authorization required
    * and if the user is authorized.
@@ -267,6 +273,11 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
    * When `handleNavigationEvents` is set then it also manages the selection.
    */
   [navigationHandler](e: CustomEvent): void;
+
+  /**
+   * Retargets the change event from the editor.
+   */
+  [changeHandler](): void;
 
   render(): TemplateResult;
 
