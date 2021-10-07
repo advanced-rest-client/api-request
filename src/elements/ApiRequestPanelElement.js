@@ -25,6 +25,7 @@ import '../../api-response-view.js';
 /** @typedef {import('lit-html').TemplateResult} TemplateResult */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.Response} ArcResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.ErrorResponse} ErrorResponse */
+/** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.ArcBaseRequest} ArcBaseRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcRequest.TransportRequest} TransportRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ApiTypes.ApiType} ApiType */
 /** @typedef {import('@advanced-rest-client/authorization').Oauth2Credentials} Oauth2Credentials */
@@ -281,7 +282,7 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
     this.applyAuthorization = undefined;
     /** @type Oauth2Credentials[] */
     this.credentialsSource = undefined;
-    /** @type {TransportRequest} */
+    /** @type {ArcBaseRequest} */
     this.request = undefined;
     /** @type {ArcResponse|ErrorResponse} */
     this.response = undefined;
@@ -416,7 +417,8 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
         payload: data.response.payload,
       });
     }
-    this.request = /** @type TransportRequest */({
+
+    const transportRequest = /** @type TransportRequest */({
       httpMessage: '',
       method: data.request.method,
       endTime: 0,
@@ -425,6 +427,18 @@ export default class ApiRequestPanelElement extends EventsTargetMixin(LitElement
       headers: data.request.headers,
       payload: data.request.payload,
     });
+
+    const arcRequest = /** @type ArcBaseRequest */ ({
+      method: data.request.method,
+      url: data.request.url,
+      payload: data.request.payload,
+      headers: data.request.headers,
+      kind: 'ARC#HttpRequest',
+      transportRequest,
+      response: this.response,
+    });
+
+    this.request = arcRequest;
     await this.updateComplete;
     this.dispatchEvent(new Event('resize', { bubbles: true, composed: true }));
   }

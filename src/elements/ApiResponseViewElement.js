@@ -8,6 +8,7 @@ import {
   responseOptionsItemsTemplate,
   contentActionHandler,
   responsePrefixTemplate,
+  clearResponseHandler,
 } from '@advanced-rest-client/arc-response/src/internals.js';
 import { DataExportEventTypes } from '@advanced-rest-client/arc-events';
 import { dataValue, providerOptionsValue } from '@advanced-rest-client/arc-events/src/dataexport/Events.js';
@@ -72,6 +73,9 @@ export class ApiResponseViewElement extends ResponseViewElement {
       this.source = !this.source;
       return undefined;
     }
+    if (id === 'clear') {
+      this[clearResponseHandler]();
+    }
     return super[contentActionHandler](e);
   }
 
@@ -123,6 +127,9 @@ export class ApiResponseViewElement extends ResponseViewElement {
     const icon = details ? 'toggleOn' : 'toggleOff';
     const sourceLabel = source ? 'Formatted view' : 'Source view';
     return html`
+    <anypoint-icon-item data-id="clear" ?compatibility="${this.compatibility}">
+      <arc-icon icon="clear" slot="item-icon"></arc-icon> Clear response
+    </anypoint-icon-item>
     ${super[responseOptionsItemsTemplate]()}
     <anypoint-icon-item data-id="toggle-details" ?compatibility="${this.compatibility}">
       <arc-icon icon="${icon}" slot="item-icon"></arc-icon> Response details
