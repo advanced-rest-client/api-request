@@ -1,10 +1,8 @@
-# API request
+# DEPRECATED
 
-A set of composite components that are used to build an HTTP request editor with the support of the AMF model.
+This component is being deprecated. The code base has been moved to [amf-components](https://github.com/advanced-rest-client/amf-components) module. This module will be archived when [PR 1](https://github.com/advanced-rest-client/amf-components/pull/1) is merged.
 
-[![Published on NPM](https://img.shields.io/npm/v/@api-components/api-request.svg)](https://www.npmjs.com/package/@advanced-rest-client/api-request)
-
-[![Tests and publishing](https://github.com/advanced-rest-client/api-request/actions/workflows/deployment.yml/badge.svg)](https://github.com/advanced-rest-client/api-request/actions/workflows/deployment.yml)
+-----
 
 ## Usage
 
