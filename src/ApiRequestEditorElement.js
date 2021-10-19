@@ -970,9 +970,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       }
       return /** @type string */ (this._getValue(/** @type object */ (result), '@id'));
     });
+    const idPrefix = this._getAmfKey('amf://id')
     return ids.map(id => {
-      const propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
-      return shape[propertyKey];
+      let propertyKey = id.startsWith(idPrefix) ? id : `${idPrefix}:${id}`;
+      let shapeElement = shape[propertyKey]
+      if (!shapeElement) {
+        propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
+        shapeElement = shape[propertyKey]
+      }
+      return shapeElement;
     });
   }
 

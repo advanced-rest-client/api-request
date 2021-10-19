@@ -1155,5 +1155,334 @@ describe('ApiRequestEditorElement', () => {
       });
     });
   });
-  
+
+  describe('_computeCustomProperties()', () => {
+    it('should return properties when they use "@base" properties', async () => {
+      const amf = {
+        "@type": [
+          "doc:DomainElement",
+          "apiContract:EndPoint"
+        ],
+        "@context": {
+          "@base": "amf://id",
+          "data": "http://a.ml/vocabularies/data#",
+          "sources": "http://a.ml/vocabularies/document-source-maps#",
+          "owl": "http://www.w3.org/2002/07/owl#",
+          "apiContract": "http://a.ml/vocabularies/apiContract#",
+          "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+          "apiBinding": "http://a.ml/vocabularies/apiBinding#",
+          "shacl": "http://www.w3.org/ns/shacl#",
+          "core": "http://a.ml/vocabularies/core#",
+          "security": "http://a.ml/vocabularies/security#",
+          "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          "shapes": "http://a.ml/vocabularies/shapes#",
+          "meta": "http://a.ml/vocabularies/meta#",
+          "doc": "http://a.ml/vocabularies/document#"
+        }
+      }
+      const element = await modelFixture(amf)
+      const items = element._computeCustomProperties({
+        "@id": "#66",
+        "@type": [
+          "doc:DomainElement",
+          "apiContract:Parameter"
+        ],
+        "@base:#1": [
+          {
+            "@id": "#71",
+            "@type": [
+              "doc:DomainElement",
+              "data:Node",
+              "data:Scalar"
+            ],
+            "core:name": [
+              {
+                "@value": "scalar_1",
+                "__apicResolved": true
+              }
+            ],
+            "data:value": [
+              {
+                "@value": "id",
+                "__apicResolved": true
+              }
+            ],
+            "sources:sources": [
+              {
+                "@id": "#71/source-map",
+                "sources:lexical": [
+                  {
+                    "@value": "[(13,26)-(13,28)]",
+                    "__apicResolved": true
+                  }
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "shacl:datatype": [
+              {
+                "@id": "http://www.w3.org/2001/XMLSchema#string",
+                "__apicResolved": true
+              }
+            ],
+            "__apicResolved": true
+          }
+        ],
+        "apiContract:binding": [
+          {
+            "@value": "header",
+            "__apicResolved": true
+          }
+        ],
+        "apiContract:paramName": [
+          {
+            "@value": "client_id",
+            "__apicResolved": true
+          }
+        ],
+        "apiContract:required": [
+          {
+            "@value": true,
+            "__apicResolved": true
+          }
+        ],
+        "core:name": [
+          {
+            "@value": "client_id",
+            "__apicResolved": true
+          }
+        ],
+        "doc:customDomainProperties": [
+          {
+            "@id": "#1",
+            "@type": [
+              "doc:DomainElement",
+              "rdf:Property",
+              "doc:DomainProperty"
+            ],
+            "core:extensionName": [
+              {
+                "@value": "credentialType",
+                "__apicResolved": true
+              }
+            ],
+            "core:name": [
+              {
+                "@value": "credentialType",
+                "__apicResolved": true
+              }
+            ],
+            "sources:sources": [
+              {
+                "@id": "#1/source-map",
+                "sources:lexical": [
+                  "[(6,2)-(6,16)]",
+                  "[(6,2)-(8,0)]"
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "shapes:schema": [
+              {
+                "@id": "#2",
+                "@type": [
+                  "doc:DomainElement",
+                  "shapes:Shape",
+                  "shacl:Shape",
+                  "shapes:AnyShape",
+                  "shapes:ScalarShape"
+                ],
+                "sources:sources": [
+                  {
+                    "@id": "#2/source-map",
+                    "sources:lexical": [
+                      {
+                        "@value": "[(6,18)-(6,24)]",
+                        "__apicResolved": true
+                      }
+                    ],
+                    "__apicResolved": true
+                  }
+                ],
+                "shacl:datatype": [
+                  {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string",
+                    "__apicResolved": true
+                  }
+                ],
+                "shacl:name": [
+                  {
+                    "@value": "credentialType",
+                    "__apicResolved": true
+                  }
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "__apicResolved": true
+          }
+        ],
+        "sources:sources": [
+          {
+            "@id": "#66/source-map",
+            "sources:lexical": [
+              {
+                "@value": "[(11,6)-(13,28)]",
+                "__apicResolved": true
+              }
+            ],
+            "__apicResolved": true
+          }
+        ],
+        "shapes:schema": [
+          {
+            "@id": "#67",
+            "@type": [
+              "shapes:AnyShape",
+              "doc:DomainElement",
+              "shacl:Shape",
+              "shapes:ScalarShape",
+              "shapes:Shape"
+            ],
+            "@base:#1": [
+              {
+                "@id": "#69",
+                "@type": [
+                  "doc:DomainElement",
+                  "data:Node",
+                  "data:Scalar"
+                ],
+                "core:name": [
+                  {
+                    "@value": "scalar_1",
+                    "__apicResolved": true
+                  }
+                ],
+                "data:value": [
+                  {
+                    "@value": "id",
+                    "__apicResolved": true
+                  }
+                ],
+                "sources:sources": [
+                  {
+                    "@id": "#69/source-map",
+                    "sources:lexical": [
+                      {
+                        "@value": "[(13,26)-(13,28)]",
+                        "__apicResolved": true
+                      }
+                    ],
+                    "__apicResolved": true
+                  }
+                ],
+                "shacl:datatype": [
+                  {
+                    "@id": "http://www.w3.org/2001/XMLSchema#string",
+                    "__apicResolved": true
+                  }
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "doc:customDomainProperties": [
+              {
+                "@id": "#1",
+                "@type": [
+                  "doc:DomainElement",
+                  "rdf:Property",
+                  "doc:DomainProperty"
+                ],
+                "core:extensionName": [
+                  {
+                    "@value": "credentialType",
+                    "__apicResolved": true
+                  }
+                ],
+                "core:name": [
+                  {
+                    "@value": "credentialType",
+                    "__apicResolved": true
+                  }
+                ],
+                "sources:sources": [
+                  {
+                    "@id": "#1/source-map",
+                    "sources:lexical": [
+                      "[(6,2)-(6,16)]",
+                      "[(6,2)-(8,0)]"
+                    ],
+                    "__apicResolved": true
+                  }
+                ],
+                "shapes:schema": [
+                  {
+                    "@id": "#2",
+                    "@type": [
+                      "doc:DomainElement",
+                      "shapes:Shape",
+                      "shacl:Shape",
+                      "shapes:AnyShape",
+                      "shapes:ScalarShape"
+                    ],
+                    "sources:sources": [
+                      {
+                        "@id": "#2/source-map",
+                        "sources:lexical": [
+                          {
+                            "@value": "[(6,18)-(6,24)]",
+                            "__apicResolved": true
+                          }
+                        ],
+                        "__apicResolved": true
+                      }
+                    ],
+                    "shacl:datatype": [
+                      {
+                        "@id": "http://www.w3.org/2001/XMLSchema#string",
+                        "__apicResolved": true
+                      }
+                    ],
+                    "shacl:name": [
+                      {
+                        "@value": "credentialType",
+                        "__apicResolved": true
+                      }
+                    ],
+                    "__apicResolved": true
+                  }
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "sources:sources": [
+              {
+                "@id": "#67/source-map",
+                "sources:lexical": [
+                  "[(12,8)-(12,20)]",
+                  "[(11,6)-(13,28)]"
+                ],
+                "__apicResolved": true
+              }
+            ],
+            "shacl:datatype": [
+              {
+                "@id": "http://www.w3.org/2001/XMLSchema#string",
+                "__apicResolved": true
+              }
+            ],
+            "shacl:name": [
+              {
+                "@value": "schema",
+                "__apicResolved": true
+              }
+            ],
+            "__apicResolved": true
+          }
+        ],
+        "__apicResolved": true
+      })
+      assert.lengthOf(items, 1);
+    });
+  });
 });
