@@ -60,3 +60,5 @@ coverage
 # AMF models
 /demo/*.json
 !demo/apis.json
+
+.idea/
