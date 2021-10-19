@@ -483,7 +483,7 @@ export declare class ApiRequestEditorElement extends AmfHelperMixin(EventsTarget
    * @param shape AMF node
    * @return Array of all custom domain property nodes
    */
-  _computeCustomProperties(shape: Object): Object[]
+  _computeCustomPropertiesNamesAndValues(shape: Object): Object[]
 
   /**
    * Function to determine whether a shape has a custom domain property whose name

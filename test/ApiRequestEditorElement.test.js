@@ -1156,7 +1156,7 @@ describe('ApiRequestEditorElement', () => {
     });
   });
 
-  describe('_computeCustomProperties()', () => {
+  describe('_computeCustomPropertiesNamesAndValues()', () => {
     it('should return properties when they use "@base" properties', async () => {
       const amf = {
         "@type": [
@@ -1181,7 +1181,7 @@ describe('ApiRequestEditorElement', () => {
         }
       }
       const element = await modelFixture(amf)
-      const items = element._computeCustomProperties({
+      const items = element._computeCustomPropertiesNamesAndValues({
         "@id": "#66",
         "@type": [
           "doc:DomainElement",

@@ -39,6 +39,7 @@ import elementStyles from './styles/Editor.styles.js';
 /** @typedef {import('@api-components/api-authorization/src/ApiAuthorization').ApiAuthorization} ApiAuthorization */
 /** @typedef {import('@api-components/api-authorization/src/types').ApiAuthorizationSettings} ApiAuthorizationSettings */
 /** @typedef {import('@api-components/api-authorization/src/types').AuthorizationParams} AuthorizationParams */
+/** @typedef {import('@api-components/amf-helper-mixin').DomainElement} DomainElement */
 /** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('./types').PopulationInfo} PopulationInfo */
 
@@ -932,6 +933,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _updateAnnotatedHeaders(populationInfoArray) {
     const headers = this._apiHeaders;
     this._updateAnnotatedFields(populationInfoArray, headers, this._updateHeader.bind(this));
+    // this.shadowRoot.querySelector('api-headers-editor').value = this._headers
   }
 
   /**
@@ -955,57 +957,58 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   /**
    * Returns all of the custom domain properties for an AMF node
-   * @param {Object} shape AMF node
-   * @return {Object[]} Array of all custom domain property nodes
+   * @param {DomainElement} shape AMF node
+   * @return {{name: string, value: string}[]} Array of all custom domain property nodes
    */
-  _computeCustomProperties(shape) {
-    const key = this._getAmfKey(this.ns.aml.vocabularies.document.customDomainProperties);
-    const ids = (this._getValueArray(shape, key) || []).map(result => {
-      if (Array.isArray(result)) {
-        // eslint-disable-next-line no-param-reassign
-        [result] = result;
-      }
-      if (typeof result === 'string') {
-        return result
-      }
-      return /** @type string */ (this._getValue(/** @type object */ (result), '@id'));
-    });
+  _computeCustomPropertiesNamesAndValues(shape) {
+    const customPropKey = this._getAmfKey(this.ns.aml.vocabularies.document.customDomainProperties);
+    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.extensionName);
+    const valueKey = this._getAmfKey(this.ns.aml.vocabularies.data.value);
     const idPrefix = this._getAmfKey('amf://id')
-    return ids.map(id => {
+    const properties = this._getValueArray(shape, customPropKey) || []
+    return /** @type {{name: string, value: string}[]} */ (properties
+      .map(property => {
+      const prop = Array.isArray(property) ? property[0] : property;
+      if (!prop || typeof prop === 'string' || typeof prop === 'number' || typeof  prop === 'boolean') {
+        return null;
+      }
+      const id = /** @type string */ (this._getValue(prop, '@id'));
       let propertyKey = id.startsWith(idPrefix) ? id : `${idPrefix}:${id}`;
-      let shapeElement = shape[propertyKey]
+      let shapeElement = shape[propertyKey];
+      if (Array.isArray(shapeElement)) {
+        [shapeElement] = shapeElement;
+      }
       if (!shapeElement) {
         propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
-        shapeElement = shape[propertyKey]
+        shapeElement = shape[propertyKey];
       }
-      return shapeElement;
-    });
+      if (Array.isArray(shapeElement)) {
+        [shapeElement] = shapeElement;
+      }
+      if (!shapeElement) {
+        return null;
+      }
+      const name = this._getValue(prop, nameKey) || this._getValue(shapeElement,nameKey);
+      const value = this._getValue(shapeElement, valueKey);
+      return { name, value };
+    }));
   }
 
   /**
    * Function to determine whether a shape has a custom domain property whose name
    * and value match with the provided information.
-   * @param {Object} shape AMF node
+   * @param {DomainElement} domainElement AMF node
    * @param {string} propertyName Custom domain property name to search for
    * @param {string} propertyValue Custom domain property value to match with
    * @return {boolean}
    */
-  _computeHasCustomPropertyValue(shape, propertyName, propertyValue) {
-    if (Array.isArray(shape)) {
-      // eslint-disable-next-line no-param-reassign
-      [shape] = shape;
-    }
+  _computeHasCustomPropertyValue(domainElement, propertyName, propertyValue) {
+    const shape = Array.isArray(domainElement) ? domainElement[0] : domainElement
     if (!shape) {
       return false;
     }
-    const properties = this._computeCustomProperties(shape) || [];
-    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.extensionName);
-    const valueKey = this._getAmfKey(this.ns.aml.vocabularies.data.value);
-    return Boolean(properties.find(property => {
-      const actualPropName = this._getValue(property, nameKey);
-      const actualPropValue = this._getValue(property, valueKey);
-      return actualPropName === propertyName && actualPropValue === propertyValue;
-    }));
+    const tuples = this._computeCustomPropertiesNamesAndValues(shape) || [];
+    return Boolean(tuples.find(tuple => tuple.name === propertyName && tuple.value === propertyValue));
   }
 
   /**
@@ -1264,6 +1267,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       compatibility,
       allowDisableParams,
       allowHideOptional,
+      _headers,
     } = this;
     return html`
     <div class="editor-section" ?hidden="${!_apiHeaders && !allowCustom}">
@@ -1274,6 +1278,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
         .amf="${amf}"
         .amfHeaders="${_apiHeaders}"
         .readOnly="${readOnly || disabled}"
+        .value="${_headers}"
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
         ?allowCustom="${allowCustom}"
