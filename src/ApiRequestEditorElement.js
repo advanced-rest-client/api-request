@@ -1020,10 +1020,12 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _updateQueryModelParameter(queryParamNode, value) {
     const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.name);
     const name = this._getValue(queryParamNode, nameKey);
-    const queryParamItem = this._queryModel.find(item => item.name === name);
+    const newQueryModel = [...this._queryModel]
+    const queryParamItem = newQueryModel.find(item => item.name === name);
     if (queryParamItem) {
       queryParamItem.value = value;
     }
+    this._queryModel = newQueryModel;
   }
 
   /**
