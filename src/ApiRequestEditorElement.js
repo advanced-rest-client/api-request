@@ -1024,8 +1024,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const queryParamItem = newQueryModel.find(item => item.name === name);
     if (queryParamItem) {
       queryParamItem.value = value;
+      this._queryModel = newQueryModel;
     }
-    this._queryModel = newQueryModel;
   }
 
   /**
@@ -1041,9 +1041,11 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const name = this._getValue(headerNode, nameKey);
     const headers = HeadersParser.stringToJSON(this._headers);
     const headerItem = headers.find(header => header.name === name);
-    headerItem.value = value;
-    // We can't call the HeadersParser.toString() method because it removes the empty headers
-    this._headers = headers.map(header => HeadersParser.itemToString(header)).join('\n');
+    if (headerItem) {
+      headerItem.value = value;
+      // We can't call the HeadersParser.toString() method because it removes the empty headers
+      this._headers = headers.map(header => HeadersParser.itemToString(header)).join('\n');
+    }
   }
 
   _urlHandler(e) {
