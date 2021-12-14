@@ -1153,6 +1153,22 @@ describe('ApiRequestEditorElement', () => {
         const queryParams = element._queryModel.map(qm => qm.value);
         assert.deepEqual(queryParams, ['', 'test value 1']);
       });
+
+      it('_updateHeader should not throw error if header isn\'t in form', async () => {
+        element.allowCustom = true;
+        await nextFrame();
+        const headersEditor = element.shadowRoot.querySelector('api-headers-editor')
+        const firstIconButton = headersEditor.shadowRoot.querySelector('.params-list anypoint-icon-button')
+        firstIconButton.click()
+        await nextFrame();
+        const detail = { values: [
+            { annotationName: 'credentialType', annotationValue: 'id', fieldValue: 'test value 1' },
+            { annotationName: 'credentialType', annotationValue: 'secret', fieldValue: 'test value 2' },
+          ] };
+        assert.doesNotThrow(() => {
+          element._populateAnnotatedFieldsHandler(new CustomEvent('populate_annotated_fields', { detail, bubbles: true }));
+        });
+      });
     });
   });
 
