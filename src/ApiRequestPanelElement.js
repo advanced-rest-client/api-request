@@ -426,23 +426,40 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       });
     } else {
       this.response = /** @type ArcResponse */ ({
+        startTime: 0,
         loadingTime: data.loadingTime,
-        statusText: data.response.statusText,
         status: data.response.status,
-        headers: data.response.headers,
-        id: data.id,
+        statusText: data.response.statusText,
+        headers: data.request.headers,
         payload: data.response.payload,
+        size: {},
+        redirectURL: "",
+        id: data.id,
       });
     }
-    this.request = /** @type TransportRequest */({
-      httpMessage: '',
+    this.request = {
       method: data.request.method,
-      endTime: 0,
-      startTime: 0,
+      response: {
+        startTime: 0,
+        loadingTime: data.loadingTime,
+        status: data.response.status,
+        statusText: data.response.statusText,
+        headers: data.response.headers,
+        payload: data.response.payload,
+        size: {},
+        redirectURL: "",
+        id: data.id,
+        timings: ""
+      },
+      transportRequest: {
+        url: data.request.url,
+        method: data.request.method,
+        startTime: 0,
+        endTime: 0,
+        httpMessage: "Not available",
+      },
       url: data.request.url,
-      headers: data.request.headers,
-      payload: data.request.payload,
-    });
+    };
   }
 
   /**
@@ -554,9 +571,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     if (!_hasResponse) {
       return '';
     }
+    const response = this.request && this.request.response;
+
     return html`<api-response-view
       .request="${this.request}"
-      .response="${this.response}"
+      .response="${response}"
       .compatibility="${this.compatibility}"
     ></api-response-view>`;
   }
