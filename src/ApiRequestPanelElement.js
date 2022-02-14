@@ -426,14 +426,12 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       });
     } else {
       this.response = /** @type ArcResponse */ ({
-        startTime: 0,
+        startTime: data.request.startTime,
         loadingTime: data.loadingTime,
         status: data.response.status,
         statusText: data.response.statusText,
         headers: data.request.headers,
         payload: data.response.payload,
-        size: {},
-        redirectURL: "",
         id: data.id,
       });
     }
@@ -446,10 +444,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
         statusText: data.response.statusText,
         headers: data.response.headers,
         payload: data.response.payload,
-        size: {},
-        redirectURL: "",
         id: data.id,
-        timings: ""
       },
       transportRequest: {
         url: data.request.url,
@@ -459,6 +454,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
         httpMessage: "Not available",
       },
       url: data.request.url,
+      headers: data.request.headers,
     };
   }
 
