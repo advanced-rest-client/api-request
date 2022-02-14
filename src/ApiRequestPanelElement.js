@@ -438,7 +438,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     this.request = {
       method: data.request.method,
       response: {
-        startTime: 0,
+        startTime: data.request.startTime,
         loadingTime: data.loadingTime,
         status: data.response.status,
         statusText: data.response.statusText,
@@ -449,8 +449,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       transportRequest: {
         url: data.request.url,
         method: data.request.method,
-        startTime: 0,
-        endTime: 0,
+        startTime: data.request.startTime,
+        endTime: data.request.startTime + data.loadingTime,
         httpMessage: "Not available",
       },
       url: data.request.url,
