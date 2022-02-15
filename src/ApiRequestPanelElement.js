@@ -427,11 +427,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     } else {
       this.response = /** @type ArcResponse */ ({
         loadingTime: data.loadingTime,
-        status: data.response.status,
         statusText: data.response.statusText,
+        status: data.response.status,
         headers: data.response.headers,
-        payload: data.response.payload,
         id: data.id,
+        payload: data.response.payload,
       });
     }
     this.request = {
