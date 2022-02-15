@@ -554,10 +554,14 @@ describe('ApiRequestEditorElement', () => {
 
         it('_dispatch() is called with serialized request', () => {
           const spy = sinon.spy(element, '_dispatch');
+          const clock = sinon.useFakeTimers(Date.now());
+
           element.execute();
           const compare = element.serializeRequest();
           compare.id = element.requestId;
+
           assert.deepEqual(spy.args[0][1], compare);
+          clock.restore();
         });
       });
 
