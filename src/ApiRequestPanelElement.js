@@ -434,7 +434,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
         payload: data.response.payload,
       });
     }
-    this.request = {
+    this.request = /** @type TransportRequest */({
       method: data.request.method,
       response: {
         startTime: data.request.startTime,
@@ -454,7 +454,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       },
       url: data.request.url,
       headers: data.request.headers,
-    };
+    });
   }
 
   /**
