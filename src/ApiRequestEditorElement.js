@@ -785,6 +785,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       method,
       url: this.url,
       headers: this._ensureContentTypeInHeaders(this.headers) || '',
+      startTime: Date.now()
     });
 
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {

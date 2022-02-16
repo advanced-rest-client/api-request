@@ -435,13 +435,25 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
       });
     }
     this.request = /** @type TransportRequest */({
-      httpMessage: '',
       method: data.request.method,
-      endTime: 0,
-      startTime: 0,
+      response: {
+        startTime: data.request.startTime,
+        loadingTime: data.loadingTime,
+        status: data.response.status,
+        statusText: data.response.statusText,
+        headers: data.response.headers,
+        payload: data.response.payload,
+        id: data.id,
+      },
+      transportRequest: {
+        url: data.request.url,
+        method: data.request.method,
+        startTime: data.request.startTime,
+        endTime: data.request.startTime + data.loadingTime,
+        httpMessage: "Not available",
+      },
       url: data.request.url,
       headers: data.request.headers,
-      payload: data.request.payload,
     });
   }
 
@@ -554,9 +566,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     if (!_hasResponse) {
       return '';
     }
+    const response = this.request && this.request.response;
+
     return html`<api-response-view
       .request="${this.request}"
-      .response="${this.response}"
+      .response="${response}"
       .compatibility="${this.compatibility}"
     ></api-response-view>`;
   }
