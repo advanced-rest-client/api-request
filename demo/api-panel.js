@@ -84,6 +84,7 @@ class ComponentDemo extends ApiDemoPage {
       ['SE-12224', 'Scope is not an array issues (SE-12224)'],
       ['APIC-168', 'Custom scheme support (APIC-168)'],
       ['async-api', 'AsyncAPI'],
+      ['payload-vulnerability', 'payload-vulnerability'],
     ].map(
       ([file, label]) => html`
         <anypoint-item data-src="${file}-compact.json"
