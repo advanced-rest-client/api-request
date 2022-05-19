@@ -17,6 +17,7 @@ import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin';
 import elementStyles from './styles/Panel.styles.js';
 import '../api-request-editor.js';
 import '../api-response-view.js';
+import DOMPurify from 'dompurify';
 
 // import '@advanced-rest-client/response-view/response-view.js';
 
@@ -25,6 +26,7 @@ import '../api-response-view.js';
 
 /** @typedef {import('lit-html').TemplateResult} TemplateResult */
 /** @typedef {import('./types').ApiConsoleResponse} ApiConsoleResponse */
+/** @typedef {import('./types').ApiConsoleHTTPResponse} ApiConsoleHTTPResponse */
 /** @typedef {import('./types').ApiConsoleRequest} ApiConsoleRequest */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.Response} ArcResponse */
 /** @typedef {import('@advanced-rest-client/arc-types').ArcResponse.ErrorResponse} ErrorResponse */
@@ -404,6 +406,17 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
   }
 
   /**
+   * Sanitize response payload
+   *
+   * @param {ApiConsoleHTTPResponse} response Request response
+   * @return any
+   */
+  sanitizePayload(response) {
+    const {payload} = response;
+    return typeof payload === 'string' ? DOMPurify.sanitize(payload) : payload;
+  }
+
+  /**
    * Propagate `api-response` detail object.
    * 
    * Until API Console v 6.x it was using a different response view. The current version 
@@ -415,45 +428,47 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * @param {ApiConsoleResponse} data Event's detail object
    */
   _propagateResponse(data) {
-    if (data.isError) {
+    const {isError, response, request, id} = data;
+    const payload = this.sanitizePayload(response);
+    if (isError) {
       this.response = /** @type ErrorResponse */ ({
         error: data.error,
-        statusText: data.response.statusText,
-        status: data.response.status,
-        headers: data.response.headers,
-        id: data.id,
-        payload: data.response.payload,
+        statusText: response.statusText,
+        status: response.status,
+        headers: response.headers,
+        id,
+        payload,
       });
     } else {
       this.response = /** @type ArcResponse */ ({
         loadingTime: data.loadingTime,
-        statusText: data.response.statusText,
-        status: data.response.status,
-        headers: data.response.headers,
-        id: data.id,
-        payload: data.response.payload,
+        statusText: response.statusText,
+        status: response.status,
+        headers: response.headers,
+        id,
+        payload,
       });
     }
     this.request = /** @type TransportRequest */({
-      method: data.request.method,
+      method: request.method,
       response: {
-        startTime: data.request.startTime,
+        startTime: request.startTime,
         loadingTime: data.loadingTime,
-        status: data.response.status,
-        statusText: data.response.statusText,
-        headers: data.response.headers,
-        payload: data.response.payload,
-        id: data.id,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        payload,
+        id,
       },
       transportRequest: {
-        url: data.request.url,
-        method: data.request.method,
-        startTime: data.request.startTime,
-        endTime: data.request.startTime + data.loadingTime,
+        url: request.url,
+        method: request.method,
+        startTime: request.startTime,
+        endTime: request.startTime + data.loadingTime,
         httpMessage: "Not available",
       },
-      url: data.request.url,
-      headers: data.request.headers,
+      url: request.url,
+      headers: request.headers,
     });
   }
 

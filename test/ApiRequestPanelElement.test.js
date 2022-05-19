@@ -191,7 +191,7 @@ describe('ApiRequestPanelElement', () => {
   });
 
   describe('Response handling', () => {
-    function propagate(element) {
+    function propagate(element, payload) {
       const detail = /** @type ApiConsoleResponse */ ({
         request: {
           url: 'https://domain.com/',
@@ -201,7 +201,7 @@ describe('ApiRequestPanelElement', () => {
         response: {
           status: 200,
           statusText: 'OK',
-          payload: 'Hello world',
+          payload: payload || 'Hello world',
           headers: 'content-type: text/plain',
         },
         loadingTime: 124.12345678,
@@ -236,6 +236,25 @@ describe('ApiRequestPanelElement', () => {
       element.clearResponse();
       assert.isUndefined(element.request);
       assert.isUndefined(element.response);
+    });
+
+    it('sanitize HTML payload if needed', () => {
+      const payload = '<svg xmlns="http://www.w3.org/2000/svg">; <foreignObject> <iframe srcdoc="&lt;script src=\'data:text/javascript,alert(document.domain)\'&gt;&lt;/script&gt;" /> </foreignObject></svg>'
+      propagate(element, payload);
+      assert.typeOf(element.response, 'object');
+      assert.equal(element.response.payload, '<svg xmlns="http://www.w3.org/2000/svg">; </svg>');
+    });
+
+    it('does not sanitize HTML payload if valid', () => {
+      const stringPayload = 'Any string'
+      propagate(element, stringPayload);
+      assert.typeOf(element.response, 'object');
+      assert.equal(element.response.payload, stringPayload);
+
+      const objectStringPayload = '{"test":"object"}'
+      propagate(element, objectStringPayload);
+      assert.typeOf(element.response, 'object');
+      assert.equal(element.response.payload, objectStringPayload);
     });
   });
 
