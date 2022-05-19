@@ -21,6 +21,10 @@ export declare interface ApiConsoleRequest extends HTTPRequest {
    * Timeout for request, in milliseconds.
    */
   timeout?: number;
+  /**
+   * The timestamp when the request was started (before the connection is made)
+   */
+  startTime?: number;
 }
 
 export declare interface ApiConsoleResponse {
