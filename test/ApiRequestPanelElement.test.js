@@ -191,18 +191,18 @@ describe('ApiRequestPanelElement', () => {
   });
 
   describe('Response handling', () => {
-    function propagate(element, payload) {
+    function propagate(element, payload, headers = 'accept: text/plain') {
       const detail = /** @type ApiConsoleResponse */ ({
         request: {
           url: 'https://domain.com/',
           method: 'GET',
-          headers: 'accept: text/plain',
+          headers,
         },
         response: {
           status: 200,
           statusText: 'OK',
           payload: payload || 'Hello world',
-          headers: 'content-type: text/plain',
+          headers,
         },
         loadingTime: 124.12345678,
         isError: false,
@@ -240,7 +240,7 @@ describe('ApiRequestPanelElement', () => {
 
     it('sanitize HTML payload if needed', () => {
       const payload = '<svg xmlns="http://www.w3.org/2000/svg">; <foreignObject> <iframe srcdoc="&lt;script src=\'data:text/javascript,alert(document.domain)\'&gt;&lt;/script&gt;" /> </foreignObject></svg>'
-      propagate(element, payload);
+      propagate(element, payload, 'content-type: image/svg+xml');
       assert.typeOf(element.response, 'object');
       assert.equal(element.response.payload, '<svg xmlns="http://www.w3.org/2000/svg">; </svg>');
     });
@@ -256,6 +256,13 @@ describe('ApiRequestPanelElement', () => {
       assert.typeOf(element.response, 'object');
       assert.equal(element.response.payload, objectStringPayload);
     });
+
+    it('should not sanitize payload if content type is XML', () => {
+      const payload = '<svg xmlns="http://www.w3.org/2000/svg">; <foreignObject> <iframe srcdoc="&lt;script src=\'data:text/javascript,alert(document.domain)\'&gt;&lt;/script&gt;" /> </foreignObject></svg>'
+      propagate(element, payload, 'content-type: application/xml');
+      assert.typeOf(element.response, 'object');
+      assert.equal(element.response.payload, payload);
+    })
   });
 
   describe('Automated navigation', () => {
