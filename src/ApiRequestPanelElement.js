@@ -412,8 +412,24 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * @return any
    */
   sanitizePayload(response) {
-    const {payload} = response;
-    return typeof payload === 'string' ? DOMPurify.sanitize(payload) : payload;
+    const { payload } = response;
+    const contentType = this.getResponseContentType(response)
+    const lowerCaseCT = contentType.toLowerCase()
+    if (lowerCaseCT.indexOf('html') !== -1 || lowerCaseCT.indexOf('svg') !== -1) {
+      return typeof payload === 'string' ? DOMPurify.sanitize(payload) : payload
+    }
+    return payload
+  }
+
+  /**
+   * Tries to search for the Content-Type header in a response
+   * @param {ApiConsoleHTTPResponse} response
+   * @return {string}
+   */
+  getResponseContentType(response) {
+    const headers = HeadersParser.stringToJSON(response.headers || '')
+    const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type')
+    return contentTypeHeader ? contentTypeHeader.value : ''
   }
 
   /**
@@ -428,7 +444,7 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
    * @param {ApiConsoleResponse} data Event's detail object
    */
   _propagateResponse(data) {
-    const {isError, response, request, id} = data;
+    const { isError, response, request, id } = data;
     const payload = this.sanitizePayload(response);
     if (isError) {
       this.response = /** @type ErrorResponse */ ({
