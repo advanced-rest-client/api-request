@@ -35,7 +35,7 @@
     "@advanced-rest-client/arc-url": "^0.2.1",
     "@advanced-rest-client/events-target-mixin": "^3.2.3",
     "@advanced-rest-client/http-method-selector": "^3.0.5",
-    "@advanced-rest-client/oauth-authorization": "^5.0.5",
+    "@advanced-rest-client/oauth-authorization": "^5.1.0",
     "@advanced-rest-client/uuid-generator": "^3.1.1",
     "@anypoint-web-components/anypoint-button": "^1.1.1",
     "@anypoint-web-components/anypoint-item": "^1.1.0",
