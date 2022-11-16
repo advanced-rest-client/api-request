@@ -430,6 +430,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     return /** @type {ApiAuthorization} */ (this.shadowRoot.querySelector('api-authorization'));
   }
 
+  get customQueryModel() {
+    return (this._queryModel || []).filter(query => query.schema.isCustom)
+  }
+
   /**
    * @constructor
    */
@@ -503,7 +507,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Reads the URL data from the ApiUrlDataModel library and sets local variables.
    */
   readUrlData() {
-    const { effectiveBaseUri, selected, server, protocols, version, urlFactory } = this;
+    const { effectiveBaseUri, selected, server, protocols, version, urlFactory, customQueryModel } = this;
     if (!urlFactory) {
       return;
     }
@@ -522,7 +526,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this._apiBaseUri = result.apiBaseUri;
     this._endpointUri = result.endpointPath;
     this._pathModel = result.pathModel;
-    this._queryModel = result.queryModel;
+    this._queryModel = result.queryModel.concat(customQueryModel);
   }
 
   /**

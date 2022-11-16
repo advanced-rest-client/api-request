@@ -125,6 +125,21 @@ describe('ApiRequestEditorElement', () => {
       const node = element.shadowRoot.querySelector('api-url-params-editor').parentElement;
       assert.isFalse(node.hasAttribute('hidden'));
     });
+
+    it('should not remove custom query parameters after changing `serverValue`', () => {
+      element._queryModel = [
+        {
+          name: 'testName',
+          value: 'test value',
+          enabled: true,
+          schema: {
+            isCustom: true
+          }
+        }
+      ]
+      element.serverValue = 'alternate server value'
+      assert.lengthOf(element._queryModel, 1)
+    })
   });
 
   describe('oauth2-redirect-uri-changed', () => {
