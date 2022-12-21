@@ -1054,12 +1054,12 @@ describe('ApiRequestEditorElement', () => {
       element.url = 'some-url';
     });
 
-    it('should remove multipart content type if form data payload', () => {
+    it('should not remove multipart content type if form data payload', () => {
       element._headers = 'content-type: multipart/form-data';
       element._payload = new FormData()
       const request = element.serializeRequest()
 
-      assert.equal(request.headers, '');
+      assert.equal(request.headers, 'content-type: multipart/form-data');
     });
 
     it('should not modify headers if content type not defined and form data payload', () => {
