@@ -793,6 +793,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     });
 
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
+      const payload = this._payload
+      if (payload instanceof FormData) {
+        const contentType = HeadersParser.contentType(result.headers)
+        // According to form data documentation: do not explicitly set the Content-Type header on the request. Doing so will prevent
+        // the browser from being able to set the Content-Type header with the boundary expression it will use to delimit form fields in the request body.
+        if (contentType && contentType.startsWith('multipart/')) {
+          result.headers = /** @type string */ (HeadersParser.replace(result.headers, 'content-type', null));
+        }
+      }
       result.payload = this._payload;
     }
 
