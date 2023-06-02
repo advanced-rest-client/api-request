@@ -1,7 +1,7 @@
 {
   "name": "@api-components/api-request",
   "description": "A set of composite components that are used to build an HTTP request editor with the support of the AMF model.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "license": "Apache-2.0",
   "main": "index.js",
   "module": "index.js",
@@ -39,7 +39,7 @@
     "@advanced-rest-client/uuid-generator": "^3.1.1",
     "@anypoint-web-components/anypoint-button": "^1.1.1",
     "@anypoint-web-components/anypoint-item": "^1.1.0",
-    "@api-components/amf-helper-mixin": "^4.3.4",
+    "@api-components/amf-helper-mixin": "^4.5.23",
     "@api-components/api-authorization": "^0.7.1",
     "@api-components/api-body-editor": "^4.0.5",
     "@api-components/api-forms": "^0.2.1",
