@@ -976,6 +976,11 @@ describe('ApiRequestEditorElement', () => {
           await nextFrame();
           assert.isDefined(element.server);
         });
+
+        it('sets protocol to uri if missing', () => {
+          element.baseUri = 'example.org';
+          assert.equal(element.baseUri, 'https://example.org');
+        });
       });
 
       describe('from navigation events', () => {

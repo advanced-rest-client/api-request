@@ -353,7 +353,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     if (old === value) {
       return;
     }
-    this._baseUri = value;
+    this._baseUri = this._ensureUrlScheme(value);
     this.readUrlData();
     this.requestUpdate('baseUri', old);
   }
