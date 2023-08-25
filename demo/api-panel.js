@@ -73,6 +73,7 @@ class ComponentDemo extends ApiDemoPage {
 
   _apiListTemplate() {
     return [
+      ['cookies', 'Cookies'],
       ['google-drive-api', 'Google Drive'],
       ['httpbin', 'httpbin.org'],
       ['demo-api', 'Demo API'],
@@ -212,7 +213,7 @@ class ComponentDemo extends ApiDemoPage {
           @change="${this._toggleMainOption}"
           >Allow disable params</anypoint-checkbox
         >
-        
+
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"

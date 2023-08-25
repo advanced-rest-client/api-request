@@ -488,7 +488,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   /**
    * Overrides `AmfHelperMixin.__amfChanged`.
    * It updates selection and clears cache in the model generator, per APIC-229
-   * @param {any} amf 
+   * @param {any} amf
    */
   __amfChanged(amf) {
     const { urlFactory } = this;
@@ -804,7 +804,6 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       }
       result.payload = this._payload;
     }
-
     if (this._securedBy) {
       const node = this._auth;
       const { settings=[] } = node;
@@ -827,9 +826,32 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    */
   _applyAuthorization(request, settings, authParams) {
     request.auth = settings;
-    const { headers, params } = authParams;
+     /**
+     * set this property for allow custom crendentials
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
+     **/
+    request.withCredentials = true
+    request.cookies = this._getCookies(request)
+    let  { headers, params } = authParams;
     this._applyQueryParams(request, params);
+    document.cookie = this._getCookies(request)
+
+    // other way to send cookies, but no work
+    // error: https://stackoverflow.com/questions/50256737/cookie-in-header-javascript-error-refused-to-set-unsafe-header-cookie
+    // request.headers = headers
+    console.log(this._getCookies(request));
     this._applyHeaders(request, headers);
+  }
+
+/**
+ * Method to get string cookies in format key=value; key2=value2
+ */
+  _getCookies(request) {
+   if(request.auth && request.auth.length && request.auth[0].config.cookies) {
+        return Object.entries(request.auth[0].config.cookies)
+          .map(([key, value]) => `${key}=${value}`)
+          .join('; ')
+    }
   }
 
   /**
@@ -905,7 +927,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   /**
    * Handle event for populating annotated fields in the editor.
-   * @param {CustomEvent} e 
+   * @param {CustomEvent} e
    */
   _populateAnnotatedFieldsHandler(e) {
     const { values } = e.detail;
@@ -919,7 +941,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Given an array of PopulationInfo objects, look for query parameters
    * annotated with the matching information, and update their values
    * in the component's view model.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    */
   _updateAnnotatedQueryParameters(populationInfoArray) {
     const method = this._computeMethodAmfModel(this.amf, this.selected);
@@ -938,7 +960,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Given an array of PopulationInfo objects, look for headers
    * annotated with the matching information, and update their values
    * in the component's view model.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    */
   _updateAnnotatedHeaders(populationInfoArray) {
     const headers = this._apiHeaders;
@@ -950,7 +972,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Generic function for updating the nodes whose custom property information matches
    * with the `populationInfoArray` objects provided. To update, it calls the `updateCallbackFn`
    * which is one of the function's arguments.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    * @param {Object[]} parameterNodes AMF parameter nodes
    * @param {Function} updateCallbackFn Function to call to update a node's editor value
    */
@@ -1158,7 +1180,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   /**
    * Given a headers string, if it does not contain a Content-Type header,
    * set it manually and return the computed headers string.
-   * @param {String} headersString 
+   * @param {String} headersString
    * @return {String} headers string with content type if not already present
    */
   _ensureContentTypeInHeaders(headersString) {

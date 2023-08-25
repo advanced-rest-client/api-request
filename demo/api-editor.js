@@ -71,6 +71,7 @@ class ComponentDemo extends ApiDemoPage {
 
   _apiListTemplate() {
     return [
+      ['cookies', 'Cookies'],
       ['google-drive-api', 'Google Drive'],
       ['multi-server', 'Multiple servers'],
       ['httpbin', 'httpbin.org'],
@@ -162,7 +163,7 @@ class ComponentDemo extends ApiDemoPage {
         </div>
 
         <label slot="options" id="mainOptionsLabel">Options</label>
-        
+
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"

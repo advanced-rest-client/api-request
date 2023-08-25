@@ -12,6 +12,7 @@
   "oauth-flows/oauth-flows.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
   "oas-bearer/oas-bearer.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
   "oas-demo/oas-demo.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
+  "cookies/cookies.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
   "multi-server/multi-server.yaml": { "type": "OAS 3.0", "mime": "application/yaml" },
   "loan-ms/loan-microservice.json": { "type": "OAS 2.0", "mime": "application/json" },
   "async-api/async-api.yaml": "ASYNC 2.0",

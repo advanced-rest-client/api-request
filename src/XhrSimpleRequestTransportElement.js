@@ -245,7 +245,8 @@ export class XhrSimpleRequestTransportElement extends LitElement {
     xhr.addEventListener('timeout', (error) => this._timeoutHandler(error));
     xhr.addEventListener('abort', () => this._abortHandler());
     // Called after all of the above.
-    xhr.addEventListener('loadend', () => this._loadEndHandler());
+    /**Try to delete cookie for next request in this handler */
+    xhr.addEventListener('loadend', () => this._loadEndHandler(options));
     const url = this._appendProxy(options.url);
     xhr.open(options.method || 'GET', url, true);
     this._applyHeaders(xhr, options.headers, options.payload instanceof FormData);
@@ -348,12 +349,27 @@ export class XhrSimpleRequestTransportElement extends LitElement {
   }
 
   /**
+   * Delete cookie by name
+   * @see https://stackoverflow.com/questions/10593013/delete-cookie-by-name
+   * @param {string} cookieName
+   */
+  _deleteCookie(cookieName) {
+    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+  }
+
+  /**
    * Handler for XHR `loadend` event.
    */
-  _loadEndHandler() {
+  _loadEndHandler(options) {
     if (this.aborted || this.timedOut) {
       return;
     }
+    if (options.auth[0].config.cookies) {
+      Object.keys(options.auth[0].config.cookies).forEach((item) => {
+        this._deleteCookie(item.name)
+      })
+    }
+
     this._updateStatus();
     this._headers = this.collectHeaders();
     this._response = this.parseResponse();
@@ -372,7 +388,7 @@ export class XhrSimpleRequestTransportElement extends LitElement {
       });
     }
   }
-  
+
   /**
    * Aborts the request.
    */
