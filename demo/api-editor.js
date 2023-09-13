@@ -22,7 +22,7 @@ class ComponentDemo extends ApiDemoPage {
       'urlLabel',
       'renderCustomServer',
       'allowCustomBaseUri',
-      'noServerSelector',
+      'noServerSelector'
     ]);
     this.componentName = 'api-request-editor';
     this.allowCustom = false;
@@ -83,10 +83,15 @@ class ComponentDemo extends ApiDemoPage {
       ['api-keys', 'API key'],
       ['oauth-flows', 'OAS OAuth Flow'],
       ['oas-bearer', 'OAS Bearer'],
-    ].map(([file, label]) => html`
-      <anypoint-item data-src="${file}-compact.json">${label} - compact model</anypoint-item>
-      <anypoint-item data-src="${file}.json">${label}</anypoint-item>
-      `);
+      ['cookies', 'Cookies']
+    ].map(
+      ([file, label]) => html`
+        <anypoint-item data-src="${file}-compact.json"
+          >${label} - compact model</anypoint-item
+        >
+        <anypoint-item data-src="${file}.json">${label}</anypoint-item>
+      `
+    );
   }
 
   _responseReady(e) {
@@ -120,23 +125,20 @@ class ComponentDemo extends ApiDemoPage {
       responseBody,
       urlLabel,
       noServerSelector,
-      allowCustomBaseUri,
+      allowCustomBaseUri
     } = this;
-    return html `
-    <section class="documentation-section">
+    return html` <section class="documentation-section">
       <h3>Interactive demo</h3>
       <p>
         This demo lets you preview the API Request Editor element with various
         configuration options.
       </p>
 
-
       <arc-interactive-demo
         .states="${demoStates}"
         @state-changed="${this._demoStateHandler}"
         ?dark="${darkThemeActive}"
       >
-
         <div slot="content">
           <api-request-editor
             .amf="${amf}"
@@ -157,12 +159,16 @@ class ComponentDemo extends ApiDemoPage {
           >
             ${this._addCustomServers()}
           </api-request-editor>
-          ${responseBody ? html`<h3>Latest response</h3>
-          <output class="response-output" tabindex="0">${responseBody}</output>` : ''}
+          ${responseBody
+            ? html`<h3>Latest response</h3>
+                <output class="response-output" tabindex="0"
+                  >${responseBody}</output
+                >`
+            : ''}
         </div>
 
         <label slot="options" id="mainOptionsLabel">Options</label>
-        
+
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"
@@ -245,26 +251,30 @@ class ComponentDemo extends ApiDemoPage {
       return '';
     }
     const { compatibility } = this;
-    return html`
-    <div class="other-section" slot="custom-base-uri">Other options</div>
-    <anypoint-item
-      slot="custom-base-uri"
-      value="http://mocking.com"
-      ?compatibility="${compatibility}"
-    >Mocking service</anypoint-item>
-    <anypoint-item
-      slot="custom-base-uri"
-      value="http://customServer.com2"
-      ?compatibility="${compatibility}"
-    >Custom instance</anypoint-item>`;
+    return html` <div class="other-section" slot="custom-base-uri">
+        Other options
+      </div>
+      <anypoint-item
+        slot="custom-base-uri"
+        value="http://mocking.com"
+        ?compatibility="${compatibility}"
+        >Mocking service</anypoint-item
+      >
+      <anypoint-item
+        slot="custom-base-uri"
+        value="http://customServer.com2"
+        ?compatibility="${compatibility}"
+        >Custom instance</anypoint-item
+      >`;
   }
 
   _introductionTemplate() {
-    return html `
+    return html`
       <section class="documentation-section">
         <h3>Introduction</h3>
         <p>
-          A web component to render accessible request data editor based on AMF model.
+          A web component to render accessible request data editor based on AMF
+          model.
         </p>
         <p>
           This component implements Material Design styles.
@@ -274,111 +284,125 @@ class ComponentDemo extends ApiDemoPage {
   }
 
   _usageTemplate() {
-    return html `
-      <section class="documentation-section">
-        <h2>Usage</h2>
-        <p>API request editor comes with 3 predefied styles:</p>
-        <ul>
-          <li><b>Filled</b> (default)</li>
-          <li><b>Outlined</b> - Material desing outlined inputs, use <code>outlined</code> property</li>
-          <li>
-            <b>Compatibility</b> - To provide compatibility with Anypoint design, use
-            <code>compatibility</code> property
-          </li>
-        </ul>
+    return html` <section class="documentation-section">
+      <h2>Usage</h2>
+      <p>API request editor comes with 3 predefied styles:</p>
+      <ul>
+        <li><b>Filled</b> (default)</li>
+        <li>
+          <b>Outlined</b> - Material desing outlined inputs, use
+          <code>outlined</code> property
+        </li>
+        <li>
+          <b>Compatibility</b> - To provide compatibility with Anypoint design,
+          use <code>compatibility</code> property
+        </li>
+      </ul>
 
-        <h3>Handling request event</h3>
-        <p>
-          The element do not perform a request. It dispatches <code>api-request</code> custom event with
-          request object on the detail property of the event. The hosting application should handle this event
-          and perform the request. When the response is ready the application should dispatch <code>api-response</code>
-          property with the same <code>id</code> value from the request object. The element clears its state when
-          the event is handled.
-        </p>
+      <h3>Handling request event</h3>
+      <p>
+        The element do not perform a request. It dispatches
+        <code>api-request</code> custom event with request object on the detail
+        property of the event. The hosting application should handle this event
+        and perform the request. When the response is ready the application
+        should dispatch <code>api-response</code> property with the same
+        <code>id</code> value from the request object. The element clears its
+        state when the event is handled.
+      </p>
 
-        <h3>AMF model selection</h3>
-        <p>
-          The element handles selected shape computation after <code>selected</code> property is set.
-          The property should be set to AMF supportedOperation node's <code>@id</code> value.
-        </p>
-        <p>
-          Use
-          <a href="https://github.com/advanced-rest-client/api-navigation">
-            api-navigation
-          </a>
-          element to provide the user with accessible navigation through the AMF model.
-        </p>
+      <h3>AMF model selection</h3>
+      <p>
+        The element handles selected shape computation after
+        <code>selected</code> property is set. The property should be set to AMF
+        supportedOperation node's <code>@id</code> value.
+      </p>
+      <p>
+        Use
+        <a href="https://github.com/advanced-rest-client/api-navigation">
+          api-navigation
+        </a>
+        element to provide the user with accessible navigation through the AMF
+        model.
+      </p>
 
-        <h3>Override base URI</h3>
-        <p>
-          Sometimes you may need to override APIs base URI. The element provides <code>baseUri</code>
-          property that can be set to replace API's base URI to some other value.
-        </p>
+      <h3>Override base URI</h3>
+      <p>
+        Sometimes you may need to override APIs base URI. The element provides
+        <code>baseUri</code>
+        property that can be set to replace API's base URI to some other value.
+      </p>
 
-        <h3>Allowing custom properties</h3>
-        <p>
-          By default the editor only renders form controls to the ones defined in the API spec file.
-          When model for URI/query parameters, headers, or body is not present then the corresponding editor
-          is not rendered. Also, when the editors are rendered there's no option for the user
-          to defined a parameter that is not defined in the API specification.
-        </p>
+      <h3>Allowing custom properties</h3>
+      <p>
+        By default the editor only renders form controls to the ones defined in
+        the API spec file. When model for URI/query parameters, headers, or body
+        is not present then the corresponding editor is not rendered. Also, when
+        the editors are rendered there's no option for the user to defined a
+        parameter that is not defined in the API specification.
+      </p>
 
-        <p>
-          To allow the user to add custom properties in the editors use <code>allowCustom</code>
-          property. It will force query parameters editor to appear when hidden and the editors
-          renders "add" button in their forms.
-        </p>
+      <p>
+        To allow the user to add custom properties in the editors use
+        <code>allowCustom</code>
+        property. It will force query parameters editor to appear when hidden
+        and the editors renders "add" button in their forms.
+      </p>
 
-        <h3>Partial model support</h3>
-        <p>
-          Partial model is generated by the AMF service (by MuleSoft) to reduce data transfer size
-          and to reach the performance budget when initializing applications like API Console.<br/>
-          Partial model contains data that are only required to generate view for current API selection.
-        </p>
+      <h3>Partial model support</h3>
+      <p>
+        Partial model is generated by the AMF service (by MuleSoft) to reduce
+        data transfer size and to reach the performance budget when initializing
+        applications like API Console.<br />
+        Partial model contains data that are only required to generate view for
+        current API selection.
+      </p>
 
-        <p>
-          The element renders the model that is given to it. However, partial model may be missing
-          information about server, protocols, and API version which are required to properly
-          compute URL value.
-        </p>
+      <p>
+        The element renders the model that is given to it. However, partial
+        model may be missing information about server, protocols, and API
+        version which are required to properly compute URL value.
+      </p>
 
-        <p>
-          Note, this can be ignored when setting <code>baseUri</code> as this overrides any API
-          model value.
-        </p>
+      <p>
+        Note, this can be ignored when setting <code>baseUri</code> as this
+        overrides any API model value.
+      </p>
 
-        <p>
-          Pass corresponding model values to <code>server</code>, <code>protocols</code>, and <code>version</code>
-          properties when expecting partial AMF model.
-        </p>
+      <p>
+        Pass corresponding model values to <code>server</code>,
+        <code>protocols</code>, and <code>version</code>
+        properties when expecting partial AMF model.
+      </p>
 
-        <h3>OAuth 2</h3>
-        <p>
-          You need to set <code>redirectUri</code> property to a OAuth 2 redirect popup location.
-          Otherwise authorization won't be initialized.
-        </p>
+      <h3>OAuth 2</h3>
+      <p>
+        You need to set <code>redirectUri</code> property to a OAuth 2 redirect
+        popup location. Otherwise authorization won't be initialized.
+      </p>
 
-        <h3>Validation</h3>
-        <p>
-          The element sets <code>invalid</code> attribute when the editor contains invalid data.
-          You can use it to style the element for invalid input.
-        </p>
+      <h3>Validation</h3>
+      <p>
+        The element sets <code>invalid</code> attribute when the editor contains
+        invalid data. You can use it to style the element for invalid input.
+      </p>
 
-        <p>
-          * When all forms are reported valid but OAuth 2 has no access token value the element
-          still reports it as valid. When the user try to press the send button it will try to
-          force authorization on currently selected authorization panel before making the request.
-        </p>
-      </section>`;
+      <p>
+        * When all forms are reported valid but OAuth 2 has no access token
+        value the element still reports it as valid. When the user try to press
+        the send button it will try to force authorization on currently selected
+        authorization panel before making the request.
+      </p>
+    </section>`;
   }
 
   contentTemplate() {
     return html`
-    <xhr-simple-request @api-response="${this._responseReady}"></xhr-simple-request>
-    <h2 class="centered main">API request editor</h2>
-    ${this._demoTemplate()}
-    ${this._introductionTemplate()}
-    ${this._usageTemplate()}
+      <xhr-simple-request
+        @api-response="${this._responseReady}"
+      ></xhr-simple-request>
+      <h2 class="centered main">API request editor</h2>
+      ${this._demoTemplate()} ${this._introductionTemplate()}
+      ${this._usageTemplate()}
     `;
   }
 }

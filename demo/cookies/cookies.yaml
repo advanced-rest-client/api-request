@@ -1,0 +1,24 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: cookie auth
+
+components:
+  securitySchemes:
+    cookieAuth:        
+      type: apiKey
+      in: cookie
+      name: JSESSIONID  
+      
+security:
+  - cookieAuth: []
+
+paths:
+  /users:
+    get:
+      security:
+        - cookieAuth: []
+      description: Returns a list of users.
+      responses: 
+        '200':
+          description: OK

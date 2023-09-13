@@ -27,7 +27,7 @@ class ComponentDemo extends ApiDemoPage {
       'allowCustomBaseUri',
       'noServerSelector',
       'urlLabel',
-      'selectedServerValue',
+      'selectedServerValue'
     ]);
     this.componentName = 'api-request-panel';
     this.allowCustom = false;
@@ -73,6 +73,7 @@ class ComponentDemo extends ApiDemoPage {
 
   _apiListTemplate() {
     return [
+      ['cookies', 'Cookies'],
       ['google-drive-api', 'Google Drive'],
       ['httpbin', 'httpbin.org'],
       ['demo-api', 'Demo API'],
@@ -84,7 +85,7 @@ class ComponentDemo extends ApiDemoPage {
       ['SE-12224', 'Scope is not an array issues (SE-12224)'],
       ['APIC-168', 'Custom scheme support (APIC-168)'],
       ['async-api', 'AsyncAPI'],
-      ['payload-vulnerability', 'payload-vulnerability'],
+      ['payload-vulnerability', 'payload-vulnerability']
     ].map(
       ([file, label]) => html`
         <anypoint-item data-src="${file}-compact.json"
@@ -138,7 +139,7 @@ class ComponentDemo extends ApiDemoPage {
       allowCustomBaseUri,
       noUrlEditor,
       urlLabel,
-      selectedServerValue,
+      selectedServerValue
     } = this;
     return html` <section class="documentation-section">
       <h3>Interactive demo</h3>
@@ -212,7 +213,7 @@ class ComponentDemo extends ApiDemoPage {
           @change="${this._toggleMainOption}"
           >Allow disable params</anypoint-checkbox
         >
-        
+
         <anypoint-checkbox
           aria-describedby="mainOptionsLabel"
           slot="options"
