@@ -245,10 +245,14 @@ export class XhrSimpleRequestTransportElement extends LitElement {
     xhr.addEventListener('timeout', (error) => this._timeoutHandler(error));
     xhr.addEventListener('abort', () => this._abortHandler());
     // Called after all of the above.
-    xhr.addEventListener('loadend', () => this._loadEndHandler());
+    xhr.addEventListener('loadend', () => this._loadEndHandler(options));
     const url = this._appendProxy(options.url);
     xhr.open(options.method || 'GET', url, true);
-    this._applyHeaders(xhr, options.headers, options.payload instanceof FormData);
+    this._applyHeaders(
+      xhr,
+      options.headers,
+      options.payload instanceof FormData
+    );
     xhr.timeout = options.timeout;
     xhr.withCredentials = !!options.withCredentials;
     try {
@@ -350,7 +354,8 @@ export class XhrSimpleRequestTransportElement extends LitElement {
   /**
    * Handler for XHR `loadend` event.
    */
-  _loadEndHandler() {
+  _loadEndHandler(options) {
+    this._deleteRequestCookies(options);
     if (this.aborted || this.timedOut) {
       return;
     }
@@ -358,7 +363,9 @@ export class XhrSimpleRequestTransportElement extends LitElement {
     this._headers = this.collectHeaders();
     this._response = this.parseResponse();
     if (!this.succeeded) {
-      const error = new Error(`The request failed with status code: ${  this._xhr.status}`);
+      const error = new Error(
+        `The request failed with status code: ${this._xhr.status}`
+      );
       const response = {
         error,
         request: this._xhr,
@@ -372,7 +379,29 @@ export class XhrSimpleRequestTransportElement extends LitElement {
       });
     }
   }
-  
+
+  /**
+   * Delete cookie by name
+   * @param {string} cookieName
+   */
+  _deleteCookie(cookieName) {
+    document.cookie = `${cookieName} =; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;`;
+  }
+
+  /**
+   * Delete request cookies
+   * @param {ApiConsoleRequest} options API request object
+   */
+  _deleteRequestCookies(options) {
+    if (options?.auth?.length > 0) {
+      for (let i = 0; i < options?.auth?.length; i += 1) {
+        Object.keys(options?.auth[i]?.config?.cookies).forEach((item) => {
+          this._deleteCookie(item);
+        });
+      }
+    }
+  }
+
   /**
    * Aborts the request.
    */
@@ -386,7 +415,8 @@ export class XhrSimpleRequestTransportElement extends LitElement {
    */
   _updateStatus() {
     this._status = this._xhr.status;
-    this._statusText = (this._xhr.statusText === undefined ? '' : this._xhr.statusText);
+    this._statusText =
+      this._xhr.statusText === undefined ? '' : this._xhr.statusText;
   }
 
   /**
@@ -439,7 +469,7 @@ export class XhrSimpleRequestTransportElement extends LitElement {
         }
       }
     } catch (e) {
-      this.rejectCompletes(new Error(`Could not parse response. ${  e.message}`));
+      this.rejectCompletes(new Error(`Could not parse response. ${e.message}`));
     }
     return undefined;
   }

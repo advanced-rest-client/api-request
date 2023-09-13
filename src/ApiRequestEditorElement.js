@@ -20,7 +20,7 @@ import { ApiUrlDataModel } from '@api-components/api-url';
 import { TelemetryEvents } from '@advanced-rest-client/arc-events';
 import { v4 } from '@advanced-rest-client/uuid-generator';
 import { UrlParser } from '@advanced-rest-client/arc-url';
-import { HeadersParser } from '@advanced-rest-client/arc-headers'
+import { HeadersParser } from '@advanced-rest-client/arc-headers';
 import '@api-components/api-url/api-url-editor.js';
 import '@api-components/api-url/api-url-params-editor.js';
 import '@api-components/api-authorization/api-authorization.js';
@@ -45,12 +45,11 @@ import elementStyles from './styles/Editor.styles.js';
 
 export const EventCategory = 'API Request editor';
 
-export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(LitElement)) {
+export class ApiRequestEditorElement extends AmfHelperMixin(
+  EventsTargetMixin(LitElement)
+) {
   get styles() {
-    return [
-      apiFormStyles,
-      elementStyles,
-    ];
+    return [apiFormStyles, elementStyles];
   }
 
   static get properties() {
@@ -239,7 +238,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       /**
        * When enabled, does not clear cache on AMF change
        */
-      persistCache: { type: Boolean },
+      persistCache: { type: Boolean }
     };
   }
 
@@ -427,11 +426,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {ApiAuthorization} A reference to the authorization panel, if exists
    */
   get _auth() {
-    return /** @type {ApiAuthorization} */ (this.shadowRoot.querySelector('api-authorization'));
+    return /** @type {ApiAuthorization} */ (this.shadowRoot.querySelector(
+      'api-authorization'
+    ));
   }
 
   get customQueryModel() {
-    return (this._queryModel || []).filter(query => query.schema.isCustom)
+    return (this._queryModel || []).filter((query) => query.schema.isCustom);
   }
 
   /**
@@ -440,8 +441,12 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   constructor() {
     super();
     this._responseHandler = this._responseHandler.bind(this);
-    this._authRedirectChangedHandler = this._authRedirectChangedHandler.bind(this);
-    this._populateAnnotatedFieldsHandler = this._populateAnnotatedFieldsHandler.bind(this);
+    this._authRedirectChangedHandler = this._authRedirectChangedHandler.bind(
+      this
+    );
+    this._populateAnnotatedFieldsHandler = this._populateAnnotatedFieldsHandler.bind(
+      this
+    );
 
     this.urlLabel = false;
     this.outlined = false;
@@ -475,20 +480,32 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   _attachListeners(node) {
     node.addEventListener('api-response', this._responseHandler);
-    node.addEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
-    node.addEventListener('populate_annotated_fields', this._populateAnnotatedFieldsHandler);
+    node.addEventListener(
+      'oauth2-redirect-uri-changed',
+      this._authRedirectChangedHandler
+    );
+    node.addEventListener(
+      'populate_annotated_fields',
+      this._populateAnnotatedFieldsHandler
+    );
   }
 
   _detachListeners(node) {
     node.removeEventListener('api-response', this._responseHandler);
-    node.removeEventListener('oauth2-redirect-uri-changed', this._authRedirectChangedHandler);
-    node.removeEventListener('populate_annotated_fields', this._populateAnnotatedFieldsHandler);
+    node.removeEventListener(
+      'oauth2-redirect-uri-changed',
+      this._authRedirectChangedHandler
+    );
+    node.removeEventListener(
+      'populate_annotated_fields',
+      this._populateAnnotatedFieldsHandler
+    );
   }
 
   /**
    * Overrides `AmfHelperMixin.__amfChanged`.
    * It updates selection and clears cache in the model generator, per APIC-229
-   * @param {any} amf 
+   * @param {any} amf
    */
   __amfChanged(amf) {
     const { urlFactory } = this;
@@ -507,7 +524,15 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Reads the URL data from the ApiUrlDataModel library and sets local variables.
    */
   readUrlData() {
-    const { effectiveBaseUri, selected, server, protocols, version, urlFactory, customQueryModel } = this;
+    const {
+      effectiveBaseUri,
+      selected,
+      server,
+      protocols,
+      version,
+      urlFactory,
+      customQueryModel
+    } = this;
     if (!urlFactory) {
       return;
     }
@@ -521,7 +546,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const result = urlFactory.getModel({
       apiUri: effectiveBaseUri,
       selected,
-      server,
+      server
     });
     this._apiBaseUri = result.apiBaseUri;
     this._endpointUri = result.endpointPath;
@@ -537,7 +562,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @param {boolean=} cancelable When false the event is not cancelable.
    * @returns {CustomEvent}
    */
-  _dispatch(type, detail, cancelable=true) {
+  _dispatch(type, detail, cancelable = true) {
     const e = new CustomEvent(type, {
       bubbles: true,
       composed: true,
@@ -560,7 +585,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     this.dispatchEvent(new CustomEvent('requestclearstate'));
     TelemetryEvents.event(this, {
       category: EventCategory,
-      action: 'Clear request',
+      action: 'Clear request'
     });
   }
 
@@ -574,11 +599,14 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       return;
     }
     this._authSettings = undefined;
-    const method = /** @type string */ (this._getValue(model, this.ns.aml.vocabularies.apiContract.method));
+    const method = /** @type string */ (this._getValue(
+      model,
+      this.ns.aml.vocabularies.apiContract.method
+    ));
     this._httpMethod = method;
     this._isPayloadRequest = this._computeIsPayloadRequest(method);
     this._securedBy = this._computeSecuredBy(model);
-    this._apiHeaders = this. _computeHeaders(model);
+    this._apiHeaders = this._computeHeaders(model);
     this._apiPayload = this._computeApiPayload(model);
   }
 
@@ -594,7 +622,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       const webApi = this._computeWebApi(api);
       return this._computeMethodModel(webApi, selected);
     }
-    const key = this._getAmfKey(this.ns.aml.vocabularies.apiContract.supportedOperation);
+    const key = this._getAmfKey(
+      this.ns.aml.vocabularies.apiContract.supportedOperation
+    );
     const methods = this._ensureArray(api[key]);
     if (!methods) {
       return undefined;
@@ -793,13 +823,17 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     });
 
     if (['GET', 'HEAD'].indexOf(result.method) === -1) {
-      const payload = this._payload
+      const payload = this._payload;
       if (payload instanceof FormData) {
-        const contentType = HeadersParser.contentType(result.headers)
+        const contentType = HeadersParser.contentType(result.headers);
         // According to form data documentation: do not explicitly set the Content-Type header on the request. Doing so will prevent
         // the browser from being able to set the Content-Type header with the boundary expression it will use to delimit form fields in the request body.
         if (contentType && contentType.startsWith('multipart/')) {
-          result.headers = /** @type string */ (HeadersParser.replace(result.headers, 'content-type', null));
+          result.headers = /** @type string */ (HeadersParser.replace(
+            result.headers,
+            'content-type',
+            null
+          ));
         }
       }
       result.payload = this._payload;
@@ -807,7 +841,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
     if (this._securedBy) {
       const node = this._auth;
-      const { settings=[] } = node;
+      const { settings = [] } = node;
       if (settings.length) {
         const params = node.createAuthParams();
         this._applyAuthorization(result, settings, params);
@@ -828,8 +862,35 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _applyAuthorization(request, settings, authParams) {
     request.auth = settings;
     const { headers, params } = authParams;
+    this._applyCookies(request);
     this._applyQueryParams(request, params);
     this._applyHeaders(request, headers);
+  }
+
+  /**
+   * Method to apply document cookies if the request has cookies.
+   * @param {ApiConsoleRequest} request The request object
+   */
+  _applyCookies(request) {
+    if (request?.auth && request?.auth?.length) {
+      request.withCredentials = true;
+      for (let i = 0; i < request?.auth?.length; i += 1) {
+        if (request.auth[i]?.config?.cookies) {
+          document.cookie = this._getCookies(request.auth[i]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Method to get string cookies in format key=value; key2=value2
+   */
+  _getCookies(auth) {
+    const cookies = Object.entries(auth?.config?.cookies)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('; ');
+
+    return `${cookies}; path=/`;
   }
 
   /**
@@ -888,7 +949,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @param {CustomEvent} e
    */
   _responseHandler(e) {
-    if (!e.detail || (e.detail.id !== this.requestId)) {
+    if (!e.detail || e.detail.id !== this.requestId) {
       return;
     }
     this._loadingRequest = false;
@@ -905,7 +966,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   /**
    * Handle event for populating annotated fields in the editor.
-   * @param {CustomEvent} e 
+   * @param {CustomEvent} e
    */
   _populateAnnotatedFieldsHandler(e) {
     const { values } = e.detail;
@@ -919,30 +980,38 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Given an array of PopulationInfo objects, look for query parameters
    * annotated with the matching information, and update their values
    * in the component's view model.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    */
   _updateAnnotatedQueryParameters(populationInfoArray) {
     const method = this._computeMethodAmfModel(this.amf, this.selected);
     if (!method) {
       return;
     }
-    const expects = this._computeExpects(method)
+    const expects = this._computeExpects(method);
     const queryParameters = this._computeQueryParameters(expects);
     if (!queryParameters) {
       return;
     }
-    this._updateAnnotatedFields(populationInfoArray, queryParameters, this._updateQueryModelParameter.bind(this));
+    this._updateAnnotatedFields(
+      populationInfoArray,
+      queryParameters,
+      this._updateQueryModelParameter.bind(this)
+    );
   }
 
   /**
    * Given an array of PopulationInfo objects, look for headers
    * annotated with the matching information, and update their values
    * in the component's view model.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    */
   _updateAnnotatedHeaders(populationInfoArray) {
     const headers = this._apiHeaders;
-    this._updateAnnotatedFields(populationInfoArray, headers, this._updateHeader.bind(this));
+    this._updateAnnotatedFields(
+      populationInfoArray,
+      headers,
+      this._updateHeader.bind(this)
+    );
     // this.shadowRoot.querySelector('api-headers-editor').value = this._headers
   }
 
@@ -950,19 +1019,31 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * Generic function for updating the nodes whose custom property information matches
    * with the `populationInfoArray` objects provided. To update, it calls the `updateCallbackFn`
    * which is one of the function's arguments.
-   * @param {PopulationInfo[]} populationInfoArray 
+   * @param {PopulationInfo[]} populationInfoArray
    * @param {Object[]} parameterNodes AMF parameter nodes
    * @param {Function} updateCallbackFn Function to call to update a node's editor value
    */
-  _updateAnnotatedFields(populationInfoArray, parameterNodes, updateCallbackFn) {
+  _updateAnnotatedFields(
+    populationInfoArray,
+    parameterNodes,
+    updateCallbackFn
+  ) {
     if (!parameterNodes || !updateCallbackFn || !populationInfoArray) {
       return;
     }
-    populationInfoArray.forEach(({ annotationName, annotationValue, fieldValue }) => {
-      parameterNodes
-        .filter(node => this._computeHasCustomPropertyValue(node, annotationName, annotationValue))
-        .forEach(node => updateCallbackFn(node, fieldValue));
-    });
+    populationInfoArray.forEach(
+      ({ annotationName, annotationValue, fieldValue }) => {
+        parameterNodes
+          .filter((node) =>
+            this._computeHasCustomPropertyValue(
+              node,
+              annotationName,
+              annotationValue
+            )
+          )
+          .forEach((node) => updateCallbackFn(node, fieldValue));
+      }
+    );
   }
 
   /**
@@ -971,37 +1052,49 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {{name: string, value: string}[]} Array of all custom domain property nodes
    */
   _computeCustomPropertiesNamesAndValues(shape) {
-    const customPropKey = this._getAmfKey(this.ns.aml.vocabularies.document.customDomainProperties);
-    const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.extensionName);
+    const customPropKey = this._getAmfKey(
+      this.ns.aml.vocabularies.document.customDomainProperties
+    );
+    const nameKey = this._getAmfKey(
+      this.ns.aml.vocabularies.core.extensionName
+    );
     const valueKey = this._getAmfKey(this.ns.aml.vocabularies.data.value);
-    const idPrefix = this._getAmfKey('amf://id')
-    const properties = this._getValueArray(shape, customPropKey) || []
-    return /** @type {{name: string, value: string}[]} */ (properties
-      .map(property => {
-      const prop = Array.isArray(property) ? property[0] : property;
-      if (!prop || typeof prop === 'string' || typeof prop === 'number' || typeof  prop === 'boolean') {
-        return null;
+    const idPrefix = this._getAmfKey('amf://id');
+    const properties = this._getValueArray(shape, customPropKey) || [];
+    return /** @type {{name: string, value: string}[]} */ (properties.map(
+      (property) => {
+        const prop = Array.isArray(property) ? property[0] : property;
+        if (
+          !prop ||
+          typeof prop === 'string' ||
+          typeof prop === 'number' ||
+          typeof prop === 'boolean'
+        ) {
+          return null;
+        }
+        const id = /** @type string */ (this._getValue(prop, '@id'));
+        let propertyKey = id.startsWith(idPrefix) ? id : `${idPrefix}:${id}`;
+        let shapeElement = shape[propertyKey];
+        if (Array.isArray(shapeElement)) {
+          [shapeElement] = shapeElement;
+        }
+        if (!shapeElement) {
+          propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
+          shapeElement = shape[propertyKey];
+        }
+        if (Array.isArray(shapeElement)) {
+          [shapeElement] = shapeElement;
+        }
+        if (!shapeElement) {
+          return null;
+        }
+        const name =
+          this._getValue(prop, nameKey) ||
+          this._getValue(shapeElement, nameKey);
+        const value = this._getValue(shapeElement, valueKey);
+        return { name, value };
       }
-      const id = /** @type string */ (this._getValue(prop, '@id'));
-      let propertyKey = id.startsWith(idPrefix) ? id : `${idPrefix}:${id}`;
-      let shapeElement = shape[propertyKey];
-      if (Array.isArray(shapeElement)) {
-        [shapeElement] = shapeElement;
-      }
-      if (!shapeElement) {
-        propertyKey = id.startsWith('amf://id') ? id : `amf://id${id}`;
-        shapeElement = shape[propertyKey];
-      }
-      if (Array.isArray(shapeElement)) {
-        [shapeElement] = shapeElement;
-      }
-      if (!shapeElement) {
-        return null;
-      }
-      const name = this._getValue(prop, nameKey) || this._getValue(shapeElement,nameKey);
-      const value = this._getValue(shapeElement, valueKey);
-      return { name, value };
-    }));
+    ));
   }
 
   /**
@@ -1013,12 +1106,18 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {boolean}
    */
   _computeHasCustomPropertyValue(domainElement, propertyName, propertyValue) {
-    const shape = Array.isArray(domainElement) ? domainElement[0] : domainElement
+    const shape = Array.isArray(domainElement)
+      ? domainElement[0]
+      : domainElement;
     if (!shape) {
       return false;
     }
     const tuples = this._computeCustomPropertiesNamesAndValues(shape) || [];
-    return Boolean(tuples.find(tuple => tuple.name === propertyName && tuple.value === propertyValue));
+    return Boolean(
+      tuples.find(
+        (tuple) => tuple.name === propertyName && tuple.value === propertyValue
+      )
+    );
   }
 
   /**
@@ -1030,8 +1129,8 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   _updateQueryModelParameter(queryParamNode, value) {
     const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.name);
     const name = this._getValue(queryParamNode, nameKey);
-    const newQueryModel = [...this._queryModel]
-    const queryParamItem = newQueryModel.find(item => item.name === name);
+    const newQueryModel = [...this._queryModel];
+    const queryParamItem = newQueryModel.find((item) => item.name === name);
     if (queryParamItem) {
       queryParamItem.value = value;
       this._queryModel = newQueryModel;
@@ -1050,11 +1149,13 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     const nameKey = this._getAmfKey(this.ns.aml.vocabularies.core.name);
     const name = this._getValue(headerNode, nameKey);
     const headers = HeadersParser.stringToJSON(this._headers);
-    const headerItem = headers.find(header => header.name === name);
+    const headerItem = headers.find((header) => header.name === name);
     if (headerItem) {
       headerItem.value = value;
       // We can't call the HeadersParser.toString() method because it removes the empty headers
-      this._headers = headers.map(header => HeadersParser.itemToString(header)).join('\n');
+      this._headers = headers
+        .map((header) => HeadersParser.itemToString(header))
+        .join('\n');
     }
   }
 
@@ -1082,7 +1183,11 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   _bodyContentTypeHandler(e) {
     this._bodyContentType = e.detail.value;
-    this._headers = HeadersParser.replace(this._headers, 'content-type', e.detail.value);
+    this._headers = HeadersParser.replace(
+      this._headers,
+      'content-type',
+      e.detail.value
+    );
   }
 
   _authChanged(e) {
@@ -1158,14 +1263,20 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
   /**
    * Given a headers string, if it does not contain a Content-Type header,
    * set it manually and return the computed headers string.
-   * @param {String} headersString 
+   * @param {String} headersString
    * @return {String} headers string with content type if not already present
    */
   _ensureContentTypeInHeaders(headersString) {
     const headersArray = HeadersParser.toJSON(headersString);
-    const hasContentTypeHeader = headersArray.find((value) => value.name.toLowerCase() === 'content-type');
+    const hasContentTypeHeader = headersArray.find(
+      (value) => value.name.toLowerCase() === 'content-type'
+    );
     if (!hasContentTypeHeader && this.contentType) {
-      headersArray.push({ name: 'content-type', value: this.contentType, enabled: true });
+      headersArray.push({
+        name: 'content-type',
+        value: this.contentType,
+        enabled: true
+      });
       return HeadersParser.toString(headersArray);
     }
     return HeadersParser.toString(headersString);
@@ -1173,25 +1284,27 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   render() {
     const { styles } = this;
-    return html`<style>${styles}</style>
-    ${this._oauthHandlersTemplate()}
-    <div class="content">
-      ${this._serverSelectorTemplate()}
-      ${this._urlEditorTemplate()}
-      ${this._urlLabelTemplate()}
-      ${this._paramsEditorTemplate()}
-      ${this._headersEditorTemplate()}
-      ${this._bodyEditorTemplate()}
-      ${this._authTemplate()}
-      ${this._formActionsTemplate()}
-    </div>`;
+    return html`<style>
+        ${styles}
+      </style>
+      ${this._oauthHandlersTemplate()}
+      <div class="content">
+        ${this._serverSelectorTemplate()} ${this._urlEditorTemplate()}
+        ${this._urlLabelTemplate()} ${this._paramsEditorTemplate()}
+        ${this._headersEditorTemplate()} ${this._bodyEditorTemplate()}
+        ${this._authTemplate()} ${this._formActionsTemplate()}
+      </div>`;
   }
 
   _oauthHandlersTemplate() {
     const { eventsTarget } = this;
-    return html`
-    <oauth2-authorization .eventsTarget="${eventsTarget}"></oauth2-authorization>
-    <oauth1-authorization .eventsTarget="${eventsTarget}" ignoreBeforeRequest></oauth1-authorization>`;
+    return html` <oauth2-authorization
+        .eventsTarget="${eventsTarget}"
+      ></oauth2-authorization>
+      <oauth1-authorization
+        .eventsTarget="${eventsTarget}"
+        ignoreBeforeRequest
+      ></oauth1-authorization>`;
   }
 
   _urlEditorTemplate() {
@@ -1205,10 +1318,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       readOnly,
       disabled,
       outlined,
-      compatibility,
+      compatibility
     } = this;
-    return html`
-    <div class="url-editor" ?hidden="${noUrlEditor}">
+    return html` <div class="url-editor" ?hidden="${noUrlEditor}">
       <api-url-editor
         @change="${this._urlHandler}"
         @pathmodelchange="${this._pathModelHandler}"
@@ -1235,7 +1347,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
     if (!urlLabel) {
       return '';
     }
-    return html`<div class="url-label" title="Current request URL">${url}</div>`;
+    return html`<div class="url-label" title="Current request URL">
+      ${url}
+    </div>`;
   }
 
   _paramsEditorTemplate() {
@@ -1248,10 +1362,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       outlined,
       compatibility,
       allowDisableParams,
-      allowHideOptional,
+      allowHideOptional
     } = this;
-    return html`
-    <div class="editor-section">
+    return html` <div class="editor-section">
       <api-url-params-editor
         class="params-editor"
         @pathmodelchange="${this._pathModelHandler}"
@@ -1281,10 +1394,12 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       compatibility,
       allowDisableParams,
       allowHideOptional,
-      _headers,
+      _headers
     } = this;
-    return html`
-    <div class="editor-section" ?hidden="${!_apiHeaders && !allowCustom}">
+    return html` <div
+      class="editor-section"
+      ?hidden="${!_apiHeaders && !allowCustom}"
+    >
       <div role="heading" aria-level="2" class="section-title">Headers</div>
       <api-headers-editor
         @change="${this._headersHandler}"
@@ -1317,7 +1432,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       compatibility,
       contentType,
       allowDisableParams,
-      allowHideOptional,
+      allowHideOptional
     } = this;
 
     return html`<div class="editor-section">
@@ -1373,9 +1488,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
 
   _formActionsTemplate() {
     const { _loadingRequest } = this;
-    return html`
-    <div class="action-bar">
-      ${_loadingRequest ? this._abortButtonTemplate() : this._sendButtonTemplate()}
+    return html` <div class="action-bar">
+      ${_loadingRequest
+        ? this._abortButtonTemplate()
+        : this._sendButtonTemplate()}
       <progress ?hidden="${!_loadingRequest}"></progress>
     </div>`;
   }
@@ -1386,16 +1502,14 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {TemplateResult}
    */
   _abortButtonTemplate() {
-    const {
-      compatibility,
-    } = this;
-    return html`
-    <anypoint-button
+    const { compatibility } = this;
+    return html` <anypoint-button
       class="send-button abort"
       emphasis="high"
       ?compatibility="${compatibility}"
       @click="${this._abortRequest}"
-    >Abort</anypoint-button>`;
+      >Abort</anypoint-button
+    >`;
   }
 
   /**
@@ -1404,16 +1518,14 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
    * @return {TemplateResult}
    */
   _sendButtonTemplate() {
-    const {
-      compatibility,
-    } = this;
-    return html`
-    <anypoint-button
+    const { compatibility } = this;
+    return html` <anypoint-button
       class="send-button"
       emphasis="high"
       ?compatibility="${compatibility}"
       @click="${this._sendHandler}"
-    >Send</anypoint-button>`;
+      >Send</anypoint-button
+    >`;
   }
 
   /**
@@ -1428,10 +1540,9 @@ export class ApiRequestEditorElement extends AmfHelperMixin(EventsTargetMixin(Li
       outlined,
       compatibility,
       _serverSelectorHidden,
-      selected,
+      selected
     } = this;
-    return html`
-    <api-server-selector
+    return html` <api-server-selector
       ?hidden="${_serverSelectorHidden}"
       ?allowCustom="${allowCustomBaseUri}"
       .amf="${amf}"
