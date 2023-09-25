@@ -395,9 +395,11 @@ export class XhrSimpleRequestTransportElement extends LitElement {
   _deleteRequestCookies(options) {
     if (options?.auth?.length > 0) {
       for (let i = 0; i < options?.auth?.length; i += 1) {
-        Object.keys(options?.auth[i]?.config?.cookies).forEach((item) => {
-          this._deleteCookie(item);
-        });
+        if (options?.auth[i]?.config?.cookies) {
+          Object.keys(options?.auth[i]?.config?.cookies).forEach((item) => {
+            this._deleteCookie(item);
+          });
+        }
       }
     }
   }
