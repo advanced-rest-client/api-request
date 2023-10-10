@@ -590,6 +590,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
   }
 
   _selectedChanged() {
+    this.clearRequest()
     const { amf, selected } = this;
     if (!amf || !selected) {
       return;
