@@ -642,7 +642,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
       let newOperationSelected = null;
 
       // loop throught a list of endpoints and find the operation with the same lexical value
-      endpoints.forEach((endpoint) => {
+      for (const endpoint of endpoints) {
         const supportedOperation = this._ensureArray(endpoint[opKey]);
         // if the operation is not supported by the endpoint, skip it
         if (!supportedOperation) {
@@ -657,7 +657,11 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
             return lexicalValue === lexicalValueOld;
           });
         }
-      });
+        // if the operation is found, break the loop
+        if (newOperationSelected) {
+          break;
+        }
+      };
       // if the operation is not found, return the previous selection
       if (!newOperationSelected) {
         return this.selected;
