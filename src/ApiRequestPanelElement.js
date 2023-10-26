@@ -293,11 +293,11 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
     this.allowCustomBaseUri = false;
     this.persistCache = false;
 
-    /**  
+    /**
      * @type {TransportRequest}
      */
     this.request = undefined;
-    /**  
+    /**
      * @type {ArcResponse|ErrorResponse}
      */
     this.response = undefined;
@@ -434,8 +434,8 @@ export class ApiRequestPanelElement extends EventsTargetMixin(LitElement) {
 
   /**
    * Propagate `api-response` detail object.
-   * 
-   * Until API Console v 6.x it was using a different response view. The current version 
+   *
+   * Until API Console v 6.x it was using a different response view. The current version
    * uses new response view based on ARC response view which uses different data structure.
    * This function transforms the response to the one of the corresponding data types used in ARC.
    * However, this keeps compatibility with previous versions of the transport library so it is
