@@ -257,6 +257,14 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
     this._selectedChanged();
     this._updateServers();
     this.readUrlData();
+    this.dispatchEvent(
+      new CustomEvent(`api-request-panel-selection-changed`, {
+        composed: true,
+        detail: {
+          value: this.selected,
+        },
+      })
+    );
   }
 
   get httpMethod() {
@@ -509,6 +517,10 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
    */
   __amfChanged(amf) {
     const { urlFactory } = this;
+    let  operationChanged = undefined;
+    if (urlFactory.amf) {
+       operationChanged = urlFactory.operation
+    }
     if (urlFactory) {
       if (!this.persistCache) {
         urlFactory.clearCache();
@@ -516,7 +528,7 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
       urlFactory.amf = amf;
       this.readUrlData();
     }
-    this._selectedChanged();
+    this._selectedChanged(operationChanged);
     this._updateServers();
   }
 
@@ -589,9 +601,49 @@ export class ApiRequestEditorElement extends AmfHelperMixin(
     });
   }
 
-  _selectedChanged() {
+  _computeSelected(amf, operationChanged) {
+    if (operationChanged && amf && amf[0]) {
+      const opKey = this._getAmfKey(this.ns.aml.vocabularies.apiContract.supportedOperation);
+      const lexicalKey = this._getAmfKey(this.ns.aml.vocabularies.docSourceMaps.lexical);
+      const lexicalValueKey = this._getAmfKey(this.ns.aml.vocabularies.docSourceMaps.value);
+      const sourceKey = this._getAmfKey(this.ns.aml.vocabularies.docSourceMaps.sources);
+
+      const sourcesOld = this._getValueArray(operationChanged, sourceKey);
+      const lexicalsOld = this._getValueArray(sourcesOld[0], lexicalKey)
+      const lexicalValueOld = this._getValue(lexicalsOld[0], lexicalValueKey)
+
+      const encodes = this._computeEncodes(amf);
+      const endpoints = this._computeEndpoints(encodes);
+
+      let newOperationSelected = null
+       endpoints.forEach((endpoint) => {
+        const supportedOperation = this._ensureArray(endpoint[opKey]);
+        if (!supportedOperation) {
+          newOperationSelected = undefined
+        }
+        newOperationSelected = supportedOperation.find((operation) => {
+          const sources = this._getValueArray(operation, sourceKey);
+          const lexicals = this._getValueArray(sources[0], lexicalKey)
+          const lexicalValue = this._getValue(lexicals[0], lexicalValueKey)
+          return lexicalValue === lexicalValueOld
+        });
+
+      });
+      if (!newOperationSelected) {
+        return this.selected;
+      }
+
+      return newOperationSelected['@id'];
+    }
+  }
+
+
+  _selectedChanged(operationChanged) {
     this.clearRequest()
     const { amf, selected } = this;
+    if (operationChanged) {
+      this.selected = this._computeSelected(amf, operationChanged);
+    }
     if (!amf || !selected) {
       return;
     }
